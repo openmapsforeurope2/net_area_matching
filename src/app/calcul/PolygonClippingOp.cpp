@@ -141,7 +141,7 @@ namespace app
             while (itArea->hasNext())
             {
                 ign::feature::Feature const& fArea = itArea->next();
-                ign::geometry::Polygon const& poly = fArea.getGeometry().asPolygon();
+                ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string idOrigin = fArea.getId();
 
                 std::map<std::string, ign::geometry::GeometryPtr>::const_iterator mit = _mCountryGeomWithBuffPtr.find(_countryCode);
@@ -151,11 +151,10 @@ namespace app
                 }
 
                 //TODO ne traiter que les polygones qui chevauchent le landmask
-                if (poly.within(*mit->second)) continue;
+                if (mp.within(*mit->second)) continue;
 
-                ign::geometry::GeometryPtr resultPtr(mit->second->Intersection(poly));
-
-                ign::feature::Feature newFeat = fArea;
+                ign::geometry::GeometryPtr resultPtr(mit->second->Intersection(mp));
+                ign::geometry::MultiPolygon mpResult;
 
                 ign::geometry::Geometry::GeometryType geomType = resultPtr->getGeometryType();
                 switch( geomType )
@@ -163,16 +162,15 @@ namespace app
                     case ign::geometry::Geometry::GeometryTypePolygon :
                         {
                             ign::geometry::Polygon const& p = resultPtr->asPolygon();
-                            newFeat.setGeometry(p);
-                            _fsArea->createFeature(newFeat);
+                            if ( !p.isEmpty() ) mpResult.addGeometry(p);
+                            break;
                         }
                     case ign::geometry::Geometry::GeometryTypeMultiPolygon :
                         {
                             ign::geometry::MultiPolygon const& mp = resultPtr->asMultiPolygon();
-                            for( size_t i = 0 ; i < mp.numGeometries() ; ++i ) {
-                                newFeat.setGeometry(mp.polygonN(i));
-                                _fsArea->createFeature(newFeat);
-                            }
+                            for( size_t i = 0 ; i < mp.numGeometries() ; ++i )
+                                if ( !mp.polygonN(i).isEmpty() ) mpResult.addGeometry(mp.polygonN(i));
+                            break;
                         }
                     case ign::geometry::Geometry::GeometryTypeGeometryCollection :
                         {
@@ -180,20 +178,23 @@ namespace app
                             for( size_t i = 0 ; i < collection.numGeometries() ; ++i ) {
                                 if( collection.geometryN(i).isPolygon() ) {
                                     ign::geometry::Polygon const& p = collection.geometryN(i).asPolygon();
-                                    newFeat.setGeometry(p);
-                                    _fsArea->createFeature(newFeat);
+                                    if ( !p.isEmpty() ) mpResult.addGeometry(p);
                                 }
                                 if( collection.geometryN(i).isMultiPolygon() ) {
                                     ign::geometry::MultiPolygon const& mp = collection.geometryN(i).asMultiPolygon();
-                                    for( size_t i = 0 ; i < mp.numGeometries() ; ++i ) {
-                                        newFeat.setGeometry(mp.polygonN(i));
-                                        _fsArea->createFeature(newFeat);
-                                    }
+                                    for( size_t i = 0 ; i < mp.numGeometries() ; ++i )
+                                        if ( !mp.polygonN(i).isEmpty() ) mpResult.addGeometry(mp.polygonN(i));
                                 }
                             }
+                            break;
                         }
                 }
-
+                if (mpResult.numGeometries() && !mpResult.isEmpty() && !mpResult.isNull()) {
+                    ign::feature::Feature newFeat = fArea;
+                    newFeat.setGeometry(mpResult);
+                    _fsArea->createFeature(newFeat);
+                }
+                
                 _fsArea->deleteFeature(idOrigin);
             }
         } 

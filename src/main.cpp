@@ -11,6 +11,7 @@
 
 //APP
 #include <app/params/ThemeParameters.h>
+#include <app/calcul/PolygonClippingOp.h>
 
 
 namespace po = boost::program_options;
@@ -89,6 +90,7 @@ int main(int argc, char *argv[])
         epg::params::tools::loadParams( *themeParameters, themeParametersFile );
 
         //lancement du traitement
+        app::calcul::PolygonClippingOp::compute(countryCode, verbose);
 		
 
 		logger->log(epg::log::INFO, "[END HY MATCHING PROCESS ] " + epg::tools::TimeTools::getTime());
