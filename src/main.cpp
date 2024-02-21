@@ -9,8 +9,10 @@
 #include <epg/tools/TimeTools.h>
 #include <epg/params/tools/loadParameters.h>
 
+
 //APP
 #include <app/params/ThemeParameters.h>
+#include <app/step/tools/initSteps.h>
 #include <app/calcul/PolygonClippingOp.h>
 
 
@@ -20,18 +22,28 @@ int main(int argc, char *argv[])
 {
     // ign::geometry::PrecisionModel::SetDefaultPrecisionModel(ign::geometry::PrecisionModel(ign::geometry::PrecisionModel::FIXED, 1.0e5, 1.0e7) );
     epg::Context* context = epg::ContextS::getInstance();
+	std::string     logDirectory = "";
+	std::string     epgParametersFile = "";
+	std::string     themeParametersFile = "";
+	std::string     stepCode = "";
+	std::string     countryCode = "";
+	bool            verbose = true;
 
-    std::string     logDirectory = "";
-    std::string     epgParametersFile = "";
-    std::string     themeParametersFile = "";
-    std::string     countryCode = "";
-    bool            verbose = true;
+
+
+
+	epg::step::StepSuite< app::params::ThemeParameters > stepSuite;
+
+	std::ostringstream OperatorDetail;
+	OperatorDetail << "set step :" << std::endl
+		<< stepSuite.toString();
 
     po::options_description desc("Allowed options");
     desc.add_options()
         ("help", "produce help message")
         ("c" , po::value< std::string >(&epgParametersFile)     , "conf file" )
         ("cc" , po::value< std::string >(&countryCode)          , "country code" )
+		("sp", po::value< std::string >(&stepCode), OperatorDetail.str().c_str())
     ;
 
     //main log
@@ -53,8 +65,9 @@ int main(int argc, char *argv[])
             return 1;
         }
 
+
         //parametres EPG
-		context->loadEpgParameters( epgParametersFile );
+		//context->loadEpgParameters( epgParametersFile );
 
         //Initialisation du log de prod
         logDirectory = context->getConfigParameters().getValue( LOG_DIRECTORY ).toString();
@@ -73,6 +86,12 @@ int main(int argc, char *argv[])
         //repertoire de travail
         context->setLogDirectory( logDirectory );
 
+		//theme parameters
+		themeParametersFile = context->getConfigParameters().getValue(THEME_PARAMETER_FILE).toString();
+		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
+		epg::params::tools::loadParams(*themeParameters, themeParametersFile);
+		themeParameters->setParameter(COUNTRY_CODE_W, ign::data::String(countryCode));
+
         //epg logger
         epg::log::EpgLogger* logger = epg::log::EpgLoggerS::getInstance();
         // logger->setProdOfstream( logDirectory+"/au_merging.log" );
@@ -84,16 +103,15 @@ int main(int argc, char *argv[])
         
 		logger->log(epg::log::INFO, "[START HY MATCHING PROCESS ] " + epg::tools::TimeTools::getTime());
         
-        //theme parameters
-        themeParametersFile = context->getConfigParameters().getValue( THEME_PARAMETER_FILE ).toString();
-		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-        epg::params::tools::loadParams( *themeParameters, themeParametersFile );
-
+ 
         //lancement du traitement
-        app::calcul::PolygonClippingOp::compute(countryCode, verbose);
-		
+		epg::step::StepSuite< app::params::ThemeParameters > stepSuite;
+		app::step::tools::initSteps(stepSuite);
+
+		stepSuite.run(stepCode, verbose);
 
 		logger->log(epg::log::INFO, "[END HY MATCHING PROCESS ] " + epg::tools::TimeTools::getTime());
+	
 
     }
     catch( ign::Exception &e )
