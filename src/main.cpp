@@ -29,10 +29,8 @@ int main(int argc, char *argv[])
 	std::string     countryCode = "";
 	bool            verbose = true;
 
-
-
-
-	epg::step::StepSuite< app::params::ThemeParameters > stepSuite;
+	epg::step::StepSuite< app::params::ThemeParametersS > stepSuite;
+    app::step::tools::initSteps(stepSuite);
 
 	std::ostringstream OperatorDetail;
 	OperatorDetail << "set step :" << std::endl
@@ -45,6 +43,7 @@ int main(int argc, char *argv[])
         ("cc" , po::value< std::string >(&countryCode)          , "country code" )
 		("sp", po::value< std::string >(&stepCode), OperatorDetail.str().c_str())
     ;
+    stepCode = "301-302";
 
     //main log
     std::string     logFileName = "log.txt";
@@ -65,9 +64,8 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-
         //parametres EPG
-		//context->loadEpgParameters( epgParametersFile );
+		context->loadEpgParameters( epgParametersFile );
 
         //Initialisation du log de prod
         logDirectory = context->getConfigParameters().getValue( LOG_DIRECTORY ).toString();
@@ -105,9 +103,6 @@ int main(int argc, char *argv[])
         
  
         //lancement du traitement
-		epg::step::StepSuite< app::params::ThemeParameters > stepSuite;
-		app::step::tools::initSteps(stepSuite);
-
 		stepSuite.run(stepCode, verbose);
 
 		logger->log(epg::log::INFO, "[END HY MATCHING PROCESS ] " + epg::tools::TimeTools::getTime());

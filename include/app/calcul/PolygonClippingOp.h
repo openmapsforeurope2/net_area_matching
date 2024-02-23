@@ -1,5 +1,5 @@
-#ifndef _APP_CALCUL_EDGECLEANINGOP_H_
-#define _APP_CALCUL_EDGECLEANINGOP_H_
+#ifndef _APP_CALCUL_POLYGONCLIPPINGOP_H_
+#define _APP_CALCUL_POLYGONCLIPPINGOP_H_
 
 //SOCLE
 #include <ign/feature/sql/FeatureStorePostgis.h>
