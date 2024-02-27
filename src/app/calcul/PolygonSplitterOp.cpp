@@ -1,6 +1,7 @@
 // APP
 #include <app/calcul/PolygonSplitterOp.h>
 #include <app/params/ThemeParameters.h>
+#include <app/tools/zTools.h>
 
 // BOOST
 #include <boost/progress.hpp>
@@ -81,7 +82,6 @@ namespace app
 
             // epg parameters
             epg::params::EpgParameters const& epgParams = context->getEpgParameters();
-            std::string const boundaryTableName = epgParams.getValue(TARGET_BOUNDARY_TABLE).toString();
             std::string const areaTableName = epgParams.getValue(AREA_TABLE).toString();
             std::string const idName = epgParams.getValue(ID).toString();
             std::string const geomName = epgParams.getValue(GEOM).toString();
@@ -93,20 +93,6 @@ namespace app
             std::string const landCoverTypeName = themeParameters->getValue(LAND_COVER_TYPE).toString();
             std::string const landAreaValue = themeParameters->getValue(TYPE_LAND_AREA).toString();
             double const borderOffset = themeParameters->getValue(PS_BORDER_OFFSET).toDouble();
-
-            // on recupere un buffer autour de la frontiere
-            // ign::geometry::GeometryPtr boundBuffPtr(new ign::geometry::Polygon());
-            // ign::feature::sql::FeatureStorePostgis* fsBoundary = context->getDataBaseManager().getFeatureStore(boundaryTableName, idName, geomName);
-            // ign::feature::FeatureIteratorPtr itBoundary = fsBoundary->getFeatures(ign::feature::FeatureFilter(countryCodeName +" = '"+_countryCode+"'"));
-            // while (itBoundary->hasNext())
-            // {
-            //     ign::feature::Feature const& fBoundary = itBoundary->next();
-            //     ign::geometry::LineString const& ls = fBoundary.getGeometry().asLineString();
-
-            //     ign::geometry::GeometryPtr tmpBuffPtr(ls.buffer(100000));
-
-            //     boundBuffPtr.reset(boundBuffPtr->Union(*tmpBuffPtr));
-            // }
 
             //on recupere la geometry des pays
             std::vector<std::string> vCountry;
@@ -120,20 +106,13 @@ namespace app
                 {
                     ign::feature::Feature const& fLandmask = itLandmask->next();
                     ign::geometry::MultiPolygon const& mp = fLandmask.getGeometry().asMultiPolygon();
-                    for (int i = 0; i < mp.numGeometries(); ++i)
-                    {
-                        ign::geometry::GeometryPtr mpBuffer(mp.buffer(borderOffset));
-                        _addLs(*mpBuffer, *cuttingMlsPtr);
 
+                    ign::geometry::GeometryPtr bufferGeom(mp.buffer(borderOffset));
 
-                        cuttingMlsPtr->addGeometry(mp.polygonN(i));
-                    }
+                    _addLs(*bufferGeom, *cuttingMlsPtr);
                 }
-                _mCountryCuttingGeom.insert(std::make_pair(vCountry[1-i], cuttingMlsPtr));
-                _mCountryCuttingIndx.insert(std::make_pair(vCountry[1-i], new epg::tools::geometry::SegmentIndexedGeometry(cuttingMlsPtr)));
-
-                // //on calcul la geometry de travail
-                // _mCountryGeomWithBuffPtr.insert(std::make_pair(*vit, ign::geometry::GeometryPtr(boundBuffPtr->Intersection(mpLandmask)->buffer(landmaskBuffer))));
+                _mCountryCuttingGeom.insert(std::make_pair(vCountry[i], cuttingMlsPtr));
+                _mCountryCuttingIndx.insert(std::make_pair(vCountry[i], new epg::tools::geometry::SegmentIndexedGeometry(cuttingMlsPtr)));
 
                 ign::feature::Feature feat;
                 feat.setGeometry(*cuttingMlsPtr);
@@ -219,10 +198,7 @@ namespace app
 
                 std::vector<ign::geometry::LineString> vLs;
                 mit->second->getSegments( mp.getEnvelope(), vLs);
-                ign::geometry::MultiLineString mls;
-                for (size_t i = 0 ; i < vLs.size() ; ++i) {
-                    mls.addGeometryNoCopy(&vLs[i]);
-                }
+                ign::geometry::MultiLineString mls(vLs);
 
                 std::vector< ign::geometry::Polygon > vPolygons;
                 for (size_t i = 0 ; i < mp.numGeometries() ; ++i) {
@@ -239,7 +215,9 @@ namespace app
 
                 for (size_t i = 0 ; i < vPolygons.size() ; ++i) {
                     ign::feature::Feature newFeat = fArea;
-                    newFeat.setGeometry(vPolygons[i]);
+
+                    tools::zFiller(vPolygons[i], -1000); //TODO a parametrer
+                    newFeat.setGeometry(vPolygons[i].toMulti());
                     _fsArea->createFeature(newFeat);
                 }
                 

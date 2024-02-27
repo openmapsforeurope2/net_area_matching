@@ -8,7 +8,9 @@
 
 //APP
 #include <app/params/ThemeParameters.h>
-#include <app/calcul/PolygonClippingOp.h>
+#include <app/calcul/PolygonSplitterOp.h>
+#include <app/calcul/PolygonCleanerOp.h>
+#include <app/calcul/PolygonMergerOp.h>
 
 namespace app {
 namespace step {
@@ -28,7 +30,15 @@ namespace step {
 	{
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
-		app::calcul::PolygonClippingOp::compute(countryCodeW, verbose);
+
+		//--
+		// app::calcul::PolygonSplitterOp::compute(countryCodeW, verbose);
+
+		//--
+		// app::calcul::PolygonCleanerOp::compute(countryCodeW, verbose);
+
+		//--
+		app::calcul::PolygonMergerOp::compute(verbose);
 	}
 
 }
