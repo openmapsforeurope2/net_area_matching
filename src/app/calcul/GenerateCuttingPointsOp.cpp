@@ -20,10 +20,10 @@
 ///
 ///
 app::calcul::GenerateCuttingPointsOp::GenerateCuttingPointsOp(
-    std::string countryCode,
+    std::string borderCode,
     bool verbose
 ) : 
-    _countryCode(countryCode),
+	_borderCode(borderCode),
     _verbose(verbose)
 {
     _init();
@@ -34,17 +34,19 @@ app::calcul::GenerateCuttingPointsOp::GenerateCuttingPointsOp(
 ///
 app::calcul::GenerateCuttingPointsOp::~GenerateCuttingPointsOp()
 {
-    //_shapeLogger->closeShape("");
+
 }
 
 ///
 ///
 ///
-void app::calcul::GenerateCuttingPointsOp::compute(
-	std::string countryCode, 
-	bool verbose
-) {
+void app::calcul::GenerateCuttingPointsOp::generateCutP() 
+{
+	std::vector<std::string> vCountry;
+	epg::tools::StringTools::Split(_borderCode, "#", vCountry);
 
+	for (size_t i = 0; i < vCountry.size(); ++i)
+		_generateCutpByCountry(vCountry[i]);
 }
 
 ///
@@ -86,3 +88,25 @@ void app::calcul::GenerateCuttingPointsOp::_init()
 	_fsCutP = context->getDataBaseManager().getFeatureStore(cutpTableName, idName, geomName);
 };
 
+void app::calcul::GenerateCuttingPointsOp::_generateCutpByCountry(
+	std::string countryCode
+)
+{
+	epg::Context *context = epg::ContextS::getInstance();
+	// epg parameters
+	epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
+	std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
+	std::string const linkedFeatIdName = context->getEpgParameters().getValue(LINKED_FEATURE_ID).toString();
+
+	ign::feature::FeatureFilter filterCountry(countryCodeName + " = '" + countryCode + "'");
+	ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterCountry);
+	size_t numArea2load = context->getDataBaseManager().numFeatures(*_fsArea, filterCountry);
+	boost::progress_display displayGrapLoad(numArea2load, std::cout, "[ GENERATE CUTTING POINTS " + countryCode + " ]\n");
+	while (itArea->hasNext()) {
+		++displayGrapLoad;
+		ign::feature::Feature const& fArea = itArea->next();
+		ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
+		std::string idOrigin = fArea.getId();
+	}
+
+}

@@ -18,6 +18,8 @@
 #include <epg/tools/TimeTools.h>
 #include <epg/tools/FilterTools.h>
 
+//OME2
+#include <ome2/calcul/detail/ClMerger.h>
 
 ///
 ///
@@ -43,14 +45,14 @@ app::calcul::GenerateCuttingLinesOp::~GenerateCuttingLinesOp()
 ///
 ///
 ///
-void app::calcul::GenerateCuttingLinesOp::generateCL(
+void app::calcul::GenerateCuttingLinesOp::generateCutL(
 )
 {
 	std::vector<std::string> vCountry;
 	epg::tools::StringTools::Split(_borderCode, "#", vCountry);
 
 	for (size_t i = 0; i < vCountry.size(); ++i) 
-		_computeByCountry(vCountry[i]);
+		_generateCutlByCountry(vCountry[i]);
 	
 }
 
@@ -132,7 +134,7 @@ void app::calcul::GenerateCuttingLinesOp::_init()
 ///
 ///
 ///
-void app::calcul::GenerateCuttingLinesOp::_computeByCountry(
+void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 	std::string countryCode
 )
 {
@@ -149,8 +151,7 @@ void app::calcul::GenerateCuttingLinesOp::_computeByCountry(
     ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterCountry);
 	size_t numArea2load = context->getDataBaseManager().numFeatures(*_fsArea, filterCountry);
 	boost::progress_display displayGrapLoad(numArea2load, std::cout, "[ LOADING GRAPH AREA "+ countryCode +" ]\n");
-    while (itArea->hasNext())
-    {
+    while (itArea->hasNext()){
 		++displayGrapLoad;
         ign::feature::Feature const& fArea = itArea->next();
         ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
@@ -199,129 +200,6 @@ void app::calcul::GenerateCuttingLinesOp::_computeByCountry(
 	/*std::ostringstream ss1;
 	ss1 << linkedFeatIdName << " LIKE '%#%'";
 	ign::feature::FeatureFilter mergeFilter(ss1.str());*/
-	_mergeAllCutl(ign::feature::FeatureFilter());
+	ome2::calcul::detail::ClMerger::mergeAll(_fsCutL, ign::feature::FeatureFilter());
 
 } 
-
-///
-///
-///
-void app::calcul::GenerateCuttingLinesOp::_mergeAllCutl(
-	ign::feature::FeatureFilter const& filter
-) const {
-	epg::Context* context = epg::ContextS::getInstance();
-	epg::params::EpgParameters const& epgParams = context->getEpgParameters();
-	std::string const linkedFeatureIdName = epgParams.getValue(LINKED_FEATURE_ID).toString();
-
-	std::set<std::string> sMergedCl;
-	ign::feature::FeatureIteratorPtr itCutl = _fsCutL->getFeatures(filter);
-	while (itCutl->hasNext())
-	{
-		ign::feature::Feature fCutl = itCutl->next();
-		ign::geometry::LineString const& cutlGeom = fCutl.getGeometry().asLineString();
-		std::string linkedFeatureId = fCutl.getAttribute(linkedFeatureIdName).toString();
-
-		if (sMergedCl.find(fCutl.getId()) != sMergedCl.end()) continue;
-
-		std::set<std::string> sMergedCl2;
-		ign::geometry::LineString mergedClGeom = _mergeCutl(fCutl, linkedFeatureId, sMergedCl2);
-
-		if (sMergedCl2.size() < 2) continue;
-
-		sMergedCl.insert(sMergedCl2.begin(), sMergedCl2.end());
-
-		fCutl.setGeometry(mergedClGeom);
-		_fsCutL->createFeature(fCutl );
-
-	}
-	for (std::set<std::string>::const_iterator sit = sMergedCl.begin(); sit != sMergedCl.end(); ++sit) {
-		_fsCutL->deleteFeature(*sit);
-	}
-
-}
-
-
-///
-///
-///
-ign::geometry::LineString app::calcul::GenerateCuttingLinesOp::_mergeCutl(
-	ign::feature::Feature const& refClFeat,
-	std::string const& linkedFeatureId,
-	std::set<std::string> & sMergedCl
-) const {
-	epg::Context* context = epg::ContextS::getInstance();
-	epg::params::EpgParameters const& epgParams = context->getEpgParameters();
-	std::string const linkedFeatureIdName = epgParams.getValue(LINKED_FEATURE_ID).toString();
-
-	ign::geometry::LineString const& refClGeom = refClFeat.getGeometry().asLineString();
-	ign::geometry::Point startPoint = refClGeom.startPoint();
-	ign::geometry::Point endPoint = refClGeom.endPoint();
-	bool bNewStart = true;
-	bool bNewEnd = true;
-
-	std::vector<ign::feature::Feature> vCandidates;
-	ign::feature::FeatureIteratorPtr itCl = _fsCutL->getFeatures(linkedFeatureIdName + " LIKE '%" + linkedFeatureId + "%'");
-	while (itCl->hasNext())
-	{
-		ign::feature::Feature const& fCl = itCl->next();
-		vCandidates.push_back(fCl);
-	}
-
-	std::vector<ign::geometry::LineString> vGeom2Merge;
-	vGeom2Merge.push_back(refClGeom);
-	sMergedCl.insert(refClFeat.getId());
-
-	do {
-		std::vector<ign::feature::Feature>::const_iterator vit;
-		size_t before = sMergedCl.size();
-		for (vit = vCandidates.begin(); vit != vCandidates.end(); ++vit) {
-			if (sMergedCl.find(vit->getId()) != sMergedCl.end()) continue;
-
-			ign::geometry::LineString const& clGeom = vit->getGeometry().asLineString();
-
-			//DEBUG
-			double bTouchingEnd_d = startPoint.distance(clGeom.endPoint());
-			double bTouchingStart_d = startPoint.distance(clGeom.startPoint());
-
-			bool bTouchingEnd = startPoint.distance(clGeom.endPoint()) < 1e-1;
-			bool bTouchingStart = startPoint.distance(clGeom.startPoint()) < 1e-1;
-			if (bTouchingEnd || bTouchingStart) {
-				sMergedCl.insert(vit->getId());
-				vGeom2Merge.push_back(clGeom);
-				if (bTouchingEnd) vGeom2Merge.back().endPoint() = startPoint;
-				if (bTouchingStart) vGeom2Merge.back().startPoint() = startPoint;
-				startPoint = bTouchingEnd ? clGeom.startPoint() : clGeom.endPoint();
-				break;
-			}
-		}
-		if (before == sMergedCl.size()) bNewStart = false;
-	} while (bNewStart);
-
-	do {
-		std::vector<ign::feature::Feature>::const_iterator vit;
-		size_t before = sMergedCl.size();
-		for (vit = vCandidates.begin(); vit != vCandidates.end(); ++vit) {
-			if (sMergedCl.find(vit->getId()) != sMergedCl.end()) continue;
-
-			ign::geometry::LineString const& clGeom = vit->getGeometry().asLineString();
-			bool bTouchingEnd = endPoint.distance(clGeom.endPoint()) < 1e-5;
-			bool bTouchingStart = endPoint.distance(clGeom.startPoint()) < 1e-5;
-			if (bTouchingEnd || bTouchingStart) {
-				sMergedCl.insert(vit->getId());
-				vGeom2Merge.push_back(clGeom);
-				if (bTouchingEnd) vGeom2Merge.back().endPoint() = endPoint;
-				if (bTouchingStart) vGeom2Merge.back().startPoint() = endPoint;
-				endPoint = bTouchingEnd ? clGeom.startPoint() : clGeom.endPoint();
-				break;
-			}
-		}
-		if (before == sMergedCl.size()) bNewEnd = false;
-	} while (bNewEnd);
-
-	if (vGeom2Merge.size() == 1) return vGeom2Merge.front();
-
-	std::vector<ign::geometry::LineString> vMergedGeom = ign::geometry::algorithm::LineMergerOpGeos::MergeLineStrings(vGeom2Merge);
-	if (vMergedGeom.size() > 1) _logger->log(epg::log::WARN, "Merging adjacent CL gives a MultilineString [ref CL id] " + refClFeat.getId());
-
-	return vMergedGeom.front();
-};

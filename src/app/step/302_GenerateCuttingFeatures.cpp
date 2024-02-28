@@ -40,9 +40,10 @@ namespace step {
 
 
 		app::calcul::GenerateCuttingLinesOp generateCuttingLinesOp(countryCodeW, verbose);
-		generateCuttingLinesOp.generateCL();
+		generateCuttingLinesOp.generateCutL();
 
 		app::calcul::GenerateCuttingPointsOp generateCuttingPointsOp(countryCodeW, verbose);
+		generateCuttingPointsOp.generateCutP();
 
 	}
 

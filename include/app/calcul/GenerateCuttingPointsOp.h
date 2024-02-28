@@ -32,10 +32,7 @@ namespace calcul{
 
 
 		/// \brief
-		void compute(
-			std::string borderCode, 
-			bool verbose
-		);
+		void generateCutP();
 
 
 	private:
@@ -48,7 +45,7 @@ namespace calcul{
 		//--
 		epg::log::ShapeLogger*                                   _shapeLogger;
 		//--
-		std::string                                              _countryCode;
+		std::string                                              _borderCode;
 		//--
 		bool                                                     _verbose;
 
@@ -56,6 +53,12 @@ namespace calcul{
 
 		//--
 		void _init();
+
+
+		//--
+		void _generateCutpByCountry(
+			std::string countryCode
+		);
 
 
     };

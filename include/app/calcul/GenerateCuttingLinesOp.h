@@ -40,7 +40,7 @@ namespace calcul{
 
 
 		/// \brief
-		void generateCL();
+		void generateCutL();
 
 
 
@@ -58,29 +58,16 @@ namespace calcul{
 		//--
 		bool                                                     _verbose;
 
-		//epg::sql::tools::IdGeneratorInterfacePtr				 _idGeneratorCutL;
-
 	private:
 
 		//--
 		void _init();
 
 		//--
-		void _computeByCountry(
+		void _generateCutlByCountry(
 			std::string countryCode
 			);
 		
-		//--
-		void _mergeAllCutl(
-			ign::feature::FeatureFilter const& filter
-			) const;
-
-		//--
-		ign::geometry::LineString _mergeCutl(
-			ign::feature::Feature const& refClFeat,
-			std::string const& linkedFeatureId,
-			std::set<std::string> & sMergedCl
-		) const;
 
     };
 
