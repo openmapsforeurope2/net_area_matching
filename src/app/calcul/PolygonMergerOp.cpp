@@ -96,8 +96,11 @@ namespace app
 
             std::list<std::string> lNatIds = _getAllIdentifiers(areaTableName);
 
+            boost::progress_display display(lNatIds.size(), std::cout, "[ polygon merger  % complete ]\n");
             
             for( std::list<std::string>::const_iterator lit = lNatIds.begin(); lit != lNatIds.end() ; ++lit ) {
+                ++display;
+
                 ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(ign::feature::FeatureFilter(natIdName+"='"+*lit+"'"));
 
                 ign::geometry::GeometryPtr mergedGeomPtr(new ign::geometry::MultiPolygon());

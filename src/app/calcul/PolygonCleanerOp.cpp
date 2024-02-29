@@ -150,9 +150,15 @@ namespace app
             params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
             double const distanceMax = themeParameters->getValue(PC_DISTANCE_THRESHOLD).toDouble();
 
-            ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(ign::feature::FeatureFilter());
+            ign::feature::FeatureFilter filterArea;
+            int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
+            boost::progress_display display(numFeatures, std::cout, "[ polygon cleaner  % complete ]\n");
+
+            ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
             while (itArea->hasNext())
             {
+                ++display;
+                
                 ign::feature::Feature const& fArea = itArea->next();
                 ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string idOrigin = fArea.getId();

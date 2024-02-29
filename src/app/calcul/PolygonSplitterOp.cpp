@@ -182,9 +182,15 @@ namespace app
             epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
             std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
 
-            ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(ign::feature::FeatureFilter());
+            ign::feature::FeatureFilter filterArea;
+            int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
+            boost::progress_display display(numFeatures, std::cout, "[ polygon splitter  % complete ]\n");
+
+            ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
             while (itArea->hasNext())
             {
+                ++display;
+                
                 ign::feature::Feature const& fArea = itArea->next();
                 ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string idOrigin = fArea.getId();
