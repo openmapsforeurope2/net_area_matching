@@ -169,7 +169,7 @@ namespace app
             ign::sql::SqlResultSetPtr	resultPtr = context->getDataBaseManager().getConnection()->query( sql );
 
             for( size_t i = 0 ; i < resultPtr->size() ; ++i )
-                if (resultPtr->getFieldValue(i,1).toInteger() > 2) {
+                if (resultPtr->getFieldValue(i,1).toInteger() > 1) {
                     lValues.push_back( resultPtr->getFieldValue(i,0).toString() );
                 }
 			    
