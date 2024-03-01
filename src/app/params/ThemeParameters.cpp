@@ -24,7 +24,8 @@ namespace params{
 		_initParameter( CUTP_TABLE_SUFFIX, "CUTP_TABLE_SUFFIX");
 		_initParameter( CUTL_TABLE_SUFFIX, "CUTL_TABLE_SUFFIX");
 		_initParameter( CUTP_TABLE, "CUTP_TABLE");
-		_initParameter( CUTL_TABLE, "CUTL_TABLE" );
+		_initParameter(CUTL_TABLE, "CUTL_TABLE");
+		_initParameter(DIST_SNAP_MERGE_CF, "DIST_SNAP_MERGE_CF" );
 		_initParameter( PS_BORDER_OFFSET, "PS_BORDER_OFFSET" );
 		_initParameter( PC_DISTANCE_THRESHOLD, "PC_DISTANCE_THRESHOLD" );
 		

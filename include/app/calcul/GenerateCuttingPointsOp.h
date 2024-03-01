@@ -41,6 +41,8 @@ namespace calcul{
 		//--
 		ign::feature::sql::FeatureStorePostgis*                  _fsCutP;
 		//--
+		ign::feature::sql::FeatureStorePostgis*                  _fsCutL;
+		//--
 		epg::log::EpgLogger*                                     _logger;
 		//--
 		epg::log::ShapeLogger*                                   _shapeLogger;
