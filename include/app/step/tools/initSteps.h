@@ -6,8 +6,8 @@
 #include <epg/step/factoryNew.h>
 
 //APP
-#include <app/step/301_CleanByLandmask.h>
-#include <app/step/302_GenerateCuttingFeatures.h>
+#include <app/step/301_GenerateCuttingFeatures.h>
+#include <app/step/302_CleanByLandmask.h>
 
 
 namespace app{
@@ -17,8 +17,9 @@ namespace tools{
 	template<  typename StepSuiteType >
 	void initSteps( StepSuiteType& stepSuite )
 	{
+		stepSuite.addStep(epg::step::factoryNew< GenerateCuttingFeatures >());
 		stepSuite.addStep( epg::step::factoryNew< CleanByLandmask >() );
-		stepSuite.addStep( epg::step::factoryNew< GenerateCuttingFeatures >() );
+
 	}
 
 }
