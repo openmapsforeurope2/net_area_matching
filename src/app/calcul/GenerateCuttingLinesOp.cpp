@@ -161,39 +161,41 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 		}        
     }
 	planarizerGraphArea.planarize();
-	graphArea.createFaces();
+
 
 	GraphType::edge_iterator eit, eitEnd;
 	graphArea.edges(eit, eitEnd);
 	boost::progress_display displayGenerateCL(graphArea.numEdges(), std::cout, "[ GENERATE CUTTING LINES " + countryCode + " ]\n");
 	while (eit != eitEnd) {
 		++displayGenerateCL;
-		bool hasLeftFace = graphArea.leftFace(*eit).first;
-		bool hasRightFace =  graphArea.rightFace(*eit).first;
 
-		if ( ! hasLeftFace || ! hasRightFace ) {
+		std::vector<std::string> vCutlOrigins = graphArea.origins(*eit);
+
+		if (vCutlOrigins.size() == 1) {
 			++eit;
 			continue;
 		}
 
-		std::vector<std::string> vCutlOrigins = graphArea.origins(*eit);
-		ign::geometry::LineString lsCutl = graphArea.getGeometry(*eit);
-		++eit;
-
 		ign::feature::Feature featCutL = _fsCutL->newFeature();
+
+		ign::geometry::LineString lsCutl = graphArea.getGeometry(*eit);
 		lsCutl.setFillZ(0);//temp
 		featCutL.setGeometry(lsCutl);
-		//std::string idCutL = _idGeneratorCutL->next();
-		//featCutL.setId(idCutL);
+
 		std::string idLinkedValue;
 		for (size_t i = 0; i < vCutlOrigins.size(); ++i) {
 			if (i != 0)
 				idLinkedValue+="#";
 			idLinkedValue += vCutlOrigins[i];
 		}
-		featCutL.setAttribute(countryCodeName, ign::data::String(countryCode));
+
 		featCutL.setAttribute(linkedFeatIdName, ign::data::String(idLinkedValue));
+
+		featCutL.setAttribute(countryCodeName, ign::data::String(countryCode));
+
 		_fsCutL->createFeature(featCutL);
+
+		++eit;
 	}
 
 	//fusion des CutL avec les mêmes linkedFeatIdName et qui se touchent (ou presque)

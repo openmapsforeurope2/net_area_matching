@@ -18,6 +18,7 @@ namespace tools{
 	template<  typename StepSuiteType >
 	void initSteps( StepSuiteType& stepSuite )
 	{
+		stepSuite.addStep(epg::step::factoryNew< GenerateCuttingFeatures >());
 		stepSuite.addStep( epg::step::factoryNew< CleanByLandmask >() );
 		stepSuite.addStep( epg::step::factoryNew< GenerateCuttingFeatures >() );
 		stepSuite.addStep( epg::step::factoryNew< MergeAreas >() );
