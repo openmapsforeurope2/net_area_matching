@@ -8,6 +8,7 @@
 //APP
 #include <app/step/301_CleanByLandmask.h>
 #include <app/step/302_GenerateCuttingFeatures.h>
+#include <app/step/303_MergeAreas.h>
 
 
 namespace app{
@@ -19,6 +20,8 @@ namespace tools{
 	{
 		stepSuite.addStep( epg::step::factoryNew< CleanByLandmask >() );
 		stepSuite.addStep( epg::step::factoryNew< GenerateCuttingFeatures >() );
+		stepSuite.addStep( epg::step::factoryNew< MergeAreas >() );
+		stepSuite.addStep( epg::step::factoryNew< SplitMergedAreasWithCF >() );
 	}
 
 }
