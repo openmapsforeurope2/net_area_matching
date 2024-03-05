@@ -6,8 +6,8 @@
 #include <epg/step/factoryNew.h>
 
 //APP
-#include <app/step/301_CleanByLandmask.h>
-#include <app/step/302_GenerateCuttingFeatures.h>
+#include <app/step/301_GenerateCuttingFeatures.h>
+#include <app/step/302_CleanByLandmask.h>
 #include <app/step/303_MergeAreas.h>
 #include <app/step/304_SplitMergedAreasWithCF.h>
 
