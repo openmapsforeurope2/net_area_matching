@@ -27,7 +27,8 @@ namespace app
             std::string const& borderCode,
             bool verbose
         ) : 
-            _verbose(verbose)
+            _verbose(verbose),
+            _borderCode(borderCode)
         {
             _init(borderCode);
         }
@@ -81,7 +82,7 @@ namespace app
 
             //--
 		    epg::tools::StringTools::Split(borderCode, "#", _vCountry);
-        };
+        }
 
 
         ///
@@ -143,6 +144,7 @@ namespace app
                 }
 
                 ign::feature::Feature mergedFeat = _fsArea->newFeature();
+                mergedFeat.setAttribute(countryCodeName, ign::data::String(_borderCode));
                 if (mergedGeomPtr->isMultiPolygon()) {
                     ign::geometry::MultiPolygon const& mpResult = mergedGeomPtr->asMultiPolygon();
 

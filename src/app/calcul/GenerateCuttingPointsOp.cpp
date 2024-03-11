@@ -15,7 +15,7 @@
 #include <epg/tools/FilterTools.h>
 
 //OME2
-#include <ome2/geometry/tools/getEndingPoints.h>
+#include <ome2/geometry/tools/GetEndingPointsOp.h>
 
 
 ///
@@ -119,7 +119,7 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutpByCountry(
 		ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
 		std::string idOrigin = fArea.getId();
 		for (size_t i = 0; i < mp.numGeometries(); ++i) {
-			std::pair<ign::geometry::Point, ign::geometry::Point> pEndingPointsSurf = ome2::geometry::tools::getEndingVerticesOnExtRing(mp.polygonN(i));
+			std::pair<ign::geometry::Point, ign::geometry::Point> pEndingPointsSurf = ome2::geometry::tools::GetEndingPointsOp::computeGeom(mp.polygonN(i)).second;
 			std::vector<ign::geometry::Point> vEndingPt;
 			vEndingPt.push_back(pEndingPointsSurf.first);
 			vEndingPt.push_back(pEndingPointsSurf.second);

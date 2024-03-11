@@ -39,6 +39,8 @@ namespace calcul{
 
 	private:
 		//--
+		std::string                                              _borderCode;
+		//--
 		std::vector<std::string>                                 _vCountry;
 		//--
 		ign::feature::sql::FeatureStorePostgis*                  _fsArea;
@@ -48,6 +50,7 @@ namespace calcul{
 		epg::log::ShapeLogger*                                   _shapeLogger;
 		//--
 		bool                                                     _verbose;
+
 
 	private:
 
