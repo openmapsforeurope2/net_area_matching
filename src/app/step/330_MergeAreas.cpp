@@ -1,4 +1,4 @@
-#include <app/step/303_MergeAreas.h>
+#include <app/step/330_MergeAreas.h>
 
 //EPG
 #include <epg/Context.h>

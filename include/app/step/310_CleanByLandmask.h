@@ -12,7 +12,7 @@ namespace step{
 	public:
 
 		/// \brief
-		int getCode() { return 302; };
+		int getCode() { return 310; };
 
 		/// \brief
 		std::string getName() { return "CleanByLandmask"; };

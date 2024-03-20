@@ -15,6 +15,9 @@
 #include <epg/tools/TimeTools.h>
 #include <epg/tools/FilterTools.h>
 
+// SOCLE
+// #include <ign/geometry/algorithm/SnapOpGeos.h>
+
 
 namespace app
 {
@@ -139,9 +142,12 @@ namespace app
                     ign::feature::Feature const& fArea = itArea->next();
                     ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
 
+                    // mergedGeomPtr.reset(ign::geometry::algorithm::SnapOpGeos::SnapTo( mp, *mergedGeomPtr, 0.1 )) ;
                     mergedGeomPtr.reset(mergedGeomPtr->Union(mp));
 
                 }
+                // mergedGeomPtr.reset(mergedGeomPtr->buffer(0.5));
+                // mergedGeomPtr.reset(mergedGeomPtr->buffer(-0.5));
 
                 ign::feature::Feature mergedFeat = _fsArea->newFeature();
                 mergedFeat.setAttribute(countryCodeName, ign::data::String(_borderCode));

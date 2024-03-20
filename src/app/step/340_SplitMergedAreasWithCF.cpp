@@ -1,4 +1,4 @@
-#include <app/step/304_SplitMergedAreasWithCF.h>
+#include <app/step/340_SplitMergedAreasWithCF.h>
 
 //EPG
 #include <epg/Context.h>

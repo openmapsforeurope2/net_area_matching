@@ -62,6 +62,22 @@ namespace calcul{
 			std::string countryCode
 		);
 
+		//--
+		std::vector<std::pair<ign::geometry::Point, ign::math::Vec2d>> _getEndingVectors(
+			ign::geometry::Polygon const& poly
+		) const;
+
+		//--
+		ign::math::Vec2d _getLsEndingVector(
+			ign::geometry::LineString const& ls,
+			ign::geometry::Point const endingPoint
+		) const;
+
+		//--
+		double _getAngle(
+			ign::math::Vec2d const& vRef,
+			ign::math::Vec2d const& v
+		) const;
 
     };
 

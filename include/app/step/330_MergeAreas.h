@@ -12,7 +12,7 @@ namespace step{
 	public:
 
 		/// \brief
-		int getCode() { return 303; };
+		int getCode() { return 330; };
 
 		/// \brief
 		std::string getName() { return "MergeAreas"; };

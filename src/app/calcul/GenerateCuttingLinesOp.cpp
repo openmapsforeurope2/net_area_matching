@@ -198,7 +198,7 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 		++eit;
 	}
 
-	//fusion des CutL avec les mêmes linkedFeatIdName et qui se touchent (ou presque)
+	//fusion des CutL avec les mï¿½mes linkedFeatIdName et qui se touchent (ou presque)
 	/*std::ostringstream ss1;
 	ss1 << linkedFeatIdName << " LIKE '%#%'";
 	ign::feature::FeatureFilter mergeFilter(ss1.str());*/

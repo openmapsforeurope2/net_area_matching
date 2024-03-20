@@ -12,7 +12,7 @@ namespace step{
 	public:
 
 		/// \brief
-		int getCode() { return 301; };
+		int getCode() { return 320; };
 
 		/// \brief
 		std::string getName() { return "GenerateCuttingFeatures"; };

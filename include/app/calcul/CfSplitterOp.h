@@ -8,6 +8,7 @@
 //EPG
 #include <epg/log/EpgLogger.h>
 #include <epg/log/ShapeLogger.h>
+#include <epg/tools/MultiLineStringTool.h>
 
 
 namespace app{
@@ -53,6 +54,19 @@ namespace calcul{
 
         //--
 		void _compute() const;
+
+		//--
+		std::pair<bool, ign::geometry::LineString> _computeSectionGeometry(
+            ign::geometry::LineString const& sectionGeom, 
+            ign::geometry::Polygon const& poly,
+            epg::tools::MultiLineStringTool** mslToolPtr
+        ) const;
+
+		//--
+		ign::geometry::LineString _computeCuttingLineGeometry(
+            ign::geometry::LineString clGeom, 
+            ign::geometry::Polygon const& poly
+        ) const;
 
     };
 }
