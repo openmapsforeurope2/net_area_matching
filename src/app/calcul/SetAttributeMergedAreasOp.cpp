@@ -24,13 +24,13 @@ namespace app
         ///
         ///
         SetAttributeMergedAreasOp::SetAttributeMergedAreasOp(
-            std::string const& borderCode,
+            std::string borderCode,
             bool verbose
         ) : 
             _verbose(verbose),
             _borderCode(borderCode)
         {
-            _init(borderCode);
+            _init();
         }
 
         ///
@@ -44,17 +44,17 @@ namespace app
         ///
         ///
         void SetAttributeMergedAreasOp::compute(
-            std::string const& borderCode,
+            std::string borderCode,
 			bool verbose
 		) {
-            SetAttributeMergedAreasOp intersectingAreasMergerOp(borderCode, verbose);
-            intersectingAreasMergerOp._compute();
+            SetAttributeMergedAreasOp setAttributeMergedAreasOp(borderCode, verbose);
+			setAttributeMergedAreasOp._compute();
         }
 
         ///
         ///
         ///
-        void SetAttributeMergedAreasOp::_init(std::string const& borderCode)
+        void SetAttributeMergedAreasOp::_init()
         {
             //--
             _logger = epg::log::EpgLoggerS::getInstance();
@@ -76,7 +76,7 @@ namespace app
             _logger->log(epg::log::INFO, "[END] initialization: " + epg::tools::TimeTools::getTime());
 
             //--
-		    epg::tools::StringTools::Split(borderCode, "#", _vCountry);
+		    epg::tools::StringTools::Split(_borderCode, "#", _vCountry);
         }
 
 

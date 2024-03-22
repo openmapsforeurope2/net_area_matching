@@ -22,7 +22,7 @@ namespace calcul{
         /// @param borderCode 
         /// @param verbose 
 		SetAttributeMergedAreasOp(
-			std::string const& borderCode,
+			std::string borderCode,
             bool verbose
         );
 
@@ -32,7 +32,7 @@ namespace calcul{
 
 		/// \brief
 		static void compute(
-			std::string const& borderCode,
+			std::string borderCode,
 			bool verbose
 		);
 
@@ -55,7 +55,7 @@ namespace calcul{
 	private:
 
 		//--
-		void _init(std::string const& borderCode);
+		void _init();
 
 		//--
 		void _compute() const;

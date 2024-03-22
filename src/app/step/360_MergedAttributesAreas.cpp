@@ -1,4 +1,4 @@
-#include <app/step/305_MergedAttributesAreas.h>
+#include <app/step/360_MergedAttributesAreas.h>
 
 //EPG
 #include <epg/Context.h>
@@ -8,7 +8,7 @@
 
 //APP
 #include <app/params/ThemeParameters.h>
-
+#include <app/calcul/SetAttributeMergedAreasOp.h>
 
 
 
@@ -27,7 +27,7 @@ void app::step::MergedAttributesAreas::onCompute(bool verbose = false)
 {
 	app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 	std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
-
+	app::calcul::SetAttributeMergedAreasOp::compute(countryCodeW, verbose);
 
 }
 
