@@ -189,7 +189,7 @@ namespace app
                         ign::geometry::LineString sectionGeom = fCp.getAttribute(sectionGeomName).as<ign::geometry::LineString>();
 
                         // DEBUG
-                        if (sectionGeom.distance(ign::geometry::Point(3833422.0,3096739.1)) < 5) {
+                        if (sectionGeom.distance(ign::geometry::Point(3801759.4000000004,3124469.6000000052)) < 1) {
                             bool test = true;
                         }
 
@@ -202,8 +202,15 @@ namespace app
 
                         polySplitter.addCuttingGeometry(sectionGeom);
 
+                        _logger->log(epg::log::DEBUG, "Coucou1");
                         ign::feature::Feature feat;
                         feat.setGeometry(sectionGeom);
+                        for( size_t i = 0 ; i < sectionGeom.numPoints() ; i++) {
+                            if (! ign::numeric::Numeric<double>::IsNaN(sectionGeom.pointN(i).m()) )
+                                sectionGeom.pointN(i).m() = ign::numeric::Numeric<double>::NaN();
+                            if (! ign::numeric::Numeric<double>::IsNaN(sectionGeom.pointN(i).z()) )
+                                sectionGeom.pointN(i).z() = ign::numeric::Numeric<double>::NaN();
+                        }
                         _shapeLogger->writeFeature("cfs_cutting_features", feat);
 
                         // //on projete le cp sur l'axe
@@ -305,6 +312,7 @@ namespace app
 
                         polySplitter.addCuttingGeometry(clGeom);
 
+                        _logger->log(epg::log::DEBUG, "Coucou2");
                         ign::feature::Feature feat;
                         feat.setGeometry(clGeom);
                         _shapeLogger->writeFeature("cfs_cutting_features", feat);
@@ -422,11 +430,18 @@ namespace app
             ign::geometry::Polygon const& poly,
             epg::tools::MultiLineStringTool** mslToolPtr
         ) const {
+            // DEBUG
+            _logger->log(epg::log::DEBUG, sectionGeom.toString());
+            if(sectionGeom.distance(ign::geometry::Point(3801790.18041191,3124509.00261721)) < 1) {
+                bool test = true;
+            }
+
+
             double pathLengthThreshold = 5;
 
             std::vector< ign::geometry::Point > vPtIntersect = epg::tools::geometry::LineIntersector::compute(sectionGeom.startPoint(), sectionGeom.endPoint(), poly);
 
-            if (vPtIntersect.size() == 1)
+            if (vPtIntersect.size() < 2)
                 return std::make_pair(false, ign::geometry::LineString());
 
             bool foundMiddleInter = false;
@@ -440,6 +455,10 @@ namespace app
                     continue;
                 }
                 mAbsIntersect.insert(std::make_pair(abs, ign::geometry::Point(vit->toVec2d().x(), vit->toVec2d().y())));
+            }
+
+            if (mAbsIntersect.size() == 0) {
+                return std::make_pair(false, ign::geometry::LineString());
             }
 
             if (mAbsIntersect.size() == 1) {

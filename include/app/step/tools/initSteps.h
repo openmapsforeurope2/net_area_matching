@@ -6,10 +6,11 @@
 #include <epg/step/factoryNew.h>
 
 //APP
-#include <app/step/310_CleanByLandmask.h>
-#include <app/step/320_GenerateCuttingFeatures.h>
-#include <app/step/330_MergeAreas.h>
-#include <app/step/340_SplitMergedAreasWithCF.h>
+#include <app/step/310_GenerateCuttingFeatures.h>
+#include <app/step/320_CleanByLandmask.h>
+#include <app/step/330_CleanCuttingFeatures.h>
+#include <app/step/340_MergeAreas.h>
+#include <app/step/350_SplitMergedAreasWithCF.h>
 
 
 namespace app{
@@ -19,8 +20,9 @@ namespace tools{
 	template<  typename StepSuiteType >
 	void initSteps( StepSuiteType& stepSuite )
 	{
-		stepSuite.addStep( epg::step::factoryNew< CleanByLandmask >() );
 		stepSuite.addStep( epg::step::factoryNew< GenerateCuttingFeatures >());
+		stepSuite.addStep( epg::step::factoryNew< CleanByLandmask >() );
+		stepSuite.addStep( epg::step::factoryNew< CleanCuttingFeatures >() );
 		stepSuite.addStep( epg::step::factoryNew< MergeAreas >() );
 		stepSuite.addStep( epg::step::factoryNew< SplitMergedAreasWithCF >() );
 	}

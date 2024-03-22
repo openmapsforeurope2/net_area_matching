@@ -1,4 +1,4 @@
-#include <app/step/330_MergeAreas.h>
+#include <app/step/330_CleanCuttingFeatures.h>
 
 //EPG
 #include <epg/Context.h>
@@ -8,7 +8,7 @@
 
 //APP
 #include <app/params/ThemeParameters.h>
-#include <app/calcul/IntersectingAreasMergerOp.h>
+#include <app/calcul/CfCleanerOp.h>
 
 namespace app {
 namespace step {
@@ -16,7 +16,7 @@ namespace step {
 	///
 	///
 	///
-	void MergeAreas::init()
+	void CleanCuttingFeatures::init()
 	{
 
 	}
@@ -24,13 +24,13 @@ namespace step {
 	///
 	///
 	///
-	void MergeAreas::onCompute( bool verbose = false )
+	void CleanCuttingFeatures::onCompute( bool verbose = false )
 	{
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 
 		//--
-		app::calcul::IntersectingAreasMergerOp::compute(countryCodeW, verbose);
+		app::calcul::CfCleanerOp::compute(verbose);
 	}
 
 }

@@ -12,7 +12,7 @@ namespace step{
 	public:
 
 		/// \brief
-		int getCode() { return 340; };
+		int getCode() { return 350; };
 
 		/// \brief
 		std::string getName() { return "SplitMergedAreasWithCF"; };

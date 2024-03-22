@@ -1,5 +1,5 @@
-#ifndef _APP_CALCUL_CFSPLITTEROP_H_
-#define _APP_CALCUL_CFSPLITTEROP_H_
+#ifndef _APP_CALCUL_CFCLEANEROP_H_
+#define _APP_CALCUL_CFCLEANEROP_H_
 
 //SOCLE
 #include <ign/feature/sql/FeatureStorePostgis.h>
@@ -8,25 +8,24 @@
 //EPG
 #include <epg/log/EpgLogger.h>
 #include <epg/log/ShapeLogger.h>
-#include <epg/tools/MultiLineStringTool.h>
 
 
 namespace app{
 namespace calcul{
 
-	class CfSplitterOp {
+	class CfCleanerOp {
 
 	public:
 
 	
 		/// @brief 
 		/// @param verbose 
-		CfSplitterOp(
+		CfCleanerOp(
             bool verbose
         );
 
         /// @brief 
-        ~CfSplitterOp();
+        ~CfCleanerOp();
 
         /// \brief
 		static void compute(
@@ -54,20 +53,6 @@ namespace calcul{
 
         //--
 		void _compute() const;
-
-		//--
-		std::pair<bool, ign::geometry::LineString> _computeSectionGeometry(
-            ign::geometry::LineString const& sectionGeom, 
-            ign::geometry::Polygon const& poly,
-            epg::tools::MultiLineStringTool** mslToolPtr
-        ) const;
-
-		//--
-		ign::geometry::LineString _computeCuttingLineGeometry(
-            ign::geometry::LineString clGeom, 
-            ign::geometry::Polygon const& poly
-        ) const;
-
     };
 }
 }

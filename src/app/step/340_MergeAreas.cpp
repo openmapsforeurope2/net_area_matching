@@ -1,4 +1,4 @@
-#include <app/step/340_SplitMergedAreasWithCF.h>
+#include <app/step/340_MergeAreas.h>
 
 //EPG
 #include <epg/Context.h>
@@ -8,7 +8,7 @@
 
 //APP
 #include <app/params/ThemeParameters.h>
-#include <app/calcul/CfSplitterOp.h>
+#include <app/calcul/IntersectingAreasMergerOp.h>
 
 namespace app {
 namespace step {
@@ -16,7 +16,7 @@ namespace step {
 	///
 	///
 	///
-	void SplitMergedAreasWithCF::init()
+	void MergeAreas::init()
 	{
 
 	}
@@ -24,13 +24,13 @@ namespace step {
 	///
 	///
 	///
-	void SplitMergedAreasWithCF::onCompute( bool verbose = false )
+	void MergeAreas::onCompute( bool verbose = false )
 	{
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 
 		//--
-		app::calcul::CfSplitterOp::compute(verbose);
+		app::calcul::IntersectingAreasMergerOp::compute(countryCodeW, verbose);
 	}
 
 }

@@ -1,5 +1,5 @@
-#ifndef _APP_STEP_CLEANBYLANDMASK_H_
-#define _APP_STEP_CLEANBYLANDMASK_H_
+#ifndef _APP_STEP_GENERATECUTTINGFEATURES_H_
+#define _APP_STEP_GENERATECUTTINGFEATURES_H
 
 #include <epg/step/StepBase.h>
 #include <app/params/ThemeParameters.h>
@@ -7,7 +7,7 @@
 namespace app{
 namespace step{
 
-	class CleanByLandmask : public epg::step::StepBase< app::params::ThemeParametersS > {
+	class GenerateCuttingFeatures : public epg::step::StepBase< app::params::ThemeParametersS > {
 
 	public:
 
@@ -15,7 +15,7 @@ namespace step{
 		int getCode() { return 310; };
 
 		/// \brief
-		std::string getName() { return "CleanByLandmask"; };
+		std::string getName() { return "GenerateCuttingFeatures"; };
 
 		/// \brief
 		void onCompute( bool );
