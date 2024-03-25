@@ -1,5 +1,5 @@
-#ifndef _APP_CALCUL_CFCLEANEROP_H_
-#define _APP_CALCUL_CFCLEANEROP_H_
+#ifndef _APP_CALCUL_CUTTINGLINECLEANEROP_H_
+#define _APP_CALCUL_CUTTINGLINECLEANEROP_H_
 
 //SOCLE
 #include <ign/feature/sql/FeatureStorePostgis.h>
@@ -13,19 +13,19 @@
 namespace app{
 namespace calcul{
 
-	class CfCleanerOp {
+	class CuttingLineCleanerOp {
 
 	public:
 
 	
 		/// @brief 
 		/// @param verbose 
-		CfCleanerOp(
+		CuttingLineCleanerOp(
             bool verbose
         );
 
         /// @brief 
-        ~CfCleanerOp();
+        ~CuttingLineCleanerOp();
 
         /// \brief
 		static void compute(
@@ -35,8 +35,6 @@ namespace calcul{
     private:
 		//--
 		ign::feature::sql::FeatureStorePostgis*                  _fsArea;
-        //--
-		ign::feature::sql::FeatureStorePostgis*                  _fsCp;
 		//--
 		ign::feature::sql::FeatureStorePostgis*                  _fsCl;
 		//--
@@ -53,6 +51,12 @@ namespace calcul{
 
         //--
 		void _compute() const;
+
+		//--
+		bool _hasIntersectingAreas( 
+            ign::geometry::LineString const& clGeom,
+            std::string const& country
+        ) const;
     };
 }
 }

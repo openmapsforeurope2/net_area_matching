@@ -1,5 +1,5 @@
-#ifndef _APP_STEP_CLEANCUTTINGFEATURES_H_
-#define _APP_STEP_CLEANCUTTINGFEATURES_H_
+#ifndef _APP_STEP_CLEANCUTTINGLINES_H_
+#define _APP_STEP_CLEANCUTTINGLINES_H_
 
 #include <epg/step/StepBase.h>
 #include <app/params/ThemeParameters.h>
@@ -7,7 +7,7 @@
 namespace app{
 namespace step{
 
-	class CleanCuttingFeatures : public epg::step::StepBase< app::params::ThemeParametersS > {
+	class CleanCuttingLines : public epg::step::StepBase< app::params::ThemeParametersS > {
 
 	public:
 
@@ -15,7 +15,7 @@ namespace step{
 		int getCode() { return 330; };
 
 		/// \brief
-		std::string getName() { return "CleanCuttingFeatures"; };
+		std::string getName() { return "CleanCuttingLines"; };
 
 		/// \brief
 		void onCompute( bool );

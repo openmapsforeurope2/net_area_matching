@@ -1,4 +1,4 @@
-#include <app/step/330_CleanCuttingFeatures.h>
+#include <app/step/335_GenerateCuttingPoints.h>
 
 //EPG
 #include <epg/Context.h>
@@ -8,7 +8,8 @@
 
 //APP
 #include <app/params/ThemeParameters.h>
-#include <app/calcul/CfCleanerOp.h>
+#include <app/calcul/GenerateCuttingPointsOp.h>
+
 
 namespace app {
 namespace step {
@@ -16,7 +17,7 @@ namespace step {
 	///
 	///
 	///
-	void CleanCuttingFeatures::init()
+	void GenerateCuttingPoints::init()
 	{
 
 	}
@@ -24,13 +25,13 @@ namespace step {
 	///
 	///
 	///
-	void CleanCuttingFeatures::onCompute( bool verbose = false )
+	void GenerateCuttingPoints::onCompute( bool verbose = false )
 	{
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 
-		//--
-		app::calcul::CfCleanerOp::compute(verbose);
+		app::calcul::GenerateCuttingPointsOp generateCuttingPointsOp(countryCodeW, verbose);
+		generateCuttingPointsOp.generateCutP();
 	}
 
 }
