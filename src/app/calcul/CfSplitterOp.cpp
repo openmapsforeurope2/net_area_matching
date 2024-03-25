@@ -98,12 +98,12 @@ namespace app
             std::string cpTableName = themeParameters->getValue(CUTP_TABLE).toString();
             if (cpTableName == "") {
                 std::string const cpTableSuffix = themeParameters->getValue(CUTP_TABLE_SUFFIX).toString();
-                cpTableName = areaTableName + cpTableSuffix;
+                cpTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + cpTableSuffix;
             }
             std::string clTableName = themeParameters->getValue(CUTL_TABLE).toString();
             if (clTableName == "") {
                 std::string const clTableSuffix = themeParameters->getValue(CUTL_TABLE_SUFFIX).toString();
-                clTableName = areaTableName + clTableSuffix;
+                clTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + clTableSuffix;
             }
 
             //--

@@ -15,6 +15,8 @@ namespace params{
 	///
 	ThemeParameters::ThemeParameters()
 	{
+		
+		_initParameter(AREA_TABLE_INIT, "AREA_TABLE_INIT");
 		_initParameter( NATIONAL_IDENTIFIER_NAME, "NATIONAL_IDENTIFIER_NAME" );
 		_initParameter( LANDMASK_TABLE, "LANDMASK_TABLE" );
 		_initParameter( COUNTRY_CODE_W, "COUNTRY_CODE_W" );

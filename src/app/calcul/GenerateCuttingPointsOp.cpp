@@ -84,12 +84,12 @@ void app::calcul::GenerateCuttingPointsOp::_init()
 	std::string cutpTableName = themeParameters->getValue(CUTP_TABLE).toString();
 	if (cutpTableName == "") {
 		std::string const cpTableSuffix = themeParameters->getValue(CUTP_TABLE_SUFFIX).toString();
-		cutpTableName = areaTableName + cpTableSuffix;
+		cutpTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + cpTableSuffix;
 	}
 	std::string cutlTableName = themeParameters->getValue(CUTL_TABLE).toString();
 	if (cutlTableName == "") {
 		std::string const cutlTableSuffix = themeParameters->getValue(CUTL_TABLE_SUFFIX).toString();
-		cutlTableName = areaTableName + cutlTableSuffix;
+		cutlTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + cutlTableSuffix;
 	}
 	
 	{

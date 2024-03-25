@@ -106,6 +106,7 @@ namespace app
                 ign::feature::Feature const& fArea = itArea->next();
                 ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string idOrigin = fArea.getId();
+				ign::geometry::Polygon geomArea = fArea.getGeometry().asPolygon();
 
             }
 
