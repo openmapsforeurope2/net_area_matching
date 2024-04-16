@@ -105,7 +105,7 @@ void app::calcul::GenerateCuttingLinesOp::_init()
 	std::string cutlTableName = themeParameters->getValue(CUTL_TABLE).toString();
 	if (cutlTableName == "") {
 		std::string const cutlTableSuffix = themeParameters->getValue(CUTL_TABLE_SUFFIX).toString();
-		cutlTableName = areaTableName + cutlTableSuffix;
+		cutlTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + cutlTableSuffix;
 	}
 	{
 		std::ostringstream ss;

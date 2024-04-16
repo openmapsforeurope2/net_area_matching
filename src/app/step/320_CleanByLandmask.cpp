@@ -20,14 +20,18 @@ namespace step {
 	///
 	void CleanByLandmask::init()
 	{
-
+		addWorkingEntity(AREA_TABLE_INIT);
 	}
 
 	///
 	///
 	///
 	void CleanByLandmask::onCompute( bool verbose = false )
-	{
+	{		
+		//copie table AREA
+		_epgParams.setParameter(AREA_TABLE, ign::data::String(getCurrentWorkingTableName(AREA_TABLE_INIT)));
+		epg::utils::CopyTableUtils::copyAreaTable(getLastWorkingTableName(AREA_TABLE_INIT), "", false, true, true, false);
+
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 
