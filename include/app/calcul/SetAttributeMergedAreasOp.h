@@ -10,6 +10,9 @@
 #include <epg/log/ShapeLogger.h>
 
 
+#include <ome2/calcul/utils/attributeMerger.h>
+
+
 namespace app{
 namespace calcul{
 
@@ -45,12 +48,15 @@ namespace calcul{
 		//--
 		ign::feature::sql::FeatureStorePostgis*                  _fsArea;
 		//--
+		ign::feature::sql::FeatureStorePostgis*                  _fsAreaInit;
+		//--
 		epg::log::EpgLogger*                                     _logger;
 		//--
 		epg::log::ShapeLogger*                                   _shapeLogger;
 		//--
 		bool                                                     _verbose;
 
+		ome2::calcul::utils::AttributeMerger*					_attrMergerOnBorder;
 
 	private:
 
@@ -58,10 +64,10 @@ namespace calcul{
 		void _init();
 
 		//--
-		void _compute() const;
+		void _compute() ;
 
 
-
+		bool _getAreaMergedByCountry(ign::geometry::Polygon& geomAreaMerged, ign::feature::FeatureFilter& filterArroundAreaFromCountry, ign::feature::Feature& fMergedInit);
 
     };
 
