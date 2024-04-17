@@ -3,11 +3,11 @@
 //EPG
 #include <epg/Context.h>
 #include <epg/log/ScopeLogger.h>
-#include <epg/utils/CopyTableUtils.h>
 
 
 //APP
 #include <app/calcul/CuttingLineCleanerOp.h>
+#include <app/utils/CopyTableUtils.h>
 
 namespace app {
 namespace step {

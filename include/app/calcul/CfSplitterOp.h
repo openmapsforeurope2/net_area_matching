@@ -80,7 +80,7 @@ namespace calcul{
         ) const;
 
         //--
-        std::vector<ign::geometry::Point> _getAllCp(ign::geometry::Polygon const& poly) const;
+        std::map<std::string, ign::geometry::Point> _getAllCp(ign::geometry::Polygon const& poly) const;
 
         //--
         void _removeHoles( ign::geometry::Polygon & poly ) const;

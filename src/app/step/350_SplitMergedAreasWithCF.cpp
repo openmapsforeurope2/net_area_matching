@@ -3,12 +3,12 @@
 //EPG
 #include <epg/Context.h>
 #include <epg/log/ScopeLogger.h>
-#include <epg/utils/CopyTableUtils.h>
-
 
 //APP
 #include <app/params/ThemeParameters.h>
 #include <app/calcul/CfSplitterOp.h>
+#include <app/utils/CopyTableUtils.h>
+
 
 namespace app {
 namespace step {
@@ -28,7 +28,7 @@ namespace step {
 	{
 		//copie table AREA
 		_epgParams.setParameter(AREA_TABLE, ign::data::String(getCurrentWorkingTableName(AREA_TABLE_INIT)));
-		epg::utils::CopyTableUtils::copyAreaTable(getLastWorkingTableName(AREA_TABLE_INIT), "", false, true, true, false);
+		app::utils::CopyTableUtils::copyAreaTable(getLastWorkingTableName(AREA_TABLE_INIT), "", false, true, true);
 
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();

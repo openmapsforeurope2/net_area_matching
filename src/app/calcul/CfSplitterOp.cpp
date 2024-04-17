@@ -138,6 +138,7 @@ namespace app
             //--
             app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
         	std::string const sectionGeomName = themeParameters->getValue(CUTP_SECTION_GEOM).toString();
+            double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
 
             ign::feature::FeatureFilter filterArea(countryCodeName + " LIKE '%#%'");
             int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
@@ -183,8 +184,11 @@ namespace app
                     // on calcul les index correspondant de ces cp sur le contour exterieur du poly (ajouter les extremités des cl ?)
                     // on découpe le contour exterieur au niveau des cp
                     
-                    std::vector<ign::geometry::Point> vCp = _getAllCp(polyWithoutHoles);
-                    std::vector<ign::geometry::Point> vCpCl = vCp;
+                    std::map<std::string, ign::geometry::Point> mCp = _getAllCp(polyWithoutHoles); //TODO supprimer doublons sur le contour
+                    std::vector<ign::geometry::Point> vCpCl;
+                    for( std::map<std::string, ign::geometry::Point>::const_iterator mit = mCp.begin() ; mit != mCp.end() ; ++mit )
+                        vCpCl.push_back(mit->second);
+
                     _getAllClEndingPoints(polyWithoutHoles, vCpCl);
                     std::vector<int> vCpClIndex = _getCpIndex(polyWithoutHoles.exteriorRing(), vCpCl);
                     std::set<size_t> sCuttingIndex = _getCuttingIndex(vCpClIndex);
@@ -202,12 +206,25 @@ namespace app
 
 
                     // on boucle sur les CP
-                    for(size_t i = 0 ; i < vCp.size() ; ++i) {
+                    std::set<std::string> sMergedCp;
+                    for( std::map<std::string, ign::geometry::Point>::const_iterator mit_ = mCp.begin() ; mit_ != mCp.end() ; ++mit_ ) {
                         //DEBUG
                         // continue;
+                        if ( sMergedCp.find(mit_->first) != sMergedCp.end() ) continue;
 
-                        ign::geometry::Point const& cpGeom = vCp[i];
+                        ign::geometry::Point const& cpGeom = mit_->second;
 
+                        // on merge les autres CP proches
+                        // TODO : faut-il privilégier les CP sur le contour ou ceux à l'intérieur du poly ?
+                        ign::feature::FeatureCollection fCollection;
+                        ign::geometry::Envelope bboxPt(cpGeom.getEnvelope());
+                        bboxPt.expandBy(distSnapMergeCf);
+                        _fsCp->getFeaturesByExtent(bboxPt, fCollection);
+                        for (ign::feature::FeatureCollection::iterator fcit = fCollection.begin() ; fcit != fCollection.end() ; ++fcit) {
+                            if ( fcit->getId() == mit_->first ) continue;
+                            sMergedCp.insert(fcit->getId());
+                        }
+                            
                         //DEBUG
                         // if(cpGeom.distance(ign::geometry::Point(3952000.830,3017494.182))<5.) {
                         //     bool test = true;
@@ -226,7 +243,7 @@ namespace app
 
                         ign::geometry::GeometryPtr sectionGeomPtr;
                         std::vector<ign::geometry::Point> vInOutProj;
-                        std::pair<double, std::pair<int, ign::geometry::Point>> foundFullRatio = std::make_pair(false, std::make_pair(-1, ign::geometry::Point()));
+                        std::pair<bool, std::pair<int, ign::geometry::Point>> foundFullRatio = std::make_pair(false, std::make_pair(-1, ign::geometry::Point()));
                         std::map<double, std::pair<int, ign::geometry::Point>>::const_iterator mit;
                         for ( mit = mDistSubLsProj.begin() ; mit != mDistSubLsProj.end() ; ++mit ) {
                             ign::geometry::LineString ls(cpGeom, mit->second.second);
@@ -692,24 +709,57 @@ namespace app
         ///
         ///
         ///
-        std::vector<ign::geometry::Point> CfSplitterOp::_getAllCp(ign::geometry::Polygon const& poly) const {
-            std::vector<ign::geometry::Point> vCp;
+        std::map<std::string, ign::geometry::Point> CfSplitterOp::_getAllCp(ign::geometry::Polygon const& poly) const {
+            std::map<std::string, ign::geometry::Point> mCp;
 
             // epg parameters
             epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
             std::string const geomName = epgParams.getValue(GEOM).toString();
 
+            //--
+            app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
+            double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
+
             ign::feature::FeatureFilter filterCp("ST_INTERSECTS(" + geomName + ", ST_GeomFromText('" + poly.toString() + "'))");
             ign::feature::FeatureIteratorPtr itCp = _fsCp->getFeatures(filterCp);
+
+            std::set<std::string> sMergedCp;
             while (itCp->hasNext())
             {
                 ign::feature::Feature const& fCp = itCp->next();
                 ign::geometry::Point const& cpGeom = fCp.getGeometry().asPoint();
+                std::string cpId = fCp.getId();
 
-                vCp.push_back(cpGeom);
+                if ( sMergedCp.find(cpId) != sMergedCp.end() ) continue;
+
+                // on merge les autres CP sur le contour proches
+                // TODO : faut-il privilégier les CP sur le contour ou ceux à l'intérieur du poly ?
+                if ( poly.exteriorRing().distance(cpGeom) < 1e-5 ) {
+                    ign::feature::FeatureCollection fCollection;
+                    ign::geometry::Envelope bboxPt(cpGeom.getEnvelope());
+                    bboxPt.expandBy(distSnapMergeCf);
+                    _fsCp->getFeaturesByExtent(bboxPt, fCollection);
+                    for (ign::feature::FeatureCollection::iterator fcit = fCollection.begin() ; fcit != fCollection.end() ; ++fcit) {
+                        if (fcit->getId() == cpId) continue;
+                        if ( poly.exteriorRing().distance(fcit->getGeometry().asPoint()) < 1e-5 ) {
+                            sMergedCp.insert(fcit->getId());
+                        }
+                    }
+                            
+                }
+
+                
+                ign::feature::FeatureCollection fCollection;
+                ign::geometry::Envelope bboxPt(cpGeom.getEnvelope());
+                bboxPt.expandBy(distSnapMergeCf);
+                _fsCp->getFeaturesByExtent(bboxPt, fCollection);
+                for (ign::feature::FeatureCollection::iterator fcit = fCollection.begin() ; fcit != fCollection.end() ; ++fcit)
+                    sMergedCp.insert(fcit->getId());
+
+                mCp.insert(std::make_pair(cpId, cpGeom));
             }
 
-            return vCp;
+            return mCp;
         };
 
         ///
