@@ -31,8 +31,9 @@ namespace params{
 		_initParameter( DIST_SNAP_MERGE_CF, "DIST_SNAP_MERGE_CF" );
 		_initParameter( PS_BORDER_OFFSET, "PS_BORDER_OFFSET" );
 		_initParameter(PC_DISTANCE_THRESHOLD, "PC_DISTANCE_THRESHOLD"); 
-		_initParameter(THRESHOLD_AREA_ATTR, "THRESHOLD_AREA_ATTR");
-
+		_initParameter(SAM_SMALL_AREA_THRESHOLD, "SAM_SMALL_AREA_THRESHOLD");
+			
+		_initParameter(THRESHOLD_AREA_ATTR, "THRESHOLD_AREA_ATTR"); 
 		_initParameter(LIST_ATTR_TO_CONCAT, "LIST_ATTR_TO_CONCAT");
 		_initParameter(LIST_ATTR_JSON, "LIST_ATTR_JSON");
 		_initParameter(LIST_ATTR_W, "LIST_ATTR_W");
