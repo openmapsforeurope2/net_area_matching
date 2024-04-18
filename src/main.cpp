@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
         ("cc" , po::value< std::string >(&countryCode)          , "country code" )
 		("sp", po::value< std::string >(&stepCode), OperatorDetail.str().c_str())
     ;
-    stepCode = "310-340";
+    stepCode = "310-370";
 
     //main log
     std::string     logFileName = "log.txt";
