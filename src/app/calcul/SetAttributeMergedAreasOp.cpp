@@ -38,6 +38,8 @@ namespace app
         ///
         SetAttributeMergedAreasOp::~SetAttributeMergedAreasOp()
         {
+			_attrMergerOnBorder = 0;
+			delete _attrMergerOnBorder;
         }
 
         ///
@@ -87,9 +89,9 @@ namespace app
 			std::string listAttr2concatName = themeParameters->getValue(LIST_ATTR_TO_CONCAT).toString();
 			std::string listAttrWName = themeParameters->getValue(LIST_ATTR_W).toString();
 			std::string listAttrJsonName = themeParameters->getValue(LIST_ATTR_JSON).toString();
-			ome2::calcul::utils::AttributeMerger* _attrMergerOnBorder = new ome2::calcul::utils::AttributeMerger(listAttr2concatName, listAttrWName, listAttrJsonName, "/");
+			_attrMergerOnBorder = new ome2::calcul::utils::AttributeMerger(listAttr2concatName, listAttrWName, listAttrJsonName, "/");
 
-
+			_thresholdAreaAttr = themeParameters->getValue(THRESHOLD_AREA_ATTR).toDouble();
         }
 
 
@@ -103,24 +105,24 @@ namespace app
             std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
             std::string const idName = epgParams.getValue(ID).toString();
 
-            ign::feature::FeatureFilter filterArea(countryCodeName+"='%#%'");
+            ign::feature::FeatureFilter filterArea(countryCodeName+" like '%#%'");
 
             int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ set attribute merged areas % complete ]\n");
 
             ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
 
-            std::list<std::set<std::string>> lsAreas2Merge;
-            std::set<std::string> sTreatedArea;
+			std::vector < ign::feature::Feature> vArea2modify;
+
             while (itArea->hasNext())
             {
                 ++display;
 
-                ign::feature::Feature const& fArea = itArea->next();
-                ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
+                ign::feature::Feature & fArea = itArea->next();
+                //ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string idOrigin = fArea.getId();
 				//boucler sur les mp ?
-				ign::geometry::Polygon geomArea = fArea.getGeometry().asPolygon();
+				ign::geometry::MultiPolygon geomArea = fArea.getGeometry().asMultiPolygon();
 
 				ign::feature::Feature featCountry1, featCountry2;
 
@@ -138,22 +140,33 @@ namespace app
 					//pas d'attribut trouvé
 					continue;
 				}
-
-				//si un seul des deux alors prendre celui là et suppr # dans code country et sinon on fusionne
-
-				//boucle sur liste des attr
-				//cf ce qui est fait dans tn
-
+				else if (hasAttr1 && !hasAttr2) {
+					fArea = featCountry1;
+				}
+				else if (hasAttr2 && !hasAttr1) {
+					fArea = featCountry2;
+				}
+				else {
+					fArea = featCountry1;
+					_attrMergerOnBorder->addFeatAttributeMerger(fArea,featCountry2,"#");
+				}
+				fArea.setId(idOrigin);
+				fArea.setGeometry(geomArea);
+				fArea.setGeometry(geomArea);
+				fArea.setAttribute("xy_source", ign::data::String("ome2"));
+				fArea.setAttribute("z_source", ign::data::String("ome2"));
+				vArea2modify.push_back(fArea);				
             }
-
+			for( size_t i = 0; i < vArea2modify.size(); ++i)
+				_fsArea->modifyFeature(vArea2modify[i]);
         }
 
 
 
-		bool SetAttributeMergedAreasOp::_getAreaMergedByCountry(ign::geometry::Polygon& geomAreaMerged, ign::feature::FeatureFilter& filterArroundAreaFromCountry, ign::feature::Feature& fMergedInit)
+		bool SetAttributeMergedAreasOp::_getAreaMergedByCountry(ign::geometry::MultiPolygon& geomAreaMerged, ign::feature::FeatureFilter& filterArroundAreaFromCountry, ign::feature::Feature& fMergedInit)
 		{
 
-			std::vector<ign::feature::Feature> vIntersectedArea;
+			std::map<double, ign::feature::Feature> mIntersectedArea;
 			//recup fs table source -> table init sans step
 			//filtre sur les feat de la table source
 			ign::feature::FeatureIteratorPtr itAreaInit = _fsAreaInit->getFeatures(filterArroundAreaFromCountry);
@@ -162,45 +175,46 @@ namespace app
 			{
 
 				ign::feature::Feature const& fAreaInit = itAreaInit->next();
-				ign::geometry::MultiPolygon const& mp = fAreaInit.getGeometry().asMultiPolygon();
+				ign::geometry::MultiPolygon geomAreaInit = fAreaInit.getGeometry().asMultiPolygon();
 				std::string idOriginInit = fAreaInit.getId();
-				//boucler sur les mp ?
-				ign::geometry::Polygon geomAreaInit = fAreaInit.getGeometry().asPolygon();
 
 				//si dist >0 continue sinon on stocke dans une map, id, feat
 				if (geomAreaInit.distance(geomAreaMerged) > 0)
 					continue;
-				vIntersectedArea.push_back(fAreaInit);
 
-			}
-
-			//si un seul obj on le prend, sinon on regarde la plus gde surf d'intersection
-			if (vIntersectedArea.size() == 1) {
-				fMergedInit = vIntersectedArea[0];
-				return true;
-			}
-			else if (vIntersectedArea.size() == 0) {
-				fMergedInit.clear();
-				return false;
-			}
-
-			double maxAreaIntersected = 0;
-			for (size_t i = 0; i < vIntersectedArea.size(); ++i) {
-				ign::geometry::Geometry* geomIntersectedArea = vIntersectedArea[i].getGeometry().Intersection(geomAreaMerged);
-				double areaIntersected;
+				ign::geometry::Geometry* geomIntersectedArea = geomAreaInit.Intersection(geomAreaMerged);
+				double areaIntersected = 0;
 				if (geomIntersectedArea->isMultiPolygon())
 					areaIntersected = geomIntersectedArea->asMultiPolygon().area();
 				else if (geomIntersectedArea->isPolygon())
 					areaIntersected = geomIntersectedArea->asPolygon().area();
-				if (areaIntersected > maxAreaIntersected) {
-					maxAreaIntersected = areaIntersected;
-					fMergedInit = vIntersectedArea[i];
+				else if (geomIntersectedArea->isGeometryCollection()) {
+					ign::geometry::GeometryCollection collection = geomIntersectedArea->asGeometryCollection();
+					for (size_t i = 0; i < collection.numGeometries(); ++i) {
+						if (collection.geometryN(i).isMultiPolygon())
+							areaIntersected = collection.geometryN(i).asMultiPolygon().area();
+						else if (collection.geometryN(i).isPolygon())
+							areaIntersected = collection.geometryN(i).asPolygon().area();
+					}
 				}
+
+				if (areaIntersected < _thresholdAreaAttr )
+					continue;
+				
+				mIntersectedArea[areaIntersected] = fAreaInit;
+
 			}
-			return true;
+
+			if (mIntersectedArea.size() == 0) {
+				fMergedInit.clear();
+				return false;
+			}
+			else {
+				fMergedInit = mIntersectedArea.rbegin()->second;
+				return true;
+			}
+
 		}
-
-
 
     }
 }

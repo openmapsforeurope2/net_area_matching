@@ -58,6 +58,8 @@ namespace calcul{
 
 		ome2::calcul::utils::AttributeMerger*					_attrMergerOnBorder;
 
+		double													_thresholdAreaAttr;
+
 	private:
 
 		//--
@@ -67,7 +69,7 @@ namespace calcul{
 		void _compute() ;
 
 
-		bool _getAreaMergedByCountry(ign::geometry::Polygon& geomAreaMerged, ign::feature::FeatureFilter& filterArroundAreaFromCountry, ign::feature::Feature& fMergedInit);
+		bool _getAreaMergedByCountry(ign::geometry::MultiPolygon& geomAreaMerged, ign::feature::FeatureFilter& filterArroundAreaFromCountry, ign::feature::Feature& fMergedInit);
 
     };
 
