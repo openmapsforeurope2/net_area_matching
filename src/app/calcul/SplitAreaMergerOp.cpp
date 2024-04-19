@@ -1,34 +1,17 @@
 // APP
 #include <app/calcul/SplitAreaMergerOp.h>
 #include <app/params/ThemeParameters.h>
-// #include <app/tools/zTools.h>
-// #include <app/tools/geometry/PolygonSplitter.h>
 
 // BOOST
 #include <boost/progress.hpp>
-
-//SOCLE
-// #include <ign/math/Line2T.h>
-// #include <ign/geometry/io/WkbReader.h>
-// #include <ign/geometry/algorithm/StraightSkeletonCGAL.h>
 
 // EPG
 #include <epg/Context.h>
 #include <epg/params/EpgParameters.h>
 #include <epg/sql/tools/numFeatures.h>
 #include <epg/sql/DataBaseManager.h>
-// #include <epg/tools/StringTools.h>
 #include <epg/tools/TimeTools.h>
 #include <epg/tools/FilterTools.h>
-// #include <epg/tools/geometry/project.h>
-// #include <epg/tools/geometry/interpolate.h>
-// #include <epg/tools/geometry/LineIntersector.h>
-// #include <epg/tools/geometry/SegmentIndexedGeometry.h>
-// #include <epg/tools/geometry/getLength.h>
-
-// #include <ome2/geometry/tools/lineStringTools.h>
-// #include <ome2/geometry/tools/GetEndingPointsOp.h>
-// #include <ome2/geometry/tools/isSlimSurface.h>
 
 
 namespace app
@@ -51,8 +34,8 @@ namespace app
         ///
         SplitAreaMergerOp::~SplitAreaMergerOp()
         {
-            _shapeLogger->closeShape("msa_small_merged");
-            _shapeLogger->closeShape("msa_same_id_merged");
+            _shapeLogger->closeShape("sam_small_merged");
+            _shapeLogger->closeShape("sam_same_id_merged");
         }
 
         ///
@@ -77,8 +60,8 @@ namespace app
 
             //--
             _shapeLogger = epg::log::ShapeLoggerS::getInstance();
-            _shapeLogger->addShape("msa_small_merged", epg::log::ShapeLogger::POLYGON);
-            _shapeLogger->addShape("msa_same_id_merged", epg::log::ShapeLogger::POLYGON);
+            _shapeLogger->addShape("sam_small_merged", epg::log::ShapeLogger::POLYGON);
+            _shapeLogger->addShape("sam_same_id_merged", epg::log::ShapeLogger::POLYGON);
 
             //--
             epg::Context *context = epg::ContextS::getInstance();
@@ -118,10 +101,14 @@ namespace app
             std::set<std::string> sSmallAreas;
 
             ign::feature::FeatureFilter filterArea(countryCodeName + " LIKE '%#%'");
+            int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
+
+            boost::progress_display display1(numFeatures, std::cout, "[  SAM [1/3] searching small areas % complete ]\n");
             ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
             while (itArea->hasNext())
             {
-                
+                ++display1;
+
                 ign::feature::Feature const& fArea = itArea->next();
                 ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string areaId = fArea.getId();
@@ -136,14 +123,20 @@ namespace app
 
             for ( std::map<double, ign::feature::Feature>::const_reverse_iterator rmit = mSortedSmallAreas.rbegin() ; rmit != mSortedSmallAreas.rend() ; ++rmit ) {
                 std::map<double, ign::feature::Feature> mNeighbours = _getNeighboursWithArea(rmit->second);
-                if (sSmallAreas.find(rmit->second.getId()) != sSmallAreas.end()) continue;
+                // if (sSmallAreas.find(rmit->second.getId()) != sSmallAreas.end()) continue;   WHAT!!!!!!!!!!!!!!!!!!!!!
+                if (mNeighbours.empty()) continue;
+
+                _shapeLogger->writeFeature("sam_small_merged", rmit->second);
 
                 _addAreas(rmit->second, mNeighbours.rbegin()->second, vmAreas);
             }
 
+            boost::progress_display display2(numFeatures, std::cout, "[  SAM [2/3] gathering areas to merge % complete ]\n");
             ign::feature::FeatureIteratorPtr itArea2 = _fsArea->getFeatures(filterArea);
             while (itArea2->hasNext())
             {
+                ++display2;
+
                 ign::feature::Feature const& fArea = itArea2->next();
                 ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string areaId = fArea.getId();
@@ -155,7 +148,12 @@ namespace app
 
                 for (std::vector<ign::feature::Feature>::const_iterator vit = vNeighbours.begin() ; vit != vNeighbours.end() ; ++vit) {
                     std::string identifierNeighbour = vit->getAttribute(nationalIdName).toString();
+
                     if( identifierNeighbour == identifier ) {
+
+                        _shapeLogger->writeFeature("sam_same_id_merged", *vit);
+                        _shapeLogger->writeFeature("sam_same_id_merged", fArea);
+
                         _addAreas(*vit, fArea, vmAreas);
                     }
                 }
@@ -163,7 +161,10 @@ namespace app
 
             _mergeGroups(vmAreas);
 
+            boost::progress_display display3(vmAreas.size(), std::cout, "[ SAM [3/3] merging areas % complete ]\n");
             for (std::vector<std::map<std::string, ign::feature::Feature>>::iterator vit = vmAreas.begin() ; vit != vmAreas.end() ; ++vit) {
+                ++display3;
+
                 double maxArea = 0;
                 ign::feature::Feature* maxFeatPtr = 0;
                 ign::geometry::GeometryPtr resultingGeomPtr(new ign::geometry::MultiPolygon());
@@ -181,7 +182,6 @@ namespace app
                 maxFeatPtr->setGeometry(*resultingGeomPtr);
                 _fsArea->createFeature(*maxFeatPtr);
             }
-
         }
 
         ///
