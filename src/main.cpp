@@ -89,7 +89,6 @@ int main(int argc, char *argv[])
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 		epg::params::tools::loadParams(*themeParameters, themeParametersFile);
 		themeParameters->setParameter(COUNTRY_CODE_W, ign::data::String(countryCode));
-        themeParameters->setParameter(AREA_TABLE_INIT, context->getEpgParameters().getValue(AREA_TABLE));
 
         //epg logger
         epg::log::EpgLogger* logger = epg::log::EpgLoggerS::getInstance();
