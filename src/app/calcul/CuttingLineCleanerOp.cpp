@@ -163,7 +163,7 @@ namespace app
             //--
             std::string sql = "SELECT count(*) FROM "+ areaTableName;
             sql += " WHERE "+countryCodeName+"='"+country+"'";
-            sql += " AND ST_DISTANCE(" + geomName + ", ST_GeomFromText('" + clGeom.toString() + "')) < 0.001";
+            sql += " AND ST_DISTANCE(" + geomName + ", ST_SetSRID(ST_GeomFromText('" + clGeom.toString() + "'),3035))) < 0.001";
 
             //--
             ign::sql::SqlResultSetPtr	resultPtr = context->getDataBaseManager().getConnection()->query( sql );
