@@ -104,6 +104,8 @@ namespace app
             epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
             std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
             std::string const idName = epgParams.getValue(ID).toString();
+			app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
+			std::string const wTagName = themeParameters->getParameter(W_TAG).getValue().toString();
 
             ign::feature::FeatureFilter filterArea(countryCodeName+" like '%#%'");
 
@@ -153,7 +155,8 @@ namespace app
 				fArea.setId(idOrigin);
 				fArea.setGeometry(geomArea);
 				fArea.setGeometry(geomArea);
-				fArea.setAttribute("xy_source", ign::data::String("ome2"));
+				fArea.setAttribute(wTagName, ign::data::String("modif_attr")); 
+				fArea.setAttribute("xy_source", ign::data::String("ome2")); 
 				fArea.setAttribute("z_source", ign::data::String("ome2"));
 				vArea2modify.push_back(fArea);				
             }
