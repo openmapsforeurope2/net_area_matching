@@ -13,6 +13,7 @@
 #include <app/step/340_MergeAreas.h>
 #include <app/step/350_SplitMergedAreasWithCF.h>
 #include <app/step/360_MergedAttributesAreas.h>
+#include <app/step/370_MergeSplitAreas.h>
 
 
 namespace app{
@@ -29,6 +30,7 @@ namespace tools{
 		stepSuite.addStep( epg::step::factoryNew< MergeAreas >() );
 		stepSuite.addStep( epg::step::factoryNew< SplitMergedAreasWithCF >() );
 		stepSuite.addStep( epg::step::factoryNew< MergedAttributesAreas >() );
+		stepSuite.addStep( epg::step::factoryNew< MergeSplitAreas >() );
 	}
 
 }

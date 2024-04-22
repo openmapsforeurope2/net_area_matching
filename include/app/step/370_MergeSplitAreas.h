@@ -7,7 +7,7 @@
 namespace app{
 namespace step{
 
-	class MergedSplitAreas : public epg::step::StepBase< app::params::ThemeParametersS > {
+	class MergeSplitAreas : public epg::step::StepBase< app::params::ThemeParametersS > {
 
 	public:
 

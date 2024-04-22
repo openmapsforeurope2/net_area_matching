@@ -16,7 +16,7 @@ namespace step {
 	///
 	///
 	///
-	void MergedSplitAreas::init()
+	void MergeSplitAreas::init()
 	{
 		addWorkingEntity(AREA_TABLE_INIT);
 	}
@@ -24,7 +24,7 @@ namespace step {
 	///
 	///
 	///
-	void MergedSplitAreas::onCompute( bool verbose = false )
+	void MergeSplitAreas::onCompute( bool verbose = false )
 	{
 		//copie table AREA
 		_epgParams.setParameter(AREA_TABLE, ign::data::String(getCurrentWorkingTableName(AREA_TABLE_INIT)));

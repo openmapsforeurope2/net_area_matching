@@ -113,6 +113,11 @@ namespace app
                 ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string areaId = fArea.getId();
 
+                //DEBUG
+                if( areaId == "d6f19a5a-048a-4d08-8f5f-123286806402") {
+                    bool test = true;
+                }
+                
                 double area = mp.area();
 
                 if( area > areaThreshold) continue;
@@ -179,7 +184,7 @@ namespace app
                     _fsArea->deleteFeature(mit->first);
                 }
 
-                maxFeatPtr->setGeometry(*resultingGeomPtr);
+                maxFeatPtr->setGeometry(resultingGeomPtr->toMulti());
                 _fsArea->createFeature(*maxFeatPtr);
             }
         }

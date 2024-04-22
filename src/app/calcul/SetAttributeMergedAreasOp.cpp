@@ -118,7 +118,7 @@ namespace app
             {
                 ++display;
 
-                ign::feature::Feature & fArea = itArea->next();
+                ign::feature::Feature fArea = itArea->next();
                 //ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string idOrigin = fArea.getId();
 				//boucler sur les mp ?
@@ -137,7 +137,7 @@ namespace app
 				bool hasAttr2 = _getAreaMergedByCountry(geomArea,filterArroundAreaFromCountry2, featCountry2);
 
 				if (!hasAttr1 && !hasAttr2) {
-					//pas d'attribut trouvé
+					//pas d'attribut trouvï¿½
 					continue;
 				}
 				else if (hasAttr1 && !hasAttr2) {
