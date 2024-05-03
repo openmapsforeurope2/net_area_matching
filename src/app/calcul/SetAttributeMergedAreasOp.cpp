@@ -76,8 +76,8 @@ namespace app
 
 			//--
 			app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-			std::string areaTableNameInit = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString();
-			_fsAreaInit = context->getDataBaseManager().getFeatureStore(areaTableNameInit, idName, geomName);
+			std::string areaTableNameInitCleaned = themeParameters->getParameter(AREA_TABLE_INIT_CLEANED).getValue().toString();
+			_fsAreaInitCleaned = context->getDataBaseManager().getFeatureStore(areaTableNameInitCleaned, idName, geomName);
 
 
             //--
@@ -165,14 +165,13 @@ namespace app
         }
 
 
-
 		bool SetAttributeMergedAreasOp::_getAreaMergedByCountry(ign::geometry::MultiPolygon& geomAreaMerged, ign::feature::FeatureFilter& filterArroundAreaFromCountry, ign::feature::Feature& fMergedInit)
 		{
 
 			std::map<double, ign::feature::Feature> mIntersectedArea;
 			//recup fs table source -> table init sans step
 			//filtre sur les feat de la table source
-			ign::feature::FeatureIteratorPtr itAreaInit = _fsAreaInit->getFeatures(filterArroundAreaFromCountry);
+			ign::feature::FeatureIteratorPtr itAreaInit = _fsAreaInitCleaned->getFeatures(filterArroundAreaFromCountry);
 
 			while (itAreaInit->hasNext())
 			{
