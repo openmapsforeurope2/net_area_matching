@@ -109,6 +109,8 @@ namespace app
 
             ign::feature::FeatureFilter filterArea(countryCodeName+" like '%#%'");
 
+			epg::ContextS::getInstance()->getDataBaseManager().setValueColumn(_fsArea->getTableName(), wTagName, "modif_attr", countryCodeName + " like '%#%'");
+
             int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ set attribute merged areas % complete ]\n");
 
@@ -139,7 +141,7 @@ namespace app
 				bool hasAttr2 = _getAreaMergedByCountry(geomArea,filterArroundAreaFromCountry2, featCountry2);
 
 				if (!hasAttr1 && !hasAttr2) {
-					//pas d'attribut trouv�
+					//pas d'attribut trouve
 					continue;
 				}
 				else if (hasAttr1 && !hasAttr2) {
@@ -155,7 +157,7 @@ namespace app
 				fArea.setId(idOrigin);
 				fArea.setGeometry(geomArea);
 				fArea.setGeometry(geomArea);
-				fArea.setAttribute(wTagName, ign::data::String("modif_attr")); 
+				//fArea.setAttribute(wTagName, ign::data::String("modif_attr")); 
 				fArea.setAttribute("xy_source", ign::data::String("ome2")); 
 				fArea.setAttribute("z_source", ign::data::String("ome2"));
 				vArea2modify.push_back(fArea);				
