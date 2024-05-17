@@ -90,6 +90,29 @@ int main(int argc, char *argv[])
 		epg::params::tools::loadParams(*themeParameters, themeParametersFile);
 		themeParameters->setParameter(COUNTRY_CODE_W, ign::data::String(countryCode));
 
+		//definition AREA_TABLE_INIT_CLEANED
+		std::string codeStepCleaned = "";
+		std::string suiteStepStg = stepSuite.toString();
+		std::vector<std::string> vStepSuiteNumNom;
+		epg::tools::StringTools::Split(suiteStepStg, "\n", vStepSuiteNumNom);
+		for (size_t i = 0; i < vStepSuiteNumNom.size(); ++i) {
+			if (vStepSuiteNumNom[i] == "")
+				continue;
+			std::vector<std::string> vStepSuiteNumNomPair;
+			epg::tools::StringTools::Split(vStepSuiteNumNom[i], " ", vStepSuiteNumNomPair);
+			if (vStepSuiteNumNomPair[1] == "CleanByLandmask") {
+				codeStepCleaned = vStepSuiteNumNomPair[0];
+				epg::tools::StringTools::trim(codeStepCleaned, "[");
+				epg::tools::StringTools::trim(codeStepCleaned, "]");
+				break;
+			}
+		}
+		std::string areaTableNameInitCleaned="";
+		if (codeStepCleaned != "")
+			areaTableNameInitCleaned += "_" + codeStepCleaned + "_";
+		areaTableNameInitCleaned += themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString();
+		themeParameters->setParameter(AREA_TABLE_INIT_CLEANED, ign::data::String(areaTableNameInitCleaned));
+
         //epg logger
         epg::log::EpgLogger* logger = epg::log::EpgLoggerS::getInstance();
         // logger->setProdOfstream( logDirectory+"/au_merging.log" );

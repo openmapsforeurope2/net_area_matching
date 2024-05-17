@@ -74,8 +74,8 @@ namespace app
 
 			//--
 			app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-			std::string areaTableNameInit = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString();
-			_fsAreaInit = context->getDataBaseManager().getFeatureStore(areaTableNameInit, idName, geomName);
+			std::string areaTableNameInitCleaned = themeParameters->getParameter(AREA_TABLE_INIT_CLEANED).getValue().toString();
+			_fsAreaInitCleaned = context->getDataBaseManager().getFeatureStore(areaTableNameInitCleaned, idName, geomName);
 
 
             //--
@@ -107,6 +107,8 @@ namespace app
 
             ign::feature::FeatureFilter filterArea(countryCodeName+" like '%#%'");
 
+			epg::ContextS::getInstance()->getDataBaseManager().setValueColumn(_fsArea->getTableName(), wTagName, "modif_attr", countryCodeName + " like '%#%'");
+
             int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ set attribute merged areas % complete ]\n");
 
@@ -137,7 +139,7 @@ namespace app
 				bool hasAttr2 = _getAreaMergedByCountry(geomArea,filterArroundAreaFromCountry2, featCountry2);
 
 				if (!hasAttr1 && !hasAttr2) {
-					//pas d'attribut trouv�
+					//pas d'attribut trouve
 					continue;
 				}
 				else if (hasAttr1 && !hasAttr2) {
@@ -153,7 +155,7 @@ namespace app
 				fArea.setId(idOrigin);
 				fArea.setGeometry(geomArea);
 				fArea.setGeometry(geomArea);
-				fArea.setAttribute(wTagName, ign::data::String("modif_attr")); 
+				//fArea.setAttribute(wTagName, ign::data::String("modif_attr")); 
 				fArea.setAttribute("xy_source", ign::data::String("ome2")); 
 				fArea.setAttribute("z_source", ign::data::String("ome2"));
 				vArea2modify.push_back(fArea);				
@@ -163,14 +165,13 @@ namespace app
         }
 
 
-
 		bool SetAttributeMergedAreasOp::_getAreaMergedByCountry(ign::geometry::MultiPolygon& geomAreaMerged, ign::feature::FeatureFilter& filterArroundAreaFromCountry, ign::feature::Feature& fMergedInit)
 		{
 
 			std::map<double, ign::feature::Feature> mIntersectedArea;
 			//recup fs table source -> table init sans step
 			//filtre sur les feat de la table source
-			ign::feature::FeatureIteratorPtr itAreaInit = _fsAreaInit->getFeatures(filterArroundAreaFromCountry);
+			ign::feature::FeatureIteratorPtr itAreaInit = _fsAreaInitCleaned->getFeatures(filterArroundAreaFromCountry);
 
 			while (itAreaInit->hasNext())
 			{

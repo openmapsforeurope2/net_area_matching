@@ -48,7 +48,7 @@ namespace calcul{
 		//--
 		ign::feature::sql::FeatureStorePostgis*                  _fsArea;
 		//--
-		ign::feature::sql::FeatureStorePostgis*                  _fsAreaInit;
+		ign::feature::sql::FeatureStorePostgis*                  _fsAreaInitCleaned;
 		//--
 		epg::log::EpgLogger*                                     _logger;
 		//--
