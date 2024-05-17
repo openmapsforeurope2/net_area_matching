@@ -38,8 +38,6 @@ namespace app
         ///
         SetAttributeMergedAreasOp::~SetAttributeMergedAreasOp()
         {
-			_attrMergerOnBorder = 0;
-			delete _attrMergerOnBorder;
         }
 
         ///
@@ -89,7 +87,7 @@ namespace app
 			std::string listAttr2concatName = themeParameters->getValue(LIST_ATTR_TO_CONCAT).toString();
 			std::string listAttrWName = themeParameters->getValue(LIST_ATTR_W).toString();
 			std::string listAttrJsonName = themeParameters->getValue(LIST_ATTR_JSON).toString();
-			_attrMergerOnBorder = new ome2::calcul::utils::AttributeMerger(listAttr2concatName, listAttrWName, listAttrJsonName, "/");
+			_attrMergerOnBorder.setLists(listAttr2concatName, listAttrWName, listAttrJsonName, "/");
 
 			_thresholdAreaAttr = themeParameters->getValue(THRESHOLD_AREA_ATTR).toDouble();
         }
@@ -150,7 +148,7 @@ namespace app
 				}
 				else {
 					fArea = featCountry1;
-					_attrMergerOnBorder->addFeatAttributeMerger(fArea,featCountry2,"#");
+					_attrMergerOnBorder.addFeatAttributeMerger(fArea,featCountry2,"#");
 				}
 				fArea.setId(idOrigin);
 				fArea.setGeometry(geomArea);

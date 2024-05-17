@@ -56,9 +56,9 @@ namespace calcul{
 		//--
 		bool                                                     _verbose;
 
-		ome2::calcul::utils::AttributeMerger*					_attrMergerOnBorder;
+		ome2::calcul::utils::AttributeMerger                     _attrMergerOnBorder;
 
-		double													_thresholdAreaAttr;
+		double													 _thresholdAreaAttr;
 
 	private:
 

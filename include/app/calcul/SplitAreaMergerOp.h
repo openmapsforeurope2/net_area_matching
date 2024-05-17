@@ -51,6 +51,9 @@ namespace calcul{
         //--
 		void _compute() const;
 
+        //--
+        bool _computeEngine( bool mergeByNatId = true ) const;
+
 		//--
 		void _mergeGroups(std::vector<std::map<std::string, ign::feature::Feature>> & vmAreas) const;
 
@@ -62,10 +65,26 @@ namespace calcul{
         ) const;
 
 		//--
-		std::map<double, ign::feature::Feature> _getNeighboursWithArea(ign::feature::Feature const& fArea) const;
+		std::map<double, ign::feature::Feature> _getNeighboursWithArea(
+            ign::feature::Feature const& fArea,
+            ign::feature::FeatureFilter const& filterArea_
+        ) const;
 
 		//--
-		std::vector<ign::feature::Feature> _getNeighbours(ign::feature::Feature const& fArea) const;
+		std::vector<ign::feature::Feature> _getNeighbours(
+			ign::feature::Feature const& fArea,
+            ign::feature::FeatureFilter const& filterArea_
+		) const;
+
+		//--
+		double _getLength(
+	        ign::geometry::Polygon const& poly
+        ) const;
+
+		//--
+		double _getLength(
+	        ign::geometry::MultiPolygon const& mp
+        ) const;
 
     };
 }

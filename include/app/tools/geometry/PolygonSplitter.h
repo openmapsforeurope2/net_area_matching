@@ -66,6 +66,8 @@ namespace geometry{
 		std::set<PolygonSplitter::face_descriptor> _getHoleFaces() const;
 		//--
 		bool _isBoundary( edge_descriptor e ) const;
+		//--
+		void _gatherGroups( std::vector<std::set<face_descriptor>> & vsGroups ) const;
 
 
 	private:

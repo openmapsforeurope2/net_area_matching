@@ -129,6 +129,7 @@ namespace app
         ///
         void CfSplitterOp::_compute() const {
             double pathLengthThreshold = 20;
+            double minInRatio = 0.9;
 
             // epg parameters
             epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
@@ -209,9 +210,18 @@ namespace app
                     std::set<std::string> sMergedCp;
                     for( std::map<std::string, ign::geometry::Point>::const_iterator mit_ = mCp.begin() ; mit_ != mCp.end() ; ++mit_ ) {
                         //DEBUG
+                        if ( mit_->second.distance(ign::geometry::Point(3892792.15,3140092.36)) < 5 ) {
+                            bool test = true;
+                        }
+                        //4018889.42,3128024.22
+                        // if ( mit_->second.distance(ign::geometry::Point(3963719.003,3157270.609)) < 0.1 ) {
+                        //     bool test = true;
+                        // }
+                        // 
                         // continue;
-                        if ( sMergedCp.find(mit_->first) != sMergedCp.end() ) continue;
 
+                        if ( sMergedCp.find(mit_->first) != sMergedCp.end() ) continue;
+                        
                         ign::geometry::Point const& cpGeom = mit_->second;
 
                         // on merge les autres CP proches
@@ -222,7 +232,8 @@ namespace app
                         _fsCp->getFeaturesByExtent(bboxPt, fCollection);
                         for (ign::feature::FeatureCollection::iterator fcit = fCollection.begin() ; fcit != fCollection.end() ; ++fcit) {
                             if ( fcit->getId() == mit_->first ) continue;
-                            sMergedCp.insert(fcit->getId());
+                            if ( cpGeom.distance(fcit->getGeometry() ) < distSnapMergeCf)
+                                sMergedCp.insert(fcit->getId());
                         }
                             
                         //DEBUG
@@ -238,7 +249,7 @@ namespace app
                         for ( size_t j = 0 ; j < vIndexedSubLs.size() ; ++j ) {
                             std::pair<double, ign::geometry::Point> distProj = vIndexedSubLs[j]->distanceWithProj(cpGeom, projDistThreshold);
                             if (distProj.first >= 0 && distProj.first < 1e-7) cpIsOnRing = true;
-                            else if (distProj.first > 0) mDistSubLsProj.insert(std::make_pair(distProj.first, std::make_pair(j, distProj.second)));
+                            else if (distProj.first > 1e-7) mDistSubLsProj.insert(std::make_pair(distProj.first, std::make_pair(j, distProj.second)));
                         }
 
                         ign::geometry::GeometryPtr sectionGeomPtr;
@@ -251,13 +262,9 @@ namespace app
 
                             double precision = 1e-5;
 
-                            if (ratio < precision) continue;
+                            if (ratio < precision) continue; //TODO elargir le seuil à ~10% ?
 
-                            if ( std::abs(1-ratio) < precision) {
-                                if (cpIsOnRing) {
-                                    sectionGeomPtr.reset( ls.clone() );
-                                    break;
-                                }
+                            if ( !cpIsOnRing ) { //Dans ce cas normalement le ratio est forcement = 1
                                 if (foundFullRatio.first) {
                                     // 1ere approche pour selectionner le meilleur candidat (point de contact sur la face opposée)
                                     double d = vIndexedSubLs[foundFullRatio.second.first]->distance(mit->second.second, 1e-5);
@@ -272,7 +279,6 @@ namespace app
                             }
 
                             vInOutProj.push_back(mit->second.second);
-
                         }
 
                         if (!sectionGeomPtr) {
@@ -741,20 +747,31 @@ namespace app
                     _fsCp->getFeaturesByExtent(bboxPt, fCollection);
                     for (ign::feature::FeatureCollection::iterator fcit = fCollection.begin() ; fcit != fCollection.end() ; ++fcit) {
                         if (fcit->getId() == cpId) continue;
-                        if ( poly.exteriorRing().distance(fcit->getGeometry().asPoint()) < 1e-5 ) {
-                            sMergedCp.insert(fcit->getId());
+                        if (cpGeom.distance(fcit->getGeometry() ) < distSnapMergeCf) {
+                            if ( poly.exteriorRing().distance(fcit->getGeometry().asPoint()) < 1e-5 ) {
+                                sMergedCp.insert(fcit->getId());
+                            }
                         }
                     }
-                            
+                } else {
+                    std::set<std::string> sMergedCpTemp;
+                    bool cancel = false;
+                    ign::feature::FeatureCollection fCollection;
+                    ign::geometry::Envelope bboxPt(cpGeom.getEnvelope());
+                    bboxPt.expandBy(distSnapMergeCf);
+                    _fsCp->getFeaturesByExtent(bboxPt, fCollection);
+                    for (ign::feature::FeatureCollection::iterator fcit = fCollection.begin() ; fcit != fCollection.end() ; ++fcit) {
+                        if (cpGeom.distance(fcit->getGeometry()) < distSnapMergeCf) {
+                            if ( poly.exteriorRing().distance(fcit->getGeometry()) < 1e-5 ) {
+                                cancel = true;
+                                break;
+                            }
+                            sMergedCpTemp.insert(fcit->getId()); 
+                        }
+                    }
+                    if (cancel) continue;
+                    sMergedCp.insert(sMergedCpTemp.begin(), sMergedCpTemp.end());
                 }
-
-                
-                ign::feature::FeatureCollection fCollection;
-                ign::geometry::Envelope bboxPt(cpGeom.getEnvelope());
-                bboxPt.expandBy(distSnapMergeCf);
-                _fsCp->getFeaturesByExtent(bboxPt, fCollection);
-                for (ign::feature::FeatureCollection::iterator fcit = fCollection.begin() ; fcit != fCollection.end() ; ++fcit)
-                    sMergedCp.insert(fcit->getId());
 
                 mCp.insert(std::make_pair(cpId, cpGeom));
             }

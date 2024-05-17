@@ -135,14 +135,33 @@ namespace geometry{
 
 		std::set<face_descriptor> sFaceTouchingExtBound;
 		std::set<face_descriptor> sTreatedFaces;
-		std::map<face_descriptor, face_descriptor> mChildParent;
+		std::vector<std::set<face_descriptor>> vsGroups;
+		// std::map<face_descriptor, face_descriptor> mChildParent;
 		face_iterator fit, fend;
 		for( _graph.faces( fit, fend ) ; fit != fend ; ++fit ) {
 			sTreatedFaces.insert(*fit);
 
+			//DEBUG
+			ign::geometry::Polygon faceG = _graph.getGeometry( *fit );
+			if (faceG.intersects(ign::geometry::Point(4017319.3,3084558.2))) {
+				bool test = true;
+			}
+			if (faceG.intersects(ign::geometry::Point(4017264.2803,3084799.8512))) {
+				bool test = true;
+			}
+			if (faceG.intersects(ign::geometry::Point(4017264.13,3084790.79))) {
+				bool test = true;
+			}
+			if (faceG.intersects(ign::geometry::Point(4017259.3258,3084743.6678))) {
+				bool test = true;
+			}
+
 			oriented_edge_descriptor startEdge = _graph.getIncidentEdge( *fit );
 			oriented_edge_descriptor nextEdge = startEdge;
 			do{
+
+				//DEBUG
+				ign::geometry::Polygon edgeG = _graph.getGeometry( nextEdge.descriptor );
 
 				std::vector< std::string > vOrigins = _graph.origins( nextEdge.descriptor );
 
@@ -160,13 +179,18 @@ namespace geometry{
 
 					if (foundRf.first) {
 						if (sTreatedFaces.find(foundRf.second) == sTreatedFaces.end()) {
-							
-							std::map<face_descriptor, face_descriptor>::const_iterator mit = mChildParent.find(*fit);
-
-							face_descriptor fParent = mit == mChildParent.end() ? mit->second : *fit;
-
-							mChildParent.insert(std::make_pair(foundRf.second, fParent));
+							vsGroups.push_back(std::set<face_descriptor>());
+							vsGroups.back().insert(*fit);
+							vsGroups.back().insert(foundRf.second);
 						}
+						// if (sTreatedFaces.find(foundRf.second) == sTreatedFaces.end()) {
+							
+						// 	std::map<face_descriptor, face_descriptor>::const_iterator mit = mChildParent.find(*fit);
+
+						// 	face_descriptor fParent = mit != mChildParent.end() ? mit->second : *fit;
+
+						// 	mChildParent.insert(std::make_pair(foundRf.second, fParent));
+						// }
 						
 					}
 				}
@@ -174,26 +198,70 @@ namespace geometry{
 				nextEdge = ign::geometry::graph::detail::nextEdge( nextEdge, _graph );
 			}while( nextEdge != startEdge );
 		}
-		
-		std::map<face_descriptor, std::set<face_descriptor>> mGroups;
-		std::set<face_descriptor> sNoHoleGroups;
-		for (std::map<face_descriptor, face_descriptor>::const_iterator mit = mChildParent.begin() ; mit != mChildParent.end() ; ++mit) {
-			std::map<face_descriptor, std::set<face_descriptor>>::iterator mg = mGroups.find(mit->second);
-			if (mg == mGroups.end()) {
-				mg = mGroups.insert(std::make_pair(mit->second, std::set<face_descriptor>())).first;
-				mg->second.insert(mit->second);
-				if (sFaceTouchingExtBound.find(mit->second) != sFaceTouchingExtBound.end()) sNoHoleGroups.insert(mg->first);
+
+		_gatherGroups(vsGroups);
+
+		for (std::vector<std::set<face_descriptor>>::const_iterator vit = vsGroups.begin() ; vit != vsGroups.end() ; ++vit ) {
+			bool isHole = true;
+			for (std::set<face_descriptor>::const_iterator sit = vit->begin() ; sit != vit->end() ; ++sit ) {
+				if (sFaceTouchingExtBound.find(*sit) != sFaceTouchingExtBound.end()) {
+					isHole = false;
+					break;
+				}
 			}
-			mg->second.insert(mit->first);
-			if (sFaceTouchingExtBound.find(mit->first) != sFaceTouchingExtBound.end()) sNoHoleGroups.insert(mg->first);
+
+			if(isHole)
+				sHoleFaces.insert(vit->begin(), vit->end());
 		}
 
-		for (std::map<face_descriptor, std::set<face_descriptor>>::const_iterator mit = mGroups.begin() ; mit != mGroups.end() ; ++mit ) {
-			if (sNoHoleGroups.find(mit->first) != sNoHoleGroups.end() ) continue;
-			sHoleFaces.insert(mit->second.begin(), mit->second.end());
-		}
+
+		// std::map<face_descriptor, std::set<face_descriptor>> mGroups;
+		// std::set<face_descriptor> sNoHoleGroups;
+		// for (std::map<face_descriptor, face_descriptor>::const_iterator mit = mChildParent.begin() ; mit != mChildParent.end() ; ++mit) {
+		// 	std::map<face_descriptor, std::set<face_descriptor>>::iterator mg = mGroups.find(mit->second);
+		// 	if (mg == mGroups.end()) {
+		// 		mg = mGroups.insert(std::make_pair(mit->second, std::set<face_descriptor>())).first;
+		// 		mg->second.insert(mit->second);
+		// 		if (sFaceTouchingExtBound.find(mit->second) != sFaceTouchingExtBound.end()) sNoHoleGroups.insert(mg->first);
+		// 	}
+		// 	mg->second.insert(mit->first);
+		// 	if (sFaceTouchingExtBound.find(mit->first) != sFaceTouchingExtBound.end()) sNoHoleGroups.insert(mg->first);
+		// }
+
+		// for (std::map<face_descriptor, std::set<face_descriptor>>::const_iterator mit = mGroups.begin() ; mit != mGroups.end() ; ++mit ) {
+		// 	if (sNoHoleGroups.find(mit->first) != sNoHoleGroups.end() ) continue;
+		// 	sHoleFaces.insert(mit->second.begin(), mit->second.end());
+		// }
 
 		return sHoleFaces;		
+	}
+
+	///
+	///
+	///
+	void PolygonSplitter::_gatherGroups( std::vector<std::set<face_descriptor>> & vsGroups ) const
+	{
+		size_t previousSize = vsGroups.size();
+
+		do {
+			previousSize = vsGroups.size();
+			for(int i = vsGroups.size()-1 ; i > 0 ; --i) {
+				bool found = false;
+				for(size_t j = 0 ; j < i ; ++j) {
+					for (std::set<face_descriptor>::const_iterator sit = vsGroups[i].begin() ; sit != vsGroups[i].end() ; ++sit ) {
+						if (vsGroups[j].find(*sit) != vsGroups[j].end()) {
+							found = true;
+							break;
+						}
+					}
+					if (found) {
+						vsGroups[j].insert(vsGroups[i].begin(), vsGroups[i].end());
+						break;
+					}
+				}
+				if (found) vsGroups.erase(vsGroups.begin()+i);
+			}
+		} while (previousSize != vsGroups.size());
 	}
 
 	///
