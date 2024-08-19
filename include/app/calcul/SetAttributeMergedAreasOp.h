@@ -10,7 +10,7 @@
 #include <epg/log/ShapeLogger.h>
 
 
-#include <ome2/calcul/utils/attributeMerger.h>
+#include <ome2/calcul/utils/AttributeMerger.h>
 
 
 namespace app{

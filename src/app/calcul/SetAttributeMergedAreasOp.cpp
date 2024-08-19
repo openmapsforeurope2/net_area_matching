@@ -102,6 +102,7 @@ namespace app
             epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
             std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
             std::string const idName = epgParams.getValue(ID).toString();
+			//--
 			app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 			std::string const wTagName = themeParameters->getParameter(W_TAG).getValue().toString();
 

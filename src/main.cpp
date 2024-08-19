@@ -13,7 +13,6 @@
 //APP
 #include <app/params/ThemeParameters.h>
 #include <app/step/tools/initSteps.h>
-#include <app/calcul/PolygonClippingOp.h>
 
 
 namespace po = boost::program_options;
@@ -87,8 +86,11 @@ int main(int argc, char *argv[])
 		//theme parameters
 		themeParametersFile = context->getConfigParameters().getValue(THEME_PARAMETER_FILE).toString();
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-		epg::params::tools::loadParams(*themeParameters, themeParametersFile);
+        epg::params::tools::loadParams(*themeParameters, themeParametersFile, countryCode);
 		themeParameters->setParameter(COUNTRY_CODE_W, ign::data::String(countryCode));
+
+        //info de connection db
+        context->loadEpgParameters( themeParameters->getValue(DB_CONF_FILE).toString() );
 
 		//definition AREA_TABLE_INIT_CLEANED
 		std::string codeStepCleaned = "";
@@ -124,7 +126,6 @@ int main(int argc, char *argv[])
         
 		logger->log(epg::log::INFO, "[START HY MATCHING PROCESS ] " + epg::tools::TimeTools::getTime());
         
- 
         //lancement du traitement
 		stepSuite.run(stepCode, verbose);
 

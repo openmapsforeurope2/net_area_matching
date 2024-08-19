@@ -4,11 +4,9 @@
 #include <epg/Context.h>
 #include <epg/log/ScopeLogger.h>
 
-
 //APP
 #include <app/params/ThemeParameters.h>
 #include <app/calcul/GenerateCuttingPointsOp.h>
-#include <app/utils/CopyTableUtils.h>
 
 
 namespace app {
