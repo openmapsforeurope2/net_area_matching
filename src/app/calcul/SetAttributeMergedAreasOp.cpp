@@ -84,10 +84,9 @@ namespace app
             //--
 		    epg::tools::StringTools::Split(_borderCode, "#", _vCountry);
 
-			std::string listAttr2concatName = themeParameters->getValue(LIST_ATTR_TO_CONCAT).toString();
 			std::string listAttrWName = themeParameters->getValue(LIST_ATTR_W).toString();
 			std::string listAttrJsonName = themeParameters->getValue(LIST_ATTR_JSON).toString();
-			_attrMergerOnBorder.setLists(listAttr2concatName, listAttrWName, listAttrJsonName, "/");
+			_attrMergerOnBorder.setLists(listAttrWName, listAttrJsonName, "/");
 
 			_thresholdAreaAttr = themeParameters->getValue(THRESHOLD_AREA_ATTR).toDouble();
         }
@@ -105,6 +104,7 @@ namespace app
 			//--
 			app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 			std::string const wTagName = themeParameters->getParameter(W_TAG).getValue().toString();
+			std::string separator = "#";
 
             ign::feature::FeatureFilter filterArea(countryCodeName+" like '%#%'");
 
@@ -151,7 +151,7 @@ namespace app
 				}
 				else {
 					fArea = featCountry1;
-					_attrMergerOnBorder.addFeatAttributeMerger(fArea,featCountry2,"#");
+					_attrMergerOnBorder.mergeFeatAttribute(fArea,featCountry2, separator);
 				}
 				fArea.setId(idOrigin);
 				fArea.setGeometry(geomArea);
