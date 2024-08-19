@@ -37,7 +37,7 @@ namespace params{
 		_initParameter(SAM_SMALL_AREA_LENGTH_THRESHOLD, "SAM_SMALL_AREA_LENGTH_THRESHOLD");
 			
 		_initParameter(THRESHOLD_AREA_ATTR, "THRESHOLD_AREA_ATTR"); 
-		_initParameter(LIST_ATTR_TO_CONCAT, "LIST_ATTR_TO_CONCAT");
+
 		_initParameter(LIST_ATTR_JSON, "LIST_ATTR_JSON");
 		_initParameter(LIST_ATTR_W, "LIST_ATTR_W");
 
