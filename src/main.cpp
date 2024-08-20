@@ -87,7 +87,6 @@ int main(int argc, char *argv[])
 		themeParametersFile = context->getConfigParameters().getValue(THEME_PARAMETER_FILE).toString();
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
         epg::params::tools::loadParams(*themeParameters, themeParametersFile, countryCode);
-		themeParameters->setParameter(COUNTRY_CODE_W, ign::data::String(countryCode));
 
         //info de connection db
         context->loadEpgParameters( themeParameters->getValue(DB_CONF_FILE).toString() );
