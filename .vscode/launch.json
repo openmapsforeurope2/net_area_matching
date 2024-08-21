@@ -8,7 +8,7 @@
         "request": "launch",
         "program": "/usr/local/src/hy_matching/bin/ome2_hy_matchingd",
         "cwd": "/usr/local/src/hy_matching",
-        "args": ["--c", "/usr/local/src/hy_matching/data/config/epg_parameters.ini", "--cc", "be#fr", "--sp", "310-370"],
+        "args": ["--c", "/usr/local/src/hy_matching/data/config/epg_parameters.ini", "--cc", "be#fr", "--sp", "330"],
         "stopAtEntry": true,
         "environment": [{ "name": "config", "value": "Debug" }],
         "externalConsole": true,

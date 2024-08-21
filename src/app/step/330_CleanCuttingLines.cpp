@@ -25,6 +25,8 @@ namespace step {
 	void CleanCuttingLines::onCompute( bool verbose = false )
 	{
 		//--
+		_epgParams.setParameter(AREA_TABLE, ign::data::String(getLastWorkingTableName(AREA_TABLE_INIT)));
+		//--
 		app::calcul::CuttingLineCleanerOp::compute(verbose);
 	}
 
