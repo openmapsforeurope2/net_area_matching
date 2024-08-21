@@ -8,6 +8,7 @@
 // EPG
 #include <epg/Context.h>
 #include <epg/tools/TimeTools.h>
+#include <epg/tools/StringTools.h>
 
 ///
 ///
@@ -60,6 +61,8 @@ void app::calcul::StandingWaterOp::_init()
     // app parameters
     params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
 
+	epg::tools::StringTools::Split(_borderCode, "#", _vCountriesCodeName);
+
     //--
 	_fsArea = context->getDataBaseManager().getFeatureStore(areaTableName, idName, geomName);
 
@@ -80,6 +83,7 @@ void app::calcul::StandingWaterOp::AddStandingWater( std::string borderCode,
 {
 	app::calcul::StandingWaterOp standingWaterOp(borderCode, verbose);
 	standingWaterOp._addStandingWater();
+	
 }
 
 ///
@@ -87,6 +91,64 @@ void app::calcul::StandingWaterOp::AddStandingWater( std::string borderCode,
 ///
 void app::calcul::StandingWaterOp::_addStandingWater()
 {
+
+	//--
+	epg::Context *context = epg::ContextS::getInstance();
+
+	// epg parameters
+	epg::params::EpgParameters const& epgParams = context->getEpgParameters();
+	std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
+	// app parameters
+	params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
+	std::string wTag = themeParameters->getValue(W_TAG).toString();
+
+	ign::feature::FeatureFilter filterCountries("(" + countryCodeName + " = '" + _vCountriesCodeName[0] + "' or " + countryCodeName + " = '" + _vCountriesCodeName[1] + "')");
+	ign::feature::FeatureIteratorPtr itStandingArea = _fsAreaStandingWater->getFeatures(filterCountries);
+	int numFeaturesStandingWater = context->getDataBaseManager().numFeatures(*_fsAreaStandingWater, filterCountries);
+	boost::progress_display display(numFeaturesStandingWater, std::cout, "[ IMPORT STANDING WATER]\n");
+	std::set<std::string> vIdStandingArea2delete;
+	while (itStandingArea->hasNext()) {
+		++display;
+		ign::feature::Feature fStandingArea = itStandingArea->next();
+
+		std::string countryCodeStandingArea = fStandingArea.getAttribute(countryCodeName).toString();
+/*
+		//on test si le standing water ne superpose pas un watercourse
+		bool isIntersectingWatercourse = false;
+		double areaMaxIntersection = 10;
+		ign::feature::FeatureFilter filterArroundStandingArea(countryCodeName + " = '" + countryCodeStandingArea + "'");;
+		filterArroundStandingArea.setExtent(fStandingArea.getGeometry().getEnvelope());
+		ign::feature::FeatureIteratorPtr itWaterCrsArea = _fsArea->getFeatures(filterArroundStandingArea);
+		while (itWaterCrsArea->hasNext()) {
+			ign::feature::Feature fWaterCrsArea = itWaterCrsArea->next();
+			if (fWaterCrsArea.getGeometry().distance(fStandingArea.getGeometry()) > 0)
+				continue;
+			ign::geometry::Geometry* ptrGeomIntersected = fWaterCrsArea.getGeometry().Intersection(fStandingArea.getGeometry());
+			double areaIntersected = 0;
+			if (ptrGeomIntersected->isMultiPolygon())
+				areaIntersected = ptrGeomIntersected->asMultiPolygon().area();
+			else if(ptrGeomIntersected->isPolygon())
+				areaIntersected = ptrGeomIntersected->asPolygon().area();
+			if (areaIntersected > areaMaxIntersection) { //ajouter l'aire d'intersection? si intersection avec plusieurs?
+				isIntersectingWatercourse = true;
+				break;
+			}
+			ptrGeomIntersected = 0;
+			delete ptrGeomIntersected;
+		}
+
+		if (isIntersectingWatercourse)
+			continue;
+*/
+		fStandingArea.setAttribute(wTag, ign::data::String("standing_water"));
+		vIdStandingArea2delete.insert(fStandingArea.getId());
+		_fsArea->createFeature(fStandingArea);
+	}
+
+
+	for (std::set<std::string>::iterator sit = vIdStandingArea2delete.begin(); sit != vIdStandingArea2delete.end(); ++sit)
+		_fsAreaStandingWater->deleteFeature(*sit);
+
 }
 
 ///
@@ -104,4 +166,10 @@ void app::calcul::StandingWaterOp::SortingStandingWater(std::string borderCode,
 ///
 void app::calcul::StandingWaterOp::_sortingStandingWater()
 {
+
+	// app parameters
+	params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
+	std::string wTag = themeParameters->getValue(W_TAG).toString();
+
+
 }
