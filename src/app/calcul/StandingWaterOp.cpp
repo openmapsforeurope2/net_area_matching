@@ -175,7 +175,8 @@ void app::calcul::StandingWaterOp::_sortingStandingWater()
 	params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
 	std::string wTag = themeParameters->getValue(W_TAG).toString();
 
-	ign::feature::FeatureFilter filterStandingArea(wTag + " = '"+_attrValueStandingWater+"#"+ _attrValueStandingWater+"'");
+	ign::feature::FeatureFilter filterStandingArea(wTag + " = '"+_attrValueStandingWater+"#"+ _attrValueStandingWater+"' or "
+	+ wTag + " = '" + _attrValueStandingWater + "'");
 	ign::feature::FeatureIteratorPtr itStandingArea = _fsArea->getFeatures(filterStandingArea);
 	int numFeaturesStandingWater = context->getDataBaseManager().numFeatures(*_fsArea, filterStandingArea);
 	boost::progress_display display(numFeaturesStandingWater, std::cout, "[ EXPORT STANDING WATER]\n");
