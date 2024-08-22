@@ -833,6 +833,7 @@ namespace app
             ign::feature::Feature fOtherTouchingEnd;
             bool endTouchingStart = false;
 
+			clGeom.setFillZ(0);
             ign::feature::FeatureFilter filterCl("ST_DISTANCE(" + geomName + ", ST_GeomFromText('" + clGeom.toString() + "')) < 0.1");
             ign::feature::FeatureIteratorPtr itCl = _fsCl->getFeatures(filterCl);
             while (itCl->hasNext()) {
