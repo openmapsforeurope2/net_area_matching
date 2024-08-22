@@ -70,6 +70,8 @@ void app::calcul::StandingWaterOp::_init()
 	std::string areaStandingWaterTableName = themeParameters->getValue(AREA_TABLE_INIT_STANDING_WATER).toString();
 	_fsAreaStandingWater = context->getDataBaseManager().getFeatureStore(areaStandingWaterTableName, idName, geomName);
 
+
+	_attrValueStandingWater = "standing_water";
     //--
     _logger->log(epg::log::INFO, "[END] initialization: " + epg::tools::TimeTools::getTime());
 };
@@ -106,7 +108,7 @@ void app::calcul::StandingWaterOp::_addStandingWater()
 	ign::feature::FeatureIteratorPtr itStandingArea = _fsAreaStandingWater->getFeatures(filterCountries);
 	int numFeaturesStandingWater = context->getDataBaseManager().numFeatures(*_fsAreaStandingWater, filterCountries);
 	boost::progress_display display(numFeaturesStandingWater, std::cout, "[ IMPORT STANDING WATER]\n");
-	std::set<std::string> vIdStandingArea2delete;
+	std::set<std::string> sIdStandingArea2delete;
 	while (itStandingArea->hasNext()) {
 		++display;
 		ign::feature::Feature fStandingArea = itStandingArea->next();
@@ -140,13 +142,13 @@ void app::calcul::StandingWaterOp::_addStandingWater()
 		if (isIntersectingWatercourse)
 			continue;
 */
-		fStandingArea.setAttribute(wTag, ign::data::String("standing_water"));
-		vIdStandingArea2delete.insert(fStandingArea.getId());
+		fStandingArea.setAttribute(wTag, ign::data::String(_attrValueStandingWater));
+		sIdStandingArea2delete.insert(fStandingArea.getId());
 		_fsArea->createFeature(fStandingArea);
 	}
 
 
-	for (std::set<std::string>::iterator sit = vIdStandingArea2delete.begin(); sit != vIdStandingArea2delete.end(); ++sit)
+	for (std::set<std::string>::iterator sit = sIdStandingArea2delete.begin(); sit != sIdStandingArea2delete.end(); ++sit)
 		_fsAreaStandingWater->deleteFeature(*sit);
 
 }
@@ -167,9 +169,26 @@ void app::calcul::StandingWaterOp::SortingStandingWater(std::string borderCode,
 void app::calcul::StandingWaterOp::_sortingStandingWater()
 {
 
+	//--
+	epg::Context *context = epg::ContextS::getInstance();
 	// app parameters
 	params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
 	std::string wTag = themeParameters->getValue(W_TAG).toString();
 
+	ign::feature::FeatureFilter filterStandingArea(wTag + " = '"+_attrValueStandingWater+"#"+ _attrValueStandingWater+"'");
+	ign::feature::FeatureIteratorPtr itStandingArea = _fsArea->getFeatures(filterStandingArea);
+	int numFeaturesStandingWater = context->getDataBaseManager().numFeatures(*_fsArea, filterStandingArea);
+	boost::progress_display display(numFeaturesStandingWater, std::cout, "[ EXPORT STANDING WATER]\n");
+	std::set<std::string> sIdStandingArea2delete;
+	while (itStandingArea->hasNext()) {
+		++display;
+		ign::feature::Feature fStandingArea = itStandingArea->next();
+
+		sIdStandingArea2delete.insert(fStandingArea.getId());
+		_fsAreaStandingWater->createFeature(fStandingArea);
+	}
+
+	for (std::set<std::string>::iterator sit = sIdStandingArea2delete.begin(); sit != sIdStandingArea2delete.end(); ++sit)
+		_fsArea->deleteFeature(*sit);
 
 }

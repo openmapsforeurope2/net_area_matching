@@ -64,6 +64,8 @@ namespace calcul{
 		std::vector<std::string>								 _vCountriesCodeName;
 		//--
 		bool                                                     _verbose;
+		//--
+		std::string												 _attrValueStandingWater;
 
 
 
