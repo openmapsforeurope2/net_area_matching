@@ -114,7 +114,7 @@ void app::calcul::StandingWaterOp::_addStandingWater()
 		ign::feature::Feature fStandingArea = itStandingArea->next();
 
 		std::string countryCodeStandingArea = fStandingArea.getAttribute(countryCodeName).toString();
-
+/*
 		//on test si le standing water ne superpose pas un watercourse
 		bool isIntersectingWatercourse = false;
 		double areaMaxIntersection = 10;
@@ -141,7 +141,7 @@ void app::calcul::StandingWaterOp::_addStandingWater()
 
 		if (isIntersectingWatercourse)
 			continue;
-
+*/
 		fStandingArea.setAttribute(wTag, ign::data::String(_attrValueStandingWater));
 		sIdStandingArea2delete.insert(fStandingArea.getId());
 		_fsArea->createFeature(fStandingArea);
