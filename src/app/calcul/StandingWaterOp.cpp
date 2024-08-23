@@ -103,6 +103,7 @@ void app::calcul::StandingWaterOp::_addStandingWater()
 	// app parameters
 	params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
 	std::string wTag = themeParameters->getValue(W_TAG).toString();
+	double areaMaxIntersection = themeParameters->getValue(MAX_INTERSECT_STANDING_WATER).toDouble();
 
 	ign::feature::FeatureFilter filterCountries("(" + countryCodeName + " = '" + _vCountriesCodeName[0] + "' or " + countryCodeName + " = '" + _vCountriesCodeName[1] + "')");
 	ign::feature::FeatureIteratorPtr itStandingArea = _fsAreaStandingWater->getFeatures(filterCountries);
@@ -114,10 +115,10 @@ void app::calcul::StandingWaterOp::_addStandingWater()
 		ign::feature::Feature fStandingArea = itStandingArea->next();
 
 		std::string countryCodeStandingArea = fStandingArea.getAttribute(countryCodeName).toString();
-/*
+
 		//on test si le standing water ne superpose pas un watercourse
 		bool isIntersectingWatercourse = false;
-		double areaMaxIntersection = 10;
+
 		ign::feature::FeatureFilter filterArroundStandingArea(countryCodeName + " = '" + countryCodeStandingArea + "'");;
 		filterArroundStandingArea.setExtent(fStandingArea.getGeometry().getEnvelope());
 		ign::feature::FeatureIteratorPtr itWaterCrsArea = _fsArea->getFeatures(filterArroundStandingArea);
@@ -141,7 +142,7 @@ void app::calcul::StandingWaterOp::_addStandingWater()
 
 		if (isIntersectingWatercourse)
 			continue;
-*/
+
 		fStandingArea.setAttribute(wTag, ign::data::String(_attrValueStandingWater));
 		sIdStandingArea2delete.insert(fStandingArea.getId());
 		_fsArea->createFeature(fStandingArea);
