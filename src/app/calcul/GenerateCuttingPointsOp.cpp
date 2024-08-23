@@ -159,11 +159,11 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutpByCountry(
 
 			for(size_t i = 0 ; i < vpEndingPtVector.size() ; ++i ) {
 
-				ign::feature::FeatureCollection fCollection;
+				ign::feature::FeatureFilter filterArroundEndPt(linkedFeatIdName + " = '" + idOrigin + "'");
 				ign::geometry::Envelope bboxPt(vpEndingPtVector[i].first.getEnvelope());
 				bboxPt.expandBy(distSnapMergeCf);
-				_fsCutL->getFeaturesByExtent(bboxPt, fCollection);
-				if (fCollection.size() != 0)
+				filterArroundEndPt.setExtent(bboxPt);
+				if (_hasCutLArroundEndingPt(filterArroundEndPt, vpEndingPtVector[i].first))
 					continue;
 
 				ign::math::Vec2d vOrtho(-vpEndingPtVector[i].second.y(), vpEndingPtVector[i].second.x());
@@ -306,4 +306,25 @@ double app::calcul::GenerateCuttingPointsOp::_getAngle(
 	ign::math::Vec2d const& v
 ) const {
 	return acos( ( v.x()*vRef.x()+vRef.y()*v.y())/(sqrt(vRef.x()*vRef.x()+vRef.y()*vRef.y())*sqrt(v.x()*v.x()+v.y()*v.y()) ) );
+}
+
+
+bool app::calcul::GenerateCuttingPointsOp::_hasCutLArroundEndingPt(
+	ign::feature::FeatureFilter& filterArroundEndPt,
+	ign::geometry::Point& ptEndPt
+)
+{
+	app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
+	double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
+
+	ign::feature::FeatureIteratorPtr itCutLArroundEndPt = _fsCutL->getFeatures(filterArroundEndPt);
+	bool hasCutLArround = false;
+	while (itCutLArroundEndPt->hasNext()) {
+		ign::feature::Feature fCutLArroundEndPt = itCutLArroundEndPt->next();
+		if (fCutLArroundEndPt.getGeometry().distance(ptEndPt) < distSnapMergeCf) 
+			return true;
+
+		
+	}
+	return false;
 }
