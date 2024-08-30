@@ -201,8 +201,7 @@ void app::calcul::StandingWaterOp::_sortingStandingWater()
 		_fsArea->deleteFeature(*sit);
 
 	std::ostringstream ss;
-	ss << "ALTER TABLE " << _fsArea->getTableName() << " DROP COLUMN " << attrIsStandingWaterName << " character varying(255);";
-	context->getDataBaseManager().getConnection()->update(ss.str());
+	ss << "ALTER TABLE " << _fsArea->getTableName() << " DROP COLUMN " << attrIsStandingWaterName << ";";
 	context->getDataBaseManager().getConnection()->update(ss.str());
 
 }
