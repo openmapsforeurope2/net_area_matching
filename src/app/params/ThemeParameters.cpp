@@ -22,7 +22,8 @@ namespace params{
 		_initParameter( NATIONAL_IDENTIFIER_NAME, "NATIONAL_IDENTIFIER_NAME" );
 		_initParameter( LANDMASK_TABLE, "LANDMASK_TABLE" );
 		_initParameter( COUNTRY_CODE_W, "COUNTRY_CODE_W");
-		_initParameter( W_TAG, "W_TAG" );
+		_initParameter(W_TAG, "W_TAG");
+		_initParameter(IS_STANDING_WATER, "IS_STANDING_WATER" );
 		_initParameter( LAND_COVER_TYPE, "LAND_COVER_TYPE" );
 		_initParameter( TYPE_LAND_AREA, "TYPE_LAND_AREA" );
 		_initParameter( PC_LANDMASK_BUFFER, "PC_LANDMASK_BUFFER" );
@@ -39,7 +40,7 @@ namespace params{
 		_initParameter(THRESHOLD_AREA_ATTR, "THRESHOLD_AREA_ATTR"); 
 		_initParameter(LIST_ATTR_JSON, "LIST_ATTR_JSON");
 		_initParameter(LIST_ATTR_W, "LIST_ATTR_W");
-		_initParameter(MAX_INTERSECT_STANDING_WATER, "MAX_INTERSECT_STANDING_WATER");
+		//_initParameter(MAX_INTERSECT_STANDING_WATER, "MAX_INTERSECT_STANDING_WATER");
 	}
 
 	///

@@ -144,6 +144,10 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
     std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
 	std::string const linkedFeatIdName = context->getEpgParameters().getValue(LINKED_FEATURE_ID).toString();
 
+	params::ThemeParameters * themeParameters = params::ThemeParametersS::getInstance();
+	std::string const natIdIdName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
+	std::map<std::string, std::string> mIdNatId;
+
 	GraphType graphArea;
 	ign::geometry::graph::tools::SnapRoundPlanarizer< GraphType >  planarizerGraphArea(graphArea, 100);
 
@@ -158,7 +162,8 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
         std::string idOrigin = fArea.getId();
 		for (size_t i = 0; i < mp.numGeometries(); ++i) {
 			planarizerGraphArea.addEdge(mp.polygonN(i).exteriorRing(), idOrigin);
-		}        
+		}
+		mIdNatId[idOrigin] = fArea.getAttribute(natIdIdName).toString();
     }
 	planarizerGraphArea.planarize();
 
@@ -186,7 +191,8 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 		for (size_t i = 0; i < vCutlOrigins.size(); ++i) {
 			if (i != 0)
 				idLinkedValue+="#";
-			idLinkedValue += vCutlOrigins[i];
+			if(mIdNatId.find(vCutlOrigins[i]) != mIdNatId.end())
+				idLinkedValue += mIdNatId.find(vCutlOrigins[i])->second;
 		}
 
 		featCutL.setAttribute(linkedFeatIdName, ign::data::String(idLinkedValue));
