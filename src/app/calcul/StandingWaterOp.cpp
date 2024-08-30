@@ -107,7 +107,9 @@ void app::calcul::StandingWaterOp::_addStandingWater()
 	std::ostringstream ss;
 	ss << "ALTER TABLE " << _fsArea->getTableName() << " ADD COLUMN " << attrIsStandingWaterName << " character varying(255);";
 	context->getDataBaseManager().getConnection()->update(ss.str());
-
+	std::string const idName = epgParams.getValue(ID).toString();
+	std::string const geomName = epgParams.getValue(GEOM).toString();
+	context->getDataBaseManager().refreshFeatureStore(_fsArea->getTableName(),idName, geomName);
 
 	ign::feature::FeatureFilter filterCountries("(" + countryCodeName + " = '" + _vCountriesCodeName[0] + "' or " + countryCodeName + " = '" + _vCountriesCodeName[1] + "')");
 	ign::feature::FeatureIteratorPtr itStandingArea = _fsAreaStandingWater->getFeatures(filterCountries);
@@ -200,6 +202,7 @@ void app::calcul::StandingWaterOp::_sortingStandingWater()
 
 	std::ostringstream ss;
 	ss << "ALTER TABLE " << _fsArea->getTableName() << " DROP COLUMN " << attrIsStandingWaterName << " character varying(255);";
+	context->getDataBaseManager().getConnection()->update(ss.str());
 	context->getDataBaseManager().getConnection()->update(ss.str());
 
 }
