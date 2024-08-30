@@ -93,7 +93,6 @@ void app::calcul::StandingWaterOp::AddStandingWater( std::string borderCode,
 ///
 void app::calcul::StandingWaterOp::_addStandingWater()
 {
-
 	//--
 	epg::Context *context = epg::ContextS::getInstance();
 
@@ -104,6 +103,11 @@ void app::calcul::StandingWaterOp::_addStandingWater()
 	params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
 	std::string attrIsStandingWaterName = themeParameters->getValue(IS_STANDING_WATER).toString();
 	//double areaMaxIntersection = themeParameters->getValue(MAX_INTERSECT_STANDING_WATER).toDouble();
+
+	std::ostringstream ss;
+	ss << "ALTER TABLE " << _fsArea->getTableName() << " ADD COLUMN " << attrIsStandingWaterName << " character varying(255);";
+	context->getDataBaseManager().getConnection()->update(ss.str());
+
 
 	ign::feature::FeatureFilter filterCountries("(" + countryCodeName + " = '" + _vCountriesCodeName[0] + "' or " + countryCodeName + " = '" + _vCountriesCodeName[1] + "')");
 	ign::feature::FeatureIteratorPtr itStandingArea = _fsAreaStandingWater->getFeatures(filterCountries);
@@ -193,5 +197,9 @@ void app::calcul::StandingWaterOp::_sortingStandingWater()
 
 	for (std::set<std::string>::iterator sit = sIdStandingArea2delete.begin(); sit != sIdStandingArea2delete.end(); ++sit)
 		_fsArea->deleteFeature(*sit);
+
+	std::ostringstream ss;
+	ss << "ALTER TABLE " << _fsArea->getTableName() << " DROP COLUMN " << attrIsStandingWaterName << " character varying(255);";
+	context->getDataBaseManager().getConnection()->update(ss.str());
 
 }
