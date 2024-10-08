@@ -159,10 +159,10 @@ namespace app
 
                 //DEBUG
                 _logger->log(epg::log::DEBUG, "Area id : "+idOrigin);
-                // if (idOrigin != "0df0f622-819c-488c-9c42-87b66ff0d848") {
-                //     // bool test = true;
-                //     continue;
-                // }
+                if (idOrigin != "911242e5-bbb1-4da8-8bb6-53d88a0af1a0") {
+                    // bool test = true;
+                    continue;
+                }
 
                 std::vector< ign::geometry::Polygon > vPolygons;
 

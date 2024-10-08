@@ -2,9 +2,33 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build (in container)",
+            "label": "build release",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/hy_matching hy_matching ./build-unix.sh",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/hy_matching hy_matching ./build-unix-release.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "build debug",
+            "type": "shell",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/hy_matching hy_matching ./build-unix-debug.sh",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -41,7 +65,7 @@
         {
             "label": "run the code",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/hy_matching hy_matching ./bin/ome2_hy_matching --c /usr/local/src/hy_matching/data/config/epg_parameters.ini --cc be#fr --sp 330-370",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/hy_matching hy_matching ./bin/ome2_hy_matching --c /usr/local/src/hy_matching/data/config/epg_parameters.ini --cc be#fr --sp 350-399",
             "group": "build",
             "problemMatcher": []
         },

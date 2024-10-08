@@ -120,6 +120,9 @@ void app::calcul::GenerateCuttingPointsOp::_init()
 
 };
 
+///
+///
+///
 void app::calcul::GenerateCuttingPointsOp::_generateCutpByCountry(
 	std::string countryCode
 )
@@ -191,6 +194,9 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutpByCountry(
 	}
 }
 
+///
+///
+///
 std::vector<std::pair<ign::geometry::Point, ign::math::Vec2d>> app::calcul::GenerateCuttingPointsOp::_getEndingVectors(
 	ign::geometry::Polygon const& poly
 ) const {
@@ -292,6 +298,9 @@ std::vector<std::pair<ign::geometry::Point, ign::math::Vec2d>> app::calcul::Gene
 	return vResult;
 }
 
+///
+///
+///
 ign::math::Vec2d app::calcul::GenerateCuttingPointsOp::_getLsEndingVector(
 	ign::geometry::LineString const& ls,
 	ign::geometry::Point const endingPoint
@@ -301,6 +310,9 @@ ign::math::Vec2d app::calcul::GenerateCuttingPointsOp::_getLsEndingVector(
 	return ls.endPoint().toVec2d() - ls.pointN(ls.numPoints()-2).toVec2d();
 }
 
+///
+///
+///
 double app::calcul::GenerateCuttingPointsOp::_getAngle(
 	ign::math::Vec2d const& vRef,
 	ign::math::Vec2d const& v
