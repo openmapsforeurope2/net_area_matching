@@ -129,16 +129,15 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutpByCountry(
 {
 	//--
 	epg::Context *context = epg::ContextS::getInstance();
-
 	//--
 	epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
 	std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
-	std::string const linkedFeatIdName = epgParams.getValue(LINKED_FEATURE_ID).toString();
-
+	std::string const linkedFeatIdName = epgParams.getValue(LINKED_FEATURE_ID).toString();	
 	//--
 	app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 	double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
 	std::string const sectionGeomName = themeParameters->getValue(CUTP_SECTION_GEOM).toString();
+	std::string const natIdIdName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
 
 	// a parametrer
 	double sectionWidth = 100;
@@ -152,8 +151,10 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutpByCountry(
 		ign::feature::Feature const& fArea = itArea->next();
 		ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
 		std::string idOrigin = fArea.getId();
+		std::string linkedNatId = fArea.getAttribute(natIdIdName).toString();
+
 		for (size_t i = 0; i < mp.numGeometries(); ++i) {
-			ign::geometry::Polygon const& poly = mp.polygonN(i);
+			ign::geometry::Polygon poly = mp.polygonN(i);
 
 			// if (poly.distance(ign::geometry::Point(3835893.154,3097818.904)) < 0.2) {
 			// 	bool test = true;
@@ -162,11 +163,11 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutpByCountry(
 
 			for(size_t i = 0 ; i < vpEndingPtVector.size() ; ++i ) {
 
-				ign::feature::FeatureCollection fCollection;
+				ign::feature::FeatureFilter filterArroundEndPt(linkedFeatIdName + " LIKE '%" + linkedNatId + "%'");
 				ign::geometry::Envelope bboxPt(vpEndingPtVector[i].first.getEnvelope());
 				bboxPt.expandBy(distSnapMergeCf);
-				_fsCutL->getFeaturesByExtent(bboxPt, fCollection);
-				if (fCollection.size() != 0)
+				filterArroundEndPt.setExtent(bboxPt);
+				if (_hasCutLArroundEndingPt(filterArroundEndPt, vpEndingPtVector[i].first, poly))
 					continue;
 
 				ign::math::Vec2d vOrtho(-vpEndingPtVector[i].second.y(), vpEndingPtVector[i].second.x());
@@ -185,7 +186,7 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutpByCountry(
 				// sectionGeom.setFillZ(0);
 				featCutP.setGeometry(vpEndingPtVector[i].first);
 				featCutP.setAttribute(countryCodeName, ign::data::String(countryCode));
-				featCutP.setAttribute(linkedFeatIdName, ign::data::String(idOrigin));
+				featCutP.setAttribute(linkedFeatIdName, ign::data::String(linkedNatId));
 				featCutP.setAttribute(sectionGeomName, sectionGeom);
 				_fsCutP->createFeature(featCutP);
 
@@ -318,4 +319,24 @@ double app::calcul::GenerateCuttingPointsOp::_getAngle(
 	ign::math::Vec2d const& v
 ) const {
 	return acos( ( v.x()*vRef.x()+vRef.y()*v.y())/(sqrt(vRef.x()*vRef.x()+vRef.y()*vRef.y())*sqrt(v.x()*v.x()+v.y()*v.y()) ) );
+}
+
+
+bool app::calcul::GenerateCuttingPointsOp::_hasCutLArroundEndingPt(
+	ign::feature::FeatureFilter& filterArroundEndPt,
+	ign::geometry::Point& ptEndPt,
+	ign::geometry::Polygon& polyArea
+)
+{
+	app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
+	double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
+
+	ign::feature::FeatureIteratorPtr itCutLArroundEndPt = _fsCutL->getFeatures(filterArroundEndPt);
+	bool hasCutLArround = false;
+	while (itCutLArroundEndPt->hasNext()) {
+		ign::feature::Feature fCutLArroundEndPt = itCutLArroundEndPt->next();
+		if (fCutLArroundEndPt.getGeometry().distance(ptEndPt) < distSnapMergeCf && fCutLArroundEndPt.getGeometry().intersects(polyArea) )
+			return true;	
+	}
+	return false;
 }

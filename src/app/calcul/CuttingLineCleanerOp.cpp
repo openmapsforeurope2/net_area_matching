@@ -90,8 +90,10 @@ namespace app
         void CuttingLineCleanerOp::_compute() const {
             // epg parameters
             epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
-            std::string const linkedFeatIdName = epgParams.getValue(LINKED_FEATURE_ID).toString();
+			std::string const linkedFeatIdName = epgParams.getValue(LINKED_FEATURE_ID).toString();
             std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
+			params::ThemeParameters * themeParameters = params::ThemeParametersS::getInstance();
+			std::string const natIdIdName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
 
             //--
             std::set<std::string> sCl2Delete;
@@ -104,21 +106,24 @@ namespace app
                 std::string clId = fCl.getId();
                 std::string linkedFeatId = fCl.getAttribute(linkedFeatIdName).toString();
 
-                if (clId == "16702069-36f2-41c3-b0f1-bcf4a8e91a78") {
-                    bool test = true;
-                }
-
                 std::vector<std::string> vIds;
                 epg::tools::StringTools::Split(linkedFeatId, "#", vIds);
 
                 bool bDelete = true;
                 for (size_t i = 0 ; i < vIds.size() ; ++i) {
                     ign::feature::Feature fArea;
-                    _fsArea->getFeatureById(vIds[i], fArea);
-                    if(fArea.getId() != "") {
-                        bDelete = false;
-                        break;
+					ign::feature::FeatureFilter filterAreaLinked(natIdIdName +" = '" + vIds[i] + "'");
+                    ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterAreaLinked);
+	
+                    while(itArea->hasNext()) {
+						ign::feature::Feature fArea = itArea->next();
+						if (fArea.getGeometry().intersects(fCl.getGeometry())) {
+							bDelete = false;
+							break;
+						}
                     }
+					if (!bDelete)
+						break;
                 }
 
                 if ( !bDelete ) continue;

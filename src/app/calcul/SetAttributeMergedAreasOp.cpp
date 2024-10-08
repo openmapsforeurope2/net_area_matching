@@ -108,14 +108,14 @@ namespace app
 
             ign::feature::FeatureFilter filterArea(countryCodeName+" like '%#%'");
 
-			epg::ContextS::getInstance()->getDataBaseManager().setValueColumn(_fsArea->getTableName(), wTagName, "modif_attr", countryCodeName + " like '%#%'");
+			//epg::ContextS::getInstance()->getDataBaseManager().setValueColumn(_fsArea->getTableName(), wTagName, "modif_attr", countryCodeName + " like '%#%'");
 
             int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ set attribute merged areas % complete ]\n");
 
             ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
 
-			std::vector < ign::feature::Feature> vArea2modify;
+			//std::vector < ign::feature::Feature> vArea2modify;
 
             while (itArea->hasNext())
             {
@@ -141,6 +141,9 @@ namespace app
 
 				if (!hasAttr1 && !hasAttr2) {
 					//pas d'attribut trouve
+					fArea.setAttribute(wTagName, ign::data::String("modif_attr"));
+					//vArea2modify.push_back(fArea);
+					_fsArea->modifyFeature(fArea);
 					continue;
 				}
 				else if (hasAttr1 && !hasAttr2) {
@@ -155,14 +158,14 @@ namespace app
 				}
 				fArea.setId(idOrigin);
 				fArea.setGeometry(geomArea);
-				fArea.setGeometry(geomArea);
-				//fArea.setAttribute(wTagName, ign::data::String("modif_attr")); 
+				fArea.setAttribute(wTagName, ign::data::String("modif_attr")); 
 				fArea.setAttribute("xy_source", ign::data::String("ome2")); 
 				fArea.setAttribute("z_source", ign::data::String("ome2"));
-				vArea2modify.push_back(fArea);				
+				//vArea2modify.push_back(fArea);
+				_fsArea->modifyFeature(fArea);
             }
-			for( size_t i = 0; i < vArea2modify.size(); ++i)
-				_fsArea->modifyFeature(vArea2modify[i]);
+			/*for( size_t i = 0; i < vArea2modify.size(); ++i)
+				_fsArea->modifyFeature(vArea2modify[i]);*/
         }
 
 

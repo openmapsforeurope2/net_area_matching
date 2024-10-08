@@ -55,8 +55,8 @@ void app::calcul::StandingWaterOp::_init()
     std::string const areaTableName = epgParams.getValue(AREA_TABLE).toString();
     std::string const idName = epgParams.getValue(ID).toString();
     std::string const geomName = epgParams.getValue(GEOM).toString();
-    std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
-	std::string const linkedFeatIdName = context->getEpgParameters().getValue(LINKED_FEATURE_ID).toString();
+
+
             
     // app parameters
     params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
@@ -93,7 +93,6 @@ void app::calcul::StandingWaterOp::AddStandingWater( std::string borderCode,
 ///
 void app::calcul::StandingWaterOp::_addStandingWater()
 {
-
 	//--
 	epg::Context *context = epg::ContextS::getInstance();
 
@@ -102,7 +101,15 @@ void app::calcul::StandingWaterOp::_addStandingWater()
 	std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
 	// app parameters
 	params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
-	std::string wTag = themeParameters->getValue(W_TAG).toString();
+	std::string attrIsStandingWaterName = themeParameters->getValue(IS_STANDING_WATER).toString();
+	//double areaMaxIntersection = themeParameters->getValue(MAX_INTERSECT_STANDING_WATER).toDouble();
+
+	std::ostringstream ss;
+	ss << "ALTER TABLE " << _fsArea->getTableName() << " ADD COLUMN " << attrIsStandingWaterName << " character varying(255);";
+	context->getDataBaseManager().getConnection()->update(ss.str());
+	std::string const idName = epgParams.getValue(ID).toString();
+	std::string const geomName = epgParams.getValue(GEOM).toString();
+	context->getDataBaseManager().refreshFeatureStore(_fsArea->getTableName(),idName, geomName);
 
 	ign::feature::FeatureFilter filterCountries("(" + countryCodeName + " = '" + _vCountriesCodeName[0] + "' or " + countryCodeName + " = '" + _vCountriesCodeName[1] + "')");
 	ign::feature::FeatureIteratorPtr itStandingArea = _fsAreaStandingWater->getFeatures(filterCountries);
@@ -116,8 +123,8 @@ void app::calcul::StandingWaterOp::_addStandingWater()
 		std::string countryCodeStandingArea = fStandingArea.getAttribute(countryCodeName).toString();
 
 		//on test si le standing water ne superpose pas un watercourse
-		bool isIntersectingWatercourse = false;
-		double areaMaxIntersection = 10;
+		/*bool isIntersectingWatercourse = false;
+
 		ign::feature::FeatureFilter filterArroundStandingArea(countryCodeName + " = '" + countryCodeStandingArea + "'");;
 		filterArroundStandingArea.setExtent(fStandingArea.getGeometry().getEnvelope());
 		ign::feature::FeatureIteratorPtr itWaterCrsArea = _fsArea->getFeatures(filterArroundStandingArea);
@@ -140,9 +147,9 @@ void app::calcul::StandingWaterOp::_addStandingWater()
 		}
 
 		if (isIntersectingWatercourse)
-			continue;
+			continue;*/
 
-		fStandingArea.setAttribute(wTag, ign::data::String(_attrValueStandingWater));
+		fStandingArea.setAttribute(attrIsStandingWaterName, ign::data::String(_attrValueStandingWater));
 		sIdStandingArea2delete.insert(fStandingArea.getId());
 		_fsArea->createFeature(fStandingArea);
 	}
@@ -173,10 +180,11 @@ void app::calcul::StandingWaterOp::_sortingStandingWater()
 	epg::Context *context = epg::ContextS::getInstance();
 	// app parameters
 	params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
-	std::string wTag = themeParameters->getValue(W_TAG).toString();
+	std::string attrIsStandingWaterName = themeParameters->getValue(IS_STANDING_WATER).toString();
 
-	ign::feature::FeatureFilter filterStandingArea(wTag + " = '"+_attrValueStandingWater+"#"+ _attrValueStandingWater+"' or "
-	+ wTag + " = '" + _attrValueStandingWater + "'");
+	ign::feature::FeatureFilter filterStandingArea(attrIsStandingWaterName + " = '" + _attrValueStandingWater + "'");
+	/*ign::feature::FeatureFilter filterStandingArea(wTag + " = '"+_attrValueStandingWater+"#"+ _attrValueStandingWater+"' or "
+	+ wTag + " = '" + _attrValueStandingWater + "'");*/
 	ign::feature::FeatureIteratorPtr itStandingArea = _fsArea->getFeatures(filterStandingArea);
 	int numFeaturesStandingWater = context->getDataBaseManager().numFeatures(*_fsArea, filterStandingArea);
 	boost::progress_display display(numFeaturesStandingWater, std::cout, "[ EXPORT STANDING WATER]\n");
@@ -191,5 +199,9 @@ void app::calcul::StandingWaterOp::_sortingStandingWater()
 
 	for (std::set<std::string>::iterator sit = sIdStandingArea2delete.begin(); sit != sIdStandingArea2delete.end(); ++sit)
 		_fsArea->deleteFeature(*sit);
+
+	std::ostringstream ss;
+	ss << "ALTER TABLE " << _fsArea->getTableName() << " DROP COLUMN " << attrIsStandingWaterName << ";";
+	context->getDataBaseManager().getConnection()->update(ss.str());
 
 }

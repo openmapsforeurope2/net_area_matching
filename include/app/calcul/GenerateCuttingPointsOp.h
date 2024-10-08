@@ -79,6 +79,13 @@ namespace calcul{
 			ign::math::Vec2d const& v
 		) const;
 
+		//--
+		bool _hasCutLArroundEndingPt(	
+			ign::feature::FeatureFilter& filterArroundEndPt,
+			ign::geometry::Point& ptEndPt,
+			ign::geometry::Polygon& polyArea
+		);
+
     };
 
 }
