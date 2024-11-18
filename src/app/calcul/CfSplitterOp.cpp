@@ -159,10 +159,10 @@ namespace app
 
                 //DEBUG
                 _logger->log(epg::log::DEBUG, "Area id : "+idOrigin);
-                if (idOrigin != "911242e5-bbb1-4da8-8bb6-53d88a0af1a0") {
-                    // bool test = true;
-                    continue;
-                }
+                // if (idOrigin != "c5b5fd05-eb9e-40c1-905e-f350e9463f9d") {
+                //     // bool test = true;
+                //     continue;
+                // }
 
                 std::vector< ign::geometry::Polygon > vPolygons;
 
@@ -184,7 +184,7 @@ namespace app
                     // On recupere les cp intersectant le poly
                     // on calcul les index correspondant de ces cp sur le contour exterieur du poly (ajouter les extremités des cl ?)
                     // on découpe le contour exterieur au niveau des cp
-                    
+
                     std::map<std::string, ign::geometry::Point> mCp = _getAllCp(polyWithoutHoles); //TODO supprimer doublons sur le contour
                     std::vector<ign::geometry::Point> vCpCl;
                     for( std::map<std::string, ign::geometry::Point>::const_iterator mit = mCp.begin() ; mit != mCp.end() ; ++mit )
@@ -210,9 +210,9 @@ namespace app
                     std::set<std::string> sMergedCp;
                     for( std::map<std::string, ign::geometry::Point>::const_iterator mit_ = mCp.begin() ; mit_ != mCp.end() ; ++mit_ ) {
                         //DEBUG
-                        if ( mit_->second.distance(ign::geometry::Point(3892792.15,3140092.36)) < 5 ) {
-                            bool test = true;
-                        }
+                        // if ( mit_->second.distance(ign::geometry::Point(3820200.7005,3088954.5002)) < 5 ) {
+                        //     bool test = true;
+                        // }
                         //4018889.42,3128024.22
                         // if ( mit_->second.distance(ign::geometry::Point(3963719.003,3157270.609)) < 0.1 ) {
                         //     bool test = true;
@@ -300,21 +300,27 @@ namespace app
                                     vIntersectInter.push_back(*vit);
                                 }
 
-                                if (cpIsOnRing && vIntersectInter.size() == 1) {
+                                if (cpIsOnRing) {
+                                    if( vIntersectInter.size() == 1) {
+                                        if( !mslToolPtr ) mslToolPtr = new epg::tools::MultiLineStringTool(polyWithoutHoles);
+                                        std::pair< bool, ign::geometry::LineString > foundPath = mslToolPtr->getPath(cpGeom, vIntersectInter.front());
 
-                                    if( !mslToolPtr ) mslToolPtr = new epg::tools::MultiLineStringTool(polyWithoutHoles);
-                                    std::pair< bool, ign::geometry::LineString > foundPath = mslToolPtr->getPath(cpGeom, vIntersectInter.front());
+                                        if( !foundPath.first ) continue;
 
-                                    if( !foundPath.first ) continue;
+                                        double length = foundPath.second.length();
 
-                                    double length = foundPath.second.length();
-
-                                    if( length < minPathLength) {
-                                        minPathLength = length;
-                                        sectionGeomPtr.reset( new ign::geometry::LineString(cpGeom, vInOutProj[i]) );
+                                        if( length < minPathLength) {
+                                            minPathLength = length;
+                                            sectionGeomPtr.reset( new ign::geometry::LineString(cpGeom, vInOutProj[i]) );
+                                        }
                                     }
-                                } else {
-                                    _logger->log(epg::log::ERROR, "More than one intermediate intersection on section : "+ign::geometry::LineString(cpGeom, vInOutProj[i]).toString());
+                                    else if( vIntersectInter.size() == 0) {
+                                        sectionGeomPtr.reset( new ign::geometry::LineString(cpGeom, vInOutProj[i]) );
+                                        break;
+                                    }
+                                    else {
+                                        _logger->log(epg::log::ERROR, "More than one intermediate intersection on section : "+ign::geometry::LineString(cpGeom, vInOutProj[i]).toString());
+                                    }
                                 }
                             }
                         }
@@ -639,6 +645,12 @@ namespace app
         ///
         std::vector<ign::geometry::LineString> CfSplitterOp::_getSubLs(ign::geometry::LineString const& ring, std::set<size_t> const& sCuttingIndex) const {
             std::vector<ign::geometry::LineString> vSubLs;
+
+            if(sCuttingIndex.size() < 2 ) {
+                vSubLs.push_back(ring);
+                return vSubLs;
+            }
+
             size_t previousId = *sCuttingIndex.rbegin();
             for( std::set<size_t>::const_iterator sit = sCuttingIndex.begin() ; sit != sCuttingIndex.end() ; ++sit ) {
                 std::pair<bool, ign::geometry::LineString> foundSubLs = ome2::geometry::tools::getSubLineString(previousId, *sit, ring);

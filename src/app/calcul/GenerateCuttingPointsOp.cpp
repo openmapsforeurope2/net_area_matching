@@ -116,8 +116,6 @@ void app::calcul::GenerateCuttingPointsOp::_init()
 	//--
 	_fsCutL = context->getDataBaseManager().getFeatureStore(cutlTableName, idName, geomName);
 
-	
-
 };
 
 ///
