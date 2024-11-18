@@ -33,8 +33,7 @@ namespace step {
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 
-		app::calcul::GenerateCuttingLinesOp generateCuttingLinesOp(countryCodeW, verbose);
-		generateCuttingLinesOp.generateCutL();
+		app::calcul::GenerateCuttingLinesOp::compute(countryCodeW, verbose);
 	}
 
 }

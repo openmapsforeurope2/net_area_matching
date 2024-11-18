@@ -44,7 +44,18 @@ app::calcul::GenerateCuttingPointsOp::~GenerateCuttingPointsOp()
 ///
 ///
 ///
-void app::calcul::GenerateCuttingPointsOp::generateCutP() 
+void app::calcul::GenerateCuttingPointsOp::compute(
+	std::string borderCode, 
+	bool verbose
+) {
+	GenerateCuttingPointsOp op(borderCode, verbose);
+	op._compute();
+}
+
+///
+///
+///
+void app::calcul::GenerateCuttingPointsOp::_compute() const
 {
 	std::vector<std::string> vCountry;
 	epg::tools::StringTools::Split(_borderCode, "#", vCountry);
@@ -79,7 +90,6 @@ void app::calcul::GenerateCuttingPointsOp::_init()
 
 	//--
 	app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-	std::string const countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 	std::string const sectionGeomName = themeParameters->getParameter(CUTP_SECTION_GEOM).getValue().toString();
 	std::string cutpTableName = themeParameters->getValue(CUTP_TABLE).toString();
 	if (cutpTableName == "") {
@@ -123,8 +133,7 @@ void app::calcul::GenerateCuttingPointsOp::_init()
 ///
 void app::calcul::GenerateCuttingPointsOp::_generateCutpByCountry(
 	std::string countryCode
-)
-{
+) const {
 	//--
 	epg::Context *context = epg::ContextS::getInstance();
 	//--
@@ -152,7 +161,7 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutpByCountry(
 		std::string linkedNatId = fArea.getAttribute(natIdIdName).toString();
 
 		for (size_t i = 0; i < mp.numGeometries(); ++i) {
-			ign::geometry::Polygon poly = mp.polygonN(i);
+			ign::geometry::Polygon const& poly = mp.polygonN(i);
 
 			// if (poly.distance(ign::geometry::Point(3835893.154,3097818.904)) < 0.2) {
 			// 	bool test = true;
@@ -322,10 +331,9 @@ double app::calcul::GenerateCuttingPointsOp::_getAngle(
 
 bool app::calcul::GenerateCuttingPointsOp::_hasCutLArroundEndingPt(
 	ign::feature::FeatureFilter& filterArroundEndPt,
-	ign::geometry::Point& ptEndPt,
-	ign::geometry::Polygon& polyArea
-)
-{
+	ign::geometry::Point const& ptEndPt,
+	ign::geometry::Polygon const& polyArea
+) const {
 	app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 	double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
 

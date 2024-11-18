@@ -55,7 +55,7 @@ namespace calcul{
 	private:
 
 		//--
-		void _init(std::string const& borderCode);
+		void _init();
 
 		//--
 		void _compute() const;

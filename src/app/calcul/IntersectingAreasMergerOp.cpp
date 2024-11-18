@@ -15,8 +15,6 @@
 #include <epg/tools/TimeTools.h>
 #include <epg/tools/FilterTools.h>
 
-// SOCLE
-// #include <ign/geometry/algorithm/SnapOpGeos.h>
 
 
 namespace app
@@ -33,7 +31,7 @@ namespace app
             _verbose(verbose),
             _borderCode(borderCode)
         {
-            _init(borderCode);
+            _init();
         }
 
         ///
@@ -58,7 +56,7 @@ namespace app
         ///
         ///
         ///
-        void IntersectingAreasMergerOp::_init(std::string const& borderCode)
+        void IntersectingAreasMergerOp::_init()
         {
             //--
             _logger = epg::log::EpgLoggerS::getInstance();
@@ -84,7 +82,7 @@ namespace app
             _logger->log(epg::log::INFO, "[END] initialization: " + epg::tools::TimeTools::getTime());
 
             //--
-		    epg::tools::StringTools::Split(borderCode, "#", _vCountry);
+		    epg::tools::StringTools::Split(_borderCode, "#", _vCountry);
         }
 
 

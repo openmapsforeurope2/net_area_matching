@@ -1,4 +1,4 @@
-#include <app/step/335_GenerateCuttingPoints.h>
+#include <app/step/336_GenerateIntersectionAreas.h>
 
 //EPG
 #include <epg/Context.h>
@@ -6,7 +6,7 @@
 
 //APP
 #include <app/params/ThemeParameters.h>
-#include <app/calcul/GenerateCuttingPointsOp.h>
+#include <app/calcul/GenerateIntersectionAreaOp.h>
 
 
 namespace app {
@@ -15,7 +15,7 @@ namespace step {
 	///
 	///
 	///
-	void GenerateCuttingPoints::init()
+	void GenerateIntersectionAreas::init()
 	{
 
 	}
@@ -23,7 +23,7 @@ namespace step {
 	///
 	///
 	///
-	void GenerateCuttingPoints::onCompute( bool verbose = false )
+	void GenerateIntersectionAreas::onCompute( bool verbose = false )
 	{
 		//--
 		_epgParams.setParameter(AREA_TABLE, ign::data::String(getLastWorkingTableName(AREA_TABLE_INIT)));
@@ -31,7 +31,7 @@ namespace step {
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 
-		app::calcul::GenerateCuttingPointsOp::compute(countryCodeW, verbose);
+		app::calcul::GenerateIntersectionAreaOp::compute(countryCodeW, verbose);
 	}
 
 }

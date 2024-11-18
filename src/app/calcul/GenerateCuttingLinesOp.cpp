@@ -39,14 +39,23 @@ app::calcul::GenerateCuttingLinesOp::GenerateCuttingLinesOp(
 ///
 app::calcul::GenerateCuttingLinesOp::~GenerateCuttingLinesOp()
 {
-    //_shapeLogger->closeShape("");
 }
 
 ///
 ///
 ///
-void app::calcul::GenerateCuttingLinesOp::generateCutL(
-)
+void app::calcul::GenerateCuttingLinesOp::compute(
+	std::string borderCode, 
+	bool verbose
+) {
+	GenerateCuttingLinesOp op(borderCode, verbose);
+	op._compute();
+}
+
+///
+///
+///
+void app::calcul::GenerateCuttingLinesOp::_compute() const
 {
 	std::vector<std::string> vCountry;
 	epg::tools::StringTools::Split(_borderCode, "#", vCountry);
@@ -136,8 +145,7 @@ void app::calcul::GenerateCuttingLinesOp::_init()
 ///
 void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 	std::string countryCode
-)
-{
+) const {
 	epg::Context *context = epg::ContextS::getInstance();
     // epg parameters
     epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();

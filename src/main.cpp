@@ -9,6 +9,8 @@
 #include <epg/tools/TimeTools.h>
 #include <epg/params/tools/loadParameters.h>
 
+//OME2
+#include <ome2/utils/setTableName.h>
 
 //APP
 #include <app/params/ThemeParameters.h>
@@ -42,7 +44,7 @@ int main(int argc, char *argv[])
         ("cc" , po::value< std::string >(&countryCode)          , "country code" )
 		("sp", po::value< std::string >(&stepCode), OperatorDetail.str().c_str())
     ;
-    stepCode = "310-370";
+    stepCode = stepSuite.getStepsRange();
 
     //main log
     std::string     logFileName = "log.txt";
@@ -122,6 +124,12 @@ int main(int argc, char *argv[])
         //shape logger
         epg::log::ShapeLogger* shapeLogger = epg::log::ShapeLoggerS::getInstance();
 	    shapeLogger->setDataDirectory( context->getLogDirectory()+"/shape" );
+
+        //set BDD search path
+        context->getDataBaseManager().setSearchPath(themeParameters->getValue(WORKING_SCHEMA).toString());
+        ome2::utils::setTableName<app::params::ThemeParametersS>(LANDMASK_TABLE);
+        ome2::utils::setTableName<epg::params::EpgParametersS>(TARGET_BOUNDARY_TABLE);
+
         
 		logger->log(epg::log::INFO, "[START HY MATCHING PROCESS ] " + epg::tools::TimeTools::getTime());
         

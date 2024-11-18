@@ -18,7 +18,13 @@ namespace calcul{
 
 	public:
 
-	
+		typedef ign::geometry::graph::GeometryGraph< ign::geometry::graph::PunctualVertexProperties, ign::geometry::graph::LinearEdgeProperties>  GraphType;
+		typedef typename GraphType::edge_descriptor edge_descriptor;
+		typedef typename GraphType::vertex_descriptor vertex_descriptor;
+
+
+	public:
+
         /// @brief 
         /// @param borderCode 
         /// @param verbose 
@@ -30,17 +36,11 @@ namespace calcul{
         /// @brief 
         ~GenerateCuttingLinesOp();
 
-
-		typedef ign::geometry::graph::GeometryGraph< ign::geometry::graph::PunctualVertexProperties, ign::geometry::graph::LinearEdgeProperties>  GraphType;
-		typedef typename GraphType::edge_descriptor edge_descriptor;
-		typedef typename GraphType::vertex_descriptor vertex_descriptor;
-		//typedef FaceProperties	                                     face_properties;
-		//typedef detail::FaceDescriptor                               face_descriptor;
-		//typedef typename std::map< face_descriptor, face_properties >::const_iterator faces_iterator;
-
-
 		/// \brief
-		void generateCutL();
+		static void compute(
+			std::string borderCode,
+            bool verbose
+		);
 
 
 
@@ -64,9 +64,12 @@ namespace calcul{
 		void _init();
 
 		//--
+		void _compute() const;
+
+		//--
 		void _generateCutlByCountry(
 			std::string countryCode
-			);
+		) const;
 		
 
     };

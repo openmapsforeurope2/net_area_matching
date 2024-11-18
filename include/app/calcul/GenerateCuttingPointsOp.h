@@ -3,7 +3,6 @@
 
 //SOCLE
 #include <ign/feature/sql/FeatureStorePostgis.h>
-//#include <ign/tools/stringtools.h>
 
 //EPG
 #include <epg/log/EpgLogger.h>
@@ -32,7 +31,10 @@ namespace calcul{
 
 
 		/// \brief
-		void generateCutP();
+		static void compute(
+			std::string borderCode,
+            bool verbose
+		);
 
 
 	private:
@@ -56,11 +58,13 @@ namespace calcul{
 		//--
 		void _init();
 
+		//--
+		void _compute() const;
 
 		//--
 		void _generateCutpByCountry(
 			std::string countryCode
-		);
+		) const;
 
 		//--
 		std::vector<std::pair<ign::geometry::Point, ign::math::Vec2d>> _getEndingVectors(
@@ -82,9 +86,9 @@ namespace calcul{
 		//--
 		bool _hasCutLArroundEndingPt(	
 			ign::feature::FeatureFilter& filterArroundEndPt,
-			ign::geometry::Point& ptEndPt,
-			ign::geometry::Polygon& polyArea
-		);
+			ign::geometry::Point const& ptEndPt,
+			ign::geometry::Polygon const& polyArea
+		) const;
 
     };
 
