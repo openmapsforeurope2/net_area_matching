@@ -65,7 +65,11 @@ namespace calcul{
 		) const;
 
 		//--
-		void _persistGeom( ign::geometry::Geometry const& geom ) const;
+		void _persistGeom( 
+			ign::geometry::Geometry const& geom,
+			std::string const& countryCode,
+			std::string const& linkedNatId
+		 ) const;
     };
 
 }

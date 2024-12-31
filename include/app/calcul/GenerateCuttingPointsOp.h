@@ -22,8 +22,9 @@ namespace calcul{
         /// @param borderCode 
         /// @param verbose 
 		GenerateCuttingPointsOp(
-            std::string borderCode,
-            bool verbose
+            std::string const& borderCode,
+            bool verbose,
+			bool resetCpTable = true
         );
 
         /// @brief 
@@ -31,9 +32,16 @@ namespace calcul{
 
 
 		/// \brief
+		static void computeByCountry(
+			std::string const& borderCode,
+            bool verbose,
+			bool resetCpTable = true
+		);
+
+		/// \brief
 		static void compute(
-			std::string borderCode,
-            bool verbose
+            bool verbose,
+			bool resetCpTable = true
 		);
 
 
@@ -56,14 +64,14 @@ namespace calcul{
 	private:
 
 		//--
-		void _init();
+		void _init(bool resetCpTable);
 
 		//--
-		void _compute() const;
+		void _computeByCountry() const;
 
 		//--
-		void _generateCutpByCountry(
-			std::string countryCode
+		void _generateCutp(
+			ign::feature::FeatureFilter filter = ign::feature::FeatureFilter()
 		) const;
 
 		//--
@@ -74,7 +82,7 @@ namespace calcul{
 		//--
 		ign::math::Vec2d _getLsEndingVector(
 			ign::geometry::LineString const& ls,
-			ign::geometry::Point const endingPoint
+			ign::geometry::Point const& endingPoint
 		) const;
 
 		//--
@@ -85,7 +93,7 @@ namespace calcul{
 
 		//--
 		bool _hasCutLArroundEndingPt(	
-			ign::feature::FeatureFilter& filterArroundEndPt,
+			ign::feature::FeatureFilter const& filterArroundEndPt,
 			ign::geometry::Point const& ptEndPt,
 			ign::geometry::Polygon const& polyArea
 		) const;

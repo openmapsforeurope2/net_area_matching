@@ -14,6 +14,7 @@
 #include <epg/tools/StringTools.h>
 #include <epg/tools/TimeTools.h>
 #include <epg/tools/FilterTools.h>
+#include <epg/tools/geometry/getArea.h>
 
 
 namespace app
@@ -95,7 +96,7 @@ namespace app
         ///
         ///
         ///
-        void SetAttributeMergedAreasOp::_compute() {
+        void SetAttributeMergedAreasOp::_compute() const {
 
             // epg parameters
             epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
@@ -127,29 +128,34 @@ namespace app
 				//boucler sur les mp ?
 				ign::geometry::MultiPolygon geomArea = fArea.getGeometry().asMultiPolygon();
 
+				//DEBUG
+				// if( geomArea.intersects(ign::geometry::Point(3801162.27798,3124997.67085))) {
+				// 	bool test = true;
+				// }
+
 				ign::feature::Feature featCountry1, featCountry2;
 
 				ign::feature::FeatureFilter filterArroundAreaFromCountry1(countryCodeName + "='" + _vCountry[0] + "'");
 				filterArroundAreaFromCountry1.setExtent(geomArea.getEnvelope());
 
-				bool hasAttr1 = _getAreaMergedByCountry(geomArea,filterArroundAreaFromCountry1, featCountry1);
+				double area1 = _getAreaMergedByCountry(geomArea, filterArroundAreaFromCountry1, featCountry1);
 
 				ign::feature::FeatureFilter filterArroundAreaFromCountry2(countryCodeName + "='"+ _vCountry[1] +"'");
 				filterArroundAreaFromCountry2.setExtent(geomArea.getEnvelope());
 
-				bool hasAttr2 = _getAreaMergedByCountry(geomArea,filterArroundAreaFromCountry2, featCountry2);
+				double area2 = _getAreaMergedByCountry(geomArea, filterArroundAreaFromCountry2, featCountry2);
 
-				if (!hasAttr1 && !hasAttr2) {
+				if ( area1 < 0 && area2 < 0 ) {
 					//pas d'attribut trouve
 					fArea.setAttribute(wTagName, ign::data::String("modif_attr"));
 					//vArea2modify.push_back(fArea);
 					_fsArea->modifyFeature(fArea);
 					continue;
 				}
-				else if (hasAttr1 && !hasAttr2) {
+				else if ( area2 < 0.1*area1 ) {
 					fArea = featCountry1;
 				}
-				else if (hasAttr2 && !hasAttr1) {
+				else if ( area1 < 0.1*area2 ) {
 					fArea = featCountry2;
 				}
 				else {
@@ -169,8 +175,11 @@ namespace app
         }
 
 
-		bool SetAttributeMergedAreasOp::_getAreaMergedByCountry(ign::geometry::MultiPolygon& geomAreaMerged, ign::feature::FeatureFilter& filterArroundAreaFromCountry, ign::feature::Feature& fMergedInit)
-		{
+		double SetAttributeMergedAreasOp::_getAreaMergedByCountry(
+			ign::geometry::MultiPolygon& geomAreaMerged,
+			ign::feature::FeatureFilter& filterArroundAreaFromCountry,
+			ign::feature::Feature& fMergedInit
+		) const {
 
 			std::map<double, ign::feature::Feature> mIntersectedArea;
 			//recup fs table source -> table init sans step
@@ -188,23 +197,26 @@ namespace app
 				if (geomAreaInit.distance(geomAreaMerged) > 0)
 					continue;
 
-				ign::geometry::Geometry* geomIntersectedArea = geomAreaInit.Intersection(geomAreaMerged);
-				double areaIntersected = 0;
-				if (geomIntersectedArea->isMultiPolygon())
-					areaIntersected = geomIntersectedArea->asMultiPolygon().area();
-				else if (geomIntersectedArea->isPolygon())
-					areaIntersected = geomIntersectedArea->asPolygon().area();
-				else if (geomIntersectedArea->isGeometryCollection()) {
-					ign::geometry::GeometryCollection collection = geomIntersectedArea->asGeometryCollection();
-					for (size_t i = 0; i < collection.numGeometries(); ++i) {
-						if (collection.geometryN(i).isMultiPolygon())
-							areaIntersected = collection.geometryN(i).asMultiPolygon().area();
-						else if (collection.geometryN(i).isPolygon())
-							areaIntersected = collection.geometryN(i).asPolygon().area();
-					}
-				}
+				// ign::geometry::Geometry* geomIntersectedArea = geomAreaInit.Intersection(geomAreaMerged);
+				// double areaIntersected = 0;
+				// if (geomIntersectedArea->isMultiPolygon())
+				// 	areaIntersected = geomIntersectedArea->asMultiPolygon().area();
+				// else if (geomIntersectedArea->isPolygon())
+				// 	areaIntersected = geomIntersectedArea->asPolygon().area();
+				// else if (geomIntersectedArea->isGeometryCollection()) {
+				// 	ign::geometry::GeometryCollection collection = geomIntersectedArea->asGeometryCollection();
+				// 	for (size_t i = 0; i < collection.numGeometries(); ++i) {
+				// 		if (collection.geometryN(i).isMultiPolygon())
+				// 			areaIntersected = collection.geometryN(i).asMultiPolygon().area();
+				// 		else if (collection.geometryN(i).isPolygon())
+				// 			areaIntersected = collection.geometryN(i).asPolygon().area();
+				// 	}
+				// }
 
-				if (areaIntersected < _thresholdAreaAttr )
+				ign::geometry::GeometryPtr geomIntersectedArea(geomAreaInit.Intersection(geomAreaMerged));
+				double areaIntersected = epg::tools::geometry::getArea(*geomIntersectedArea);
+
+				if ( areaIntersected == 0 )
 					continue;
 				
 				mIntersectedArea[areaIntersected] = fAreaInit;
@@ -213,11 +225,11 @@ namespace app
 
 			if (mIntersectedArea.size() == 0) {
 				fMergedInit.clear();
-				return false;
+				return -1;
 			}
 			else {
 				fMergedInit = mIntersectedArea.rbegin()->second;
-				return true;
+				return mIntersectedArea.rbegin()->first;
 			}
 
 		}

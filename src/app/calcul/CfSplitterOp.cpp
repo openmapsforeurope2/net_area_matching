@@ -23,7 +23,7 @@
 #include <epg/tools/geometry/project.h>
 #include <epg/tools/geometry/interpolate.h>
 #include <epg/tools/geometry/LineIntersector.h>
-#include <epg/tools/geometry/SegmentIndexedGeometry.h>
+// #include <epg/tools/geometry/SegmentIndexedGeometry.h>
 #include <epg/tools/geometry/getLength.h>
 
 #include <ome2/geometry/tools/lineStringTools.h>
@@ -127,6 +127,22 @@ namespace app
         ///
         ///
         ///
+        bool CfSplitterOp::_touchAlreadyHittenSubLs( 
+            std::vector<epg::tools::geometry::SegmentIndexedGeometryInterface*> const vIndexedSubLs,
+            std::set<size_t> const& sHittenSubLs,
+            ign::geometry::Point const& pt
+        ) const {
+
+            for ( std::set<size_t>::const_iterator sit = sHittenSubLs.begin() ; sit != sHittenSubLs.end() ; ++sit ) {
+                double d = vIndexedSubLs[*sit]->distance(pt, 1e-5);
+                if(d >= 0) return true;
+            }
+            return false;
+        }
+
+        ///
+        ///
+        ///
         void CfSplitterOp::_compute() const {
             double pathLengthThreshold = 20;
             double minInRatio = 0.9;
@@ -185,11 +201,14 @@ namespace app
                     // on calcul les index correspondant de ces cp sur le contour exterieur du poly (ajouter les extremités des cl ?)
                     // on découpe le contour exterieur au niveau des cp
 
-                    std::map<std::string, ign::geometry::Point> mCp = _getAllCp(polyWithoutHoles); //TODO supprimer doublons sur le contour
+                    std::set<std::string> sIntersectionCp;
+                    std::map<std::string, ign::geometry::Point> mCp = _getAllCp(polyWithoutHoles, sIntersectionCp); //TODO supprimer doublons sur le contour
                     std::vector<ign::geometry::Point> vCpCl;
-                    for( std::map<std::string, ign::geometry::Point>::const_iterator mit = mCp.begin() ; mit != mCp.end() ; ++mit )
+                    for( std::map<std::string, ign::geometry::Point>::const_iterator mit = mCp.begin() ; mit != mCp.end() ; ++mit ) {
+                        if (sIntersectionCp.find(mit->first) != sIntersectionCp.end() ) continue; //on ne crée pas de coupure au niveau des cp issues des surfaces intersections
                         vCpCl.push_back(mit->second);
-
+                    }
+                        
                     _getAllClEndingPoints(polyWithoutHoles, vCpCl);
                     std::vector<int> vCpClIndex = _getCpIndex(polyWithoutHoles.exteriorRing(), vCpCl);
                     std::set<size_t> sCuttingIndex = _getCuttingIndex(vCpClIndex);
@@ -203,22 +222,28 @@ namespace app
                     }
 
                     // seuil (X*largeur moyenne du poly)
-                    double const projDistThreshold = 3*(polyWithoutHoles.area() / (polyWithoutHoles.exteriorRing().length()/2));
+                    double const projDistThreshold = 10*(polyWithoutHoles.area() / (polyWithoutHoles.exteriorRing().length()/2));
 
 
                     // on boucle sur les CP
                     std::set<std::string> sMergedCp;
                     for( std::map<std::string, ign::geometry::Point>::const_iterator mit_ = mCp.begin() ; mit_ != mCp.end() ; ++mit_ ) {
                         //DEBUG
-                        // if ( mit_->second.distance(ign::geometry::Point(3820200.7005,3088954.5002)) < 5 ) {
+                        // if ( mit_->second.distance(ign::geometry::Point(3824761.795,3095190.754)) < 1 ) {
                         //     bool test = true;
                         // }
-                        //4018889.42,3128024.22
-                        // if ( mit_->second.distance(ign::geometry::Point(3963719.003,3157270.609)) < 0.1 ) {
+                        // if ( mit_->second.distance(ign::geometry::Point(3824769.528,3095194.624)) < 0.1 ) {
                         //     bool test = true;
                         // }
-                        // 
-                        // continue;
+                        // if(  mit_->first == "9876bbf9-653f-4314-be50-ec4f5bde17f9"){
+                        //     bool test = true;
+                        // }
+                        // if(  mit_->first == "4eed7107-867a-400f-9223-871c86c93ecf"){
+                        //     bool test = true;
+                        // }
+                        // if(  mit_->first == "4901d998-87bc-418c-abf6-736de8dbebd2"){
+                        //     bool test = true;
+                        // }
 
                         if ( sMergedCp.find(mit_->first) != sMergedCp.end() ) continue;
                         
@@ -254,7 +279,7 @@ namespace app
 
                         ign::geometry::GeometryPtr sectionGeomPtr;
                         std::vector<ign::geometry::Point> vInOutProj;
-                        std::pair<bool, std::pair<int, ign::geometry::Point>> foundFullRatio = std::make_pair(false, std::make_pair(-1, ign::geometry::Point()));
+                        std::set<size_t> sHittenSubLs;
                         std::map<double, std::pair<int, ign::geometry::Point>>::const_iterator mit;
                         for ( mit = mDistSubLsProj.begin() ; mit != mDistSubLsProj.end() ; ++mit ) {
                             ign::geometry::LineString ls(cpGeom, mit->second.second);
@@ -264,27 +289,32 @@ namespace app
 
                             if (ratio < precision) continue; //TODO elargir le seuil à ~10% ?
 
-                            if ( !cpIsOnRing ) { //Dans ce cas normalement le ratio est forcement = 1
-                                if (foundFullRatio.first) {
-                                    // 1ere approche pour selectionner le meilleur candidat (point de contact sur la face opposée)
-                                    double d = vIndexedSubLs[foundFullRatio.second.first]->distance(mit->second.second, 1e-5);
-                                    if(d >= 0) continue;
+                            if ( !cpIsOnRing && std::abs(1-ratio) < precision ) {
+                                if ( _touchAlreadyHittenSubLs( vIndexedSubLs, sHittenSubLs, mit->second.second ) ) continue;
+                                sHittenSubLs.insert(mit->second.first);
 
-                                    sectionGeomPtr.reset( new ign::geometry::LineString(foundFullRatio.second.second, mit->second.second) );
-                                    break;
+                                if ( !sectionGeomPtr ) {
+                                    sectionGeomPtr.reset( new ign::geometry::MultiLineString() );
                                 }
-
-                                foundFullRatio = std::make_pair(true, std::make_pair(mit->second.first, mit->second.second));
-                                    
+                                sectionGeomPtr->asMultiLineString().addGeometry( ign::geometry::LineString(cpGeom, mit->second.second) );
                             }
 
                             vInOutProj.push_back(mit->second.second);
                         }
 
-                        if (!sectionGeomPtr) {
-                            // gerer le cas ou cpIsOnRing==false et foundFullRatio.first==true ?
+                        if ( sectionGeomPtr && sectionGeomPtr->isMultiLineString() ) {
+                            //simplification de la geometrie de la section
+                            if ( sectionGeomPtr->asMultiLineString().numGeometries() == 2 ) {
+                                sectionGeomPtr.reset(new ign::geometry::LineString(
+                                    sectionGeomPtr->asMultiLineString().lineStringN(0).endPoint(),
+                                    sectionGeomPtr->asMultiLineString().lineStringN(1).endPoint()
+                                ));
+                            } else if ( sectionGeomPtr->asMultiLineString().numGeometries() < 2 ) { //dangle
+                                sectionGeomPtr.reset();
+                            }
+                        }
 
-                            double minPathLength = pathLengthThreshold;
+                        if (!sectionGeomPtr) {
                             for (size_t i = 0 ; i < vInOutProj.size() ; ++i) {
                                 //calcul intersections entre [cpGeom vInOutProj[i]] et poly.exteriorRing()
                                 // si nb points = 3 : calcul du chemin entre cpGeom et vInOutProj[i]
@@ -309,14 +339,14 @@ namespace app
 
                                         double length = foundPath.second.length();
 
-                                        if( length < minPathLength) {
-                                            minPathLength = length;
-                                            sectionGeomPtr.reset( new ign::geometry::LineString(cpGeom, vInOutProj[i]) );
+                                        if( length < pathLengthThreshold) {
+                                            if( !sectionGeomPtr ) sectionGeomPtr.reset(new ign::geometry::MultiLineString());
+                                            sectionGeomPtr->asMultiLineString().addGeometry( ign::geometry::LineString(cpGeom, vInOutProj[i]) );
                                         }
                                     }
                                     else if( vIntersectInter.size() == 0) {
-                                        sectionGeomPtr.reset( new ign::geometry::LineString(cpGeom, vInOutProj[i]) );
-                                        break;
+                                        if( !sectionGeomPtr ) sectionGeomPtr.reset(new ign::geometry::MultiLineString());
+                                        sectionGeomPtr->asMultiLineString().addGeometry( ign::geometry::LineString(cpGeom, vInOutProj[i]) );
                                     }
                                     else {
                                         _logger->log(epg::log::ERROR, "More than one intermediate intersection on section : "+ign::geometry::LineString(cpGeom, vInOutProj[i]).toString());
@@ -727,12 +757,16 @@ namespace app
         ///
         ///
         ///
-        std::map<std::string, ign::geometry::Point> CfSplitterOp::_getAllCp(ign::geometry::Polygon const& poly) const {
+        std::map<std::string, ign::geometry::Point> CfSplitterOp::_getAllCp(
+            ign::geometry::Polygon const& poly, 
+            std::set<std::string> & sIntersectionCp
+        ) const {
             std::map<std::string, ign::geometry::Point> mCp;
 
             // epg parameters
             epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
             std::string const geomName = epgParams.getValue(GEOM).toString();
+            std::string const countryName = epgParams.getValue(COUNTRY_CODE).toString();
 
             //--
             app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
@@ -746,7 +780,28 @@ namespace app
             {
                 ign::feature::Feature const& fCp = itCp->next();
                 ign::geometry::Point const& cpGeom = fCp.getGeometry().asPoint();
+                std::string const& country = fCp.getAttribute(countryName).toString();
                 std::string cpId = fCp.getId();
+
+                if ( country.find("#") != std::string::npos )
+                    sIntersectionCp.insert(cpId);
+
+                //DEBUG
+                // if ( cpGeom.distance(ign::geometry::Point(3824761.795,3095190.754)) < 1 ) {
+                //     bool test = true;
+                // }         
+                // if ( cpGeom.distance(ign::geometry::Point(3824769.528,3095194.624)) < 0.1 ) {
+                //     bool test = true;
+                // }
+                // if( cpId == "9876bbf9-653f-4314-be50-ec4f5bde17f9"){
+                //     bool test = true;
+                // }
+                // if( cpId == "4eed7107-867a-400f-9223-871c86c93ecf"){
+                //     bool test = true;
+                // }
+                // if( cpId == "4901d998-87bc-418c-abf6-736de8dbebd2"){
+                //     bool test = true;
+                // }
 
                 if ( sMergedCp.find(cpId) != sMergedCp.end() ) continue;
 

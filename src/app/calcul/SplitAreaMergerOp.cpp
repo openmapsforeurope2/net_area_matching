@@ -90,7 +90,7 @@ namespace app
             bool mergingOccured = _computeEngine();
 
             while(mergingOccured) {
-                mergingOccured = _computeEngine(false);
+                mergingOccured = _computeEngine(true);
             }
 
         }
@@ -149,7 +149,7 @@ namespace app
             ign::feature::FeatureFilter filterArea(wTagName + " IS NOT NULL");
             int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
 
-            boost::progress_display display1(numFeatures, std::cout, "[  SAM [1/3] searching small areas % complete ]\n");
+            boost::progress_display display1(numFeatures, std::cout, "[ SAM [1/3] searching small areas % complete ]\n");
             ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
             while (itArea->hasNext())
             {
@@ -167,7 +167,10 @@ namespace app
                 // if(areaId == "97efaf2a-a09a-47be-baea-631689e8484a"){
                 //     bool test = true;
                 // }
-                // if( mp.distance(ign::geometry::Point(4017241.00,3084812.99)) < 0.1) {
+                // if( mp.distance(ign::geometry::Point(3825257.46,3094997.64)) < 0.1) {
+                //     bool test = true;
+                // }
+                // if( mp.distance(ign::geometry::Point(3825260.92,3094996.35)) < 0.1) {
                 //     bool test = true;
                 // }
                 
@@ -185,6 +188,8 @@ namespace app
 
             for ( std::map<double, ign::feature::Feature>::const_reverse_iterator rmit = mSortedSmallAreas.rbegin() ; rmit != mSortedSmallAreas.rend() ; ++rmit ) {
                 //DEBUG
+                std::string id = rmit->second.getId();
+                _logger->log(epg::log::DEBUG, id);
                 // if(rmit->second.getId() == "97efaf2a-a09a-47be-baea-631689e8484a"){
                 //     bool test = true;
                 // }
@@ -210,16 +215,26 @@ namespace app
 
                 _shapeLogger->writeFeature("sam_small_merged", rmit->second);
 
+                std::string const& idNat = rmit->second.getAttribute(nationalIdName).toString();
+
+                const ign::feature::Feature* feat2Merge = &mNeighbours.rbegin()->second;
+                for( std::map<double, ign::feature::Feature>::const_reverse_iterator rmit2 = mNeighbours.rbegin() ; rmit2 != mNeighbours.rend() ; ++rmit2 ) {
+                    if( rmit2->second.getAttribute(nationalIdName).toString() == idNat ) {
+                        feat2Merge = &rmit2->second;
+                        break;
+                    }
+                }
+
                 //DEBUG
                 std::string id1 = rmit->second.getId();
-                std::string id2 = mNeighbours.rbegin()->second.getId();
+                std::string id2 = feat2Merge->getId();
 
-                _addAreas(rmit->second, mNeighbours.rbegin()->second, vmAreas);
+                _addAreas(rmit->second, *feat2Merge, vmAreas);
             }
 
             if (mergeByNatId) {
 
-                boost::progress_display display2(numFeatures, std::cout, "[  SAM [2/3] gathering areas to merge % complete ]\n");
+                boost::progress_display display2(numFeatures, std::cout, "[ SAM [2/3] gathering areas to merge % complete ]\n");
                 ign::feature::FeatureIteratorPtr itArea2 = _fsArea->getFeatures(filterArea);
                 while (itArea2->hasNext())
                 {
@@ -369,7 +384,18 @@ namespace app
             while (itArea->hasNext())
             {
                 ign::feature::Feature const& fNeighbour = itArea->next();
-                if(fNeighbour.getId() == areaId) continue;
+                std::string idNeighbour = fNeighbour.getId();
+
+                if(idNeighbour == areaId) continue;
+
+                ign::geometry::MultiPolygon const& neighbourGeom = fNeighbour.getGeometry().asMultiPolygon();
+
+                ign::geometry::GeometryPtr intersectionGeom(areaGeom.Intersection(neighbourGeom));
+
+                //DEBUG
+                ign::geometry::Geometry::GeometryType geomType = intersectionGeom->getGeometryType();
+
+                if( intersectionGeom->isPoint() || intersectionGeom->isMultiPoint() || intersectionGeom->isNull() || intersectionGeom->isEmpty() ) continue;
 
                 mNeighbours.insert(std::make_pair(fNeighbour.getGeometry().asMultiPolygon().area(), fNeighbour));
             }

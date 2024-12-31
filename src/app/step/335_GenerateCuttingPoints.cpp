@@ -26,12 +26,26 @@ namespace step {
 	void GenerateCuttingPoints::onCompute( bool verbose = false )
 	{
 		//--
+		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
+
+		//--
 		_epgParams.setParameter(AREA_TABLE, ign::data::String(getLastWorkingTableName(AREA_TABLE_INIT)));
 		
-		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 
-		app::calcul::GenerateCuttingPointsOp::compute(countryCodeW, verbose);
+		app::calcul::GenerateCuttingPointsOp::computeByCountry(countryCodeW, verbose);
+
+
+		//--
+		std::string intAreaTableName = themeParameters->getValue(INTERSECTION_AREA_TABLE).toString();
+		if (intAreaTableName == "") {
+			std::string const intAreaSuffix = themeParameters->getValue(INTERSECTION_AREA_TABLE_SUFFIX).toString();
+			intAreaTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + intAreaSuffix;
+		}
+
+		_epgParams.setParameter(AREA_TABLE, ign::data::String(intAreaTableName));
+
+		app::calcul::GenerateCuttingPointsOp::compute(verbose, false);
 	}
 
 }

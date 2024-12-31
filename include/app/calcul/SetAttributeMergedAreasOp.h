@@ -55,9 +55,9 @@ namespace calcul{
 		epg::log::ShapeLogger*                                   _shapeLogger;
 		//--
 		bool                                                     _verbose;
-
+		//--
 		ome2::calcul::utils::AttributeMerger                     _attrMergerOnBorder;
-
+		//--
 		double													 _thresholdAreaAttr;
 
 	private:
@@ -66,10 +66,14 @@ namespace calcul{
 		void _init();
 
 		//--
-		void _compute() ;
+		void _compute() const;
 
-
-		bool _getAreaMergedByCountry(ign::geometry::MultiPolygon& geomAreaMerged, ign::feature::FeatureFilter& filterArroundAreaFromCountry, ign::feature::Feature& fMergedInit);
+		//--
+		double _getAreaMergedByCountry(
+			ign::geometry::MultiPolygon& geomAreaMerged,
+			ign::feature::FeatureFilter& filterArroundAreaFromCountry,
+			ign::feature::Feature& fMergedInit
+		) const;
 
     };
 

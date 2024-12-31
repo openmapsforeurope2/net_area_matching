@@ -10,8 +10,8 @@
 #include <app/step/310_GenerateCuttingLines.h>
 #include <app/step/320_CleanByLandmask.h>
 #include <app/step/330_CleanCuttingLines.h>
+#include <app/step/334_GenerateIntersectionAreas.h>
 #include <app/step/335_GenerateCuttingPoints.h>
-#include <app/step/336_GenerateIntersectionAreas.h>
 #include <app/step/340_MergeAreas.h>
 #include <app/step/350_SplitMergedAreasWithCF.h>
 #include <app/step/360_MergedAttributesAreas.h>
@@ -29,8 +29,8 @@ namespace tools{
 		stepSuite.addStep( epg::step::factoryNew< GenerateCuttingLines >() );
 		stepSuite.addStep( epg::step::factoryNew< CleanByLandmask >() );
 		stepSuite.addStep( epg::step::factoryNew< CleanCuttingLines >() );
-		stepSuite.addStep( epg::step::factoryNew< GenerateCuttingPoints >() );
 		stepSuite.addStep( epg::step::factoryNew< GenerateIntersectionAreas >() );
+		stepSuite.addStep( epg::step::factoryNew< GenerateCuttingPoints >() );
 		stepSuite.addStep( epg::step::factoryNew< MergeAreas >() );
 		stepSuite.addStep( epg::step::factoryNew< SplitMergedAreasWithCF >() );
 		stepSuite.addStep( epg::step::factoryNew< MergedAttributesAreas >() );
