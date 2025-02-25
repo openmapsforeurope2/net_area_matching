@@ -89,7 +89,7 @@
         {
             "label": "run the code",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/hy_matching hy_matching ./bin/ome2_hy_matching --c /usr/local/src/hy_matching/config/epg_parameters.ini --cc be#fr --sp 350",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/hy_matching hy_matching ./bin/hy_matching --c /usr/local/src/hy_matching/config/epg_parameters.ini --cc be#fr --sp 350",
             "group": "build",
             "problemMatcher": []
         },
