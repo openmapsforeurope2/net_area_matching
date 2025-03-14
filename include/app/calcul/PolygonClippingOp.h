@@ -9,12 +9,11 @@
 #include <epg/log/EpgLogger.h>
 #include <epg/log/ShapeLogger.h>
 
-//APP
-
 
 namespace app{
 namespace calcul{
 
+	/// @brief 
 	class PolygonClippingOp {
 
 	public:
@@ -42,8 +41,6 @@ namespace calcul{
 	private:
 		//--
 		ign::feature::sql::FeatureStorePostgis*              _fsArea;
-		//--
-		// std::map<std::string, ign::geometry::GeometryPtr>    _mCountryGeomPtr;
 		//--
 		std::map<std::string, ign::geometry::GeometryPtr>    _mCountryGeomWithBuffPtr;
 		//--

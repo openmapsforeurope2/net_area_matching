@@ -10,7 +10,6 @@
 //SOCLE
 #include <ign/math/Line2T.h>
 #include <ign/geometry/io/WkbReader.h>
-// #include <ign/geometry/algorithm/StraightSkeletonCGAL.h>
 
 // EPG
 #include <epg/Context.h>
@@ -23,9 +22,7 @@
 #include <epg/tools/geometry/project.h>
 #include <epg/tools/geometry/interpolate.h>
 #include <epg/tools/geometry/LineIntersector.h>
-// #include <epg/tools/geometry/SegmentIndexedGeometry.h>
 #include <epg/tools/geometry/getLength.h>
-
 #include <ome2/geometry/tools/lineStringTools.h>
 #include <ome2/geometry/tools/GetEndingPointsOp.h>
 #include <ome2/geometry/tools/isSlimSurface.h>
@@ -175,10 +172,6 @@ namespace app
 
                 //DEBUG
                 _logger->log(epg::log::DEBUG, "Area id : "+idOrigin);
-                // if (idOrigin != "c5b5fd05-eb9e-40c1-905e-f350e9463f9d") {
-                //     // bool test = true;
-                //     continue;
-                // }
 
                 std::vector< ign::geometry::Polygon > vPolygons;
 
@@ -228,22 +221,6 @@ namespace app
                     // on boucle sur les CP
                     std::set<std::string> sMergedCp;
                     for( std::map<std::string, ign::geometry::Point>::const_iterator mit_ = mCp.begin() ; mit_ != mCp.end() ; ++mit_ ) {
-                        //DEBUG
-                        // if ( mit_->second.distance(ign::geometry::Point(3824761.795,3095190.754)) < 1 ) {
-                        //     bool test = true;
-                        // }
-                        // if ( mit_->second.distance(ign::geometry::Point(3824769.528,3095194.624)) < 0.1 ) {
-                        //     bool test = true;
-                        // }
-                        // if(  mit_->first == "9876bbf9-653f-4314-be50-ec4f5bde17f9"){
-                        //     bool test = true;
-                        // }
-                        // if(  mit_->first == "4eed7107-867a-400f-9223-871c86c93ecf"){
-                        //     bool test = true;
-                        // }
-                        // if(  mit_->first == "4901d998-87bc-418c-abf6-736de8dbebd2"){
-                        //     bool test = true;
-                        // }
 
                         if ( sMergedCp.find(mit_->first) != sMergedCp.end() ) continue;
                         
@@ -260,11 +237,6 @@ namespace app
                             if ( cpGeom.distance(fcit->getGeometry() ) < distSnapMergeCf)
                                 sMergedCp.insert(fcit->getId());
                         }
-                            
-                        //DEBUG
-                        // if(cpGeom.distance(ign::geometry::Point(3952000.830,3017494.182))<5.) {
-                        //     bool test = true;
-                        // }
 
                         bool cpIsOnRing = false;
                         std::map<double, std::pair<int, ign::geometry::Point>> mDistSubLsProj;
@@ -369,205 +341,14 @@ namespace app
 
                     }
 
-
+                    //--
                     for(size_t i = 0 ; i < vIndexedSubLs.size() ; ++i)
                         delete vIndexedSubLs[i];
-
-
-
-                    // _clean(poly);
-
-                    // ign::geometry::LineString medialAxis = epg::tools::geometry::getPolygonMainAxis(poly);
-
-                    // ign::feature::Feature featMedialAxis;
-                    // featMedialAxis.setGeometry(medialAxis);
-                    // _shapeLogger->writeFeature("cfs_medial_axis", featMedialAxis);
-
-                    // ajouter size_t ome2::tools::geometry::getIndex(ign::geometry::Point, lineString)
-                    // int id1 = ome2::geometry::tools::getIndex(medialAxis.startPoint(), poly.exteriorRing());
-                    // int id2 = ome2::geometry::tools::getIndex(medialAxis.endPoint(), poly.exteriorRing());
-                    
-                    //--
-                    // std::pair<bool, std::pair<ign::geometry::LineString,ign::geometry::LineString>> pSides = ome2::geometry::tools::getSubLineStrings(id1, id2, poly.exteriorRing());
-
-                    // if (!pSides.first) {
-                    //     _logger->log(epg::log::ERROR, "Error in sub-linestrings calculation : "+poly.toString());
-                    //     continue;
-                    // }
-
-                    // ign::feature::Feature featSide;
-                    // featSide.setGeometry(pSides.second.first);
-                    // _shapeLogger->writeFeature("cfs_sides", featSide);
-                    // featSide.setGeometry(pSides.second.second);
-                    // _shapeLogger->writeFeature("cfs_sides", featSide);
-
-                    // //--
-                    // app::tools::geometry::PolygonSplitter polySplitter(poly);
-
-                    // //--
-                    // epg::tools::MultiLineStringTool* mslToolPtr = 0;
-
-                    // //--
-                    // ign::geometry::GeometryPtr medialAxisGeomPtr;
-                    // // ign::feature::FeatureFilter filterCp("ST_INTERSECTS(" + geomName + ", ST_SetSRID(ST_GeomFromText('" + mp.toString() + "'),3035))");
-                    // ign::feature::FeatureFilter filterCp("ST_INTERSECTS(" + geomName + ", ST_GeomFromText('" + poly.toString() + "'))");
-                    // ign::feature::FeatureIteratorPtr itCp = _fsCp->getFeatures(filterCp);
-                    // while (itCp->hasNext())
-                    // {
-                    //     ign::feature::Feature const& fCp = itCp->next();
-                    //     ign::geometry::Point const& cpGeom = fCp.getGeometry().asPoint();
-
-                    //     //DEBUG
-                    //     _logger->log(epg::log::DEBUG, "cp geom : "+cpGeom.toString());
-
-                    //     // DEBUG
-                    //     if (cpGeom.distance(ign::geometry::Point(3820200.94,3088954.40)) < 1) {
-                    //         bool test = true;
-                    //     }
-
-                    //     // std::pair<bool, ign::geometry::LineString> foundSection = _computeSectionGeometry(sectionGeom, poly, &mslToolPtr);
-                    //     // if ( !foundSection.first ) {
-                    //     //     _logger->log(epg::log::ERROR, "Error in section geometry calculation : "+sectionGeom.toString());
-                    //     //     continue;
-                    //     // }
-                    //     // sectionGeom = foundSection.second;
-
-                    //     // polySplitter.addCuttingGeometry(sectionGeom);
-
-                    //     // _logger->log(epg::log::DEBUG, "Coucou1");
-                    //     // ign::feature::Feature feat;
-                    //     // feat.setGeometry(sectionGeom);
-                    //     // for( size_t i = 0 ; i < sectionGeom.numPoints() ; i++) {
-                    //     //     if (! ign::numeric::Numeric<double>::IsNaN(sectionGeom.pointN(i).m()) )
-                    //     //         sectionGeom.pointN(i).m() = ign::numeric::Numeric<double>::NaN();
-                    //     //     if (! ign::numeric::Numeric<double>::IsNaN(sectionGeom.pointN(i).z()) )
-                    //     //         sectionGeom.pointN(i).z() = ign::numeric::Numeric<double>::NaN();
-                    //     // }
-                    //     // _shapeLogger->writeFeature("cfs_cutting_features", feat);
-
-                    //     if ( !medialAxisGeomPtr ) {
-                    //         medialAxisGeomPtr.reset(_getMedialAxis(poly));
-
-                    //         if (medialAxisGeomPtr->isMultiLineString()) {
-                    //             ign::geometry::MultiLineString mls = medialAxisGeomPtr->asMultiLineString();
-                    //             for(size_t i = 0 ; i < mls.numGeometries() ; ++i) {
-                    //                 ign::feature::Feature featMedialAxis;
-                    //                 featMedialAxis.setGeometry(mls.lineStringN(i));
-                    //                 _shapeLogger->writeFeature("cfs_medial_axis", featMedialAxis);
-                    //             }
-                    //         }
-                            
-                    //     }
-                    //     if (!medialAxisGeomPtr->isMultiLineString()) {
-                    //          _logger->log(epg::log::ERROR, "Error in medial axis calculation : "+poly.toString());
-                    //         continue;
-                    //     }
-
-                    //     ign::geometry::MultiLineString const& mlsMedialAxis = medialAxisGeomPtr->asMultiLineString();
-
-                    //     // on projete le cp sur l'axe
-                    //     boost::tuple< int, int, double > abs = epg::tools::geometry::projectAlong(mlsMedialAxis, cpGeom /*, snapDistOnVertex*/);
-                    //     ign::geometry::Point proj = epg::tools::geometry::interpolate(mlsMedialAxis.lineStringN(boost::get<0>(abs)), boost::get<1>(abs), boost::get<2>(abs));
-
-                    //     ign::feature::Feature featMaProj;
-                    //     featMaProj.setGeometry(proj);
-                    //     _shapeLogger->writeFeature("cfs_medial_axis_proj", featMaProj);
-
-                    //     //--
-                    //     double deltaX = mlsMedialAxis.lineStringN(boost::get<0>(abs)).pointN(boost::get<1>(abs)+1).x()-mlsMedialAxis.lineStringN(boost::get<0>(abs)).pointN(boost::get<1>(abs)).x();
-                    //     double deltaY = mlsMedialAxis.lineStringN(boost::get<0>(abs)).pointN(boost::get<1>(abs)+1).y()-mlsMedialAxis.lineStringN(boost::get<0>(abs)).pointN(boost::get<1>(abs)).y();
-
-                    //     //--
-                    //     ign::geometry::Point ptOrtho1(proj.x()-deltaY, proj.y()+deltaX);
-                    //     ign::geometry::Point ptOrtho2(proj.x()+deltaY, proj.y()-deltaX);
-
-                    //     std::pair<bool, ign::geometry::LineString> foundSection = _computeSectionGeometry(ign::geometry::LineString(ptOrtho1, ptOrtho2), poly, &mslToolPtr);
-                    //     if ( !foundSection.first ) {
-                    //         _logger->log(epg::log::ERROR, "Error in section geometry calculation : "+ign::geometry::LineString(ptOrtho1, ptOrtho2).toString());
-                    //         continue;
-                    //     }
-
-                    //     //--
-                    //     // std::vector< ign::geometry::Point > vPtIntersect = epg::tools::geometry::LineIntersector::compute(proj, ptOrtho, poly);
-                    //     // std::map<double, ign::geometry::Point> mAbsIntersect;
-                    //     // ign::math::Line2d line(proj.toVec2d(), ptOrtho.toVec2d());
-                    //     // for (std::vector< ign::geometry::Point >::iterator vit = vPtIntersect.begin(); vit != vPtIntersect.end(); ++vit) {
-                    //     //     double abs = line.project(vit->toVec2d());
-                    //     //     mAbsIntersect.insert(std::make_pair(abs, ign::geometry::Point(vit->toVec2d().x(), vit->toVec2d().y())));
-                    //     // }
-                    //     // std::map<double, ign::geometry::Point>::const_iterator mit1, mit2;
-                    //     // for (std::map<double, ign::geometry::Point>::const_iterator mit = mAbsIntersect.begin() ; mit != mAbsIntersect.end() ; ++mit) {
-                    //     //     if( mit->first > 0 ) {
-                    //     //         mit2 = mit;
-                    //     //         break;
-                    //     //     }
-                    //     //     mit1 = mit;
-                    //     // }
-
-                    //     polySplitter.addCuttingGeometry(foundSection.second);
-
-                    //     ign::feature::Feature feat;
-                    //     feat.setGeometry(foundSection.second);
-                    //     _shapeLogger->writeFeature("cfs_cutting_features", feat);
-
-                    //     // //on projete le cp sur l'axe
-                    //     // std::pair< int, double > abs = epg::tools::geometry::projectAlong(medialAxis, cpGeom);
-                    //     // ign::geometry::Point proj = epg::tools::geometry::interpolate(medialAxis, abs.first, abs.second);
-
-                    //     // ign::feature::Feature featMaProj;
-                    //     // featMaProj.setGeometry(proj);
-                    //     // _shapeLogger->writeFeature("cfs_medial_axis_proj", featMaProj);
-
-                    //     // //--
-                    //     // double deltaX = medialAxis.pointN(abs.first+1).x()-medialAxis.pointN(abs.first).x();
-                    //     // double deltaY = medialAxis.pointN(abs.first+1).y()-medialAxis.pointN(abs.first).y();
-
-                    //     // //--
-                    //     // ign::geometry::Point ptOrtho(proj.x()-deltaY, proj.y()+deltaX); 
-
-                    //     // ign::feature::Feature featOrthoAxis;
-                    //     // featOrthoAxis.setGeometry(ign::geometry::LineString(cpGeom, ptOrtho));
-                    //     // _shapeLogger->writeFeature("cfs_medial_axis_ortho", featOrthoAxis);
-
-                    //     // //--
-                    //     // std::vector< ign::geometry::Point > vInter1 = epg::tools::geometry::LineIntersector::compute(proj, ptOrtho, pSides.second.first);
-                    //     // ign::geometry::Point sectionPt1;
-                    //     // double distMin1 = std::numeric_limits<double>::max();
-                    //     // for (size_t i = 0 ; i < vInter1.size() ; ++i) {
-                    //     //     double dist = vInter1[i].distance(cpGeom);
-                    //     //     if (dist < distMin1) {
-                    //     //         distMin1 = dist;
-                    //     //         sectionPt1 = vInter1[i];
-                    //     //     }
-                    //     // }
-                    //     // std::vector< ign::geometry::Point > vInter2 = epg::tools::geometry::LineIntersector::compute(cpGeom, ptOrtho, pSides.second.second);
-                    //     // ign::geometry::Point sectionPt2;
-                    //     // double distMin2 = std::numeric_limits<double>::max();
-                    //     // for (size_t i = 0 ; i < vInter2.size() ; ++i) {
-                    //     //     double dist = vInter2[i].distance(cpGeom);
-                    //     //     if (dist < distMin2) {
-                    //     //         distMin2 = dist;
-                    //     //         sectionPt2 = vInter2[i];
-                    //     //     }
-                    //     // }
-
-                    //     // polySplitter.addCuttingGeometry(ign::geometry::LineString(sectionPt1, sectionPt2));
-
-                    //     // ign::feature::Feature featSideProj;
-                    //     // featSideProj.setGeometry(ign::geometry::LineString(cpGeom, sectionPt2));
-                    //     // _shapeLogger->writeFeature("cfs_side_proj", featSideProj);
-                    //     // featSideProj.setGeometry(ign::geometry::LineString(cpGeom, sectionPt1));
-                    //     // _shapeLogger->writeFeature("cfs_side_proj", featSideProj);
-
-                    //     // ign::feature::Feature feat;
-                    //     // feat.setGeometry(ign::geometry::LineString(sectionPt1, sectionPt2));
-                    //     // _shapeLogger->writeFeature("cfs_cutting_features", feat);
-                    // }
 
                     //--
                     std::vector<ign::geometry::Point> vClEndingPoints;
                     std::map<std::string, ign::geometry::LineString> mModifiedCl;
-                    // ign::feature::FeatureFilter filterCl ("ST_INTERSECTS(" + geomName + ", ST_SetSRID(ST_GeomFromText('" + mp.toString() + "'),3035))");
+
                     ign::feature::FeatureFilter filterCl ("ST_INTERSECTS(" + geomName + ", ST_GeomFromText('" + poly.toString() + "'))");
                     ign::feature::FeatureIteratorPtr itCl = _fsCl->getFeatures(filterCl);
                     while (itCl->hasNext())
@@ -578,35 +359,7 @@ namespace app
                         //DEBUG
                         std::string idCl = fCl.getId();
                         _logger->log(epg::log::DEBUG, idCl);
-                        // if (idCl != "0df0f622-819c-488c-9c42-87b66ff0d848" ) {
-                        //     bool test =true;
-                        //     continue;
-                        // }
-
-                        // identifier extrémité clGeom et sides associés
-                        // std::vector<double> vDists(4,0);
-                        // vDists[0] = pSides.second.first.distance(clGeom.startPoint());
-                        // vDists[1] = pSides.second.second.distance(clGeom.endPoint());
-                        // vDists[2] = pSides.second.first.distance(clGeom.endPoint());
-                        // vDists[3] = pSides.second.second.distance(clGeom.startPoint());
-                        
-                        // size_t iMin = 1;
-                        // double distMin = vDists[iMin];
-                        // for (size_t i = 1 ; i < vDists.size() ; ++i) 
-                        //     if (vDists[i] < distMin) {
-                        //         iMin = i;
-                        //         distMin = vDists[i];
-                        //     }
-                        
-                        // ign::geometry::LineString * sideStartPtr = i < 2 ? &pSides.second.first : &pSides.second.second;
-                        // ign::geometry::LineString * sideEndPtr = i < 2 ? &pSides.second.second : &pSides.second.first;
-
-
-                        //DEBUG
                         _logger->log(epg::log::DEBUG, clGeom.toString());
-                        // if (clGeom.distance(ign::geometry::Point(3835926.60567479,3098287.75404886)) < 1e-5) {
-                        //     bool test = true;
-                        // }
 
                         clGeom = _computeCuttingLineGeometry(idCl, clGeom, poly, vClEndingPoints, mModifiedCl);
 
@@ -630,16 +383,12 @@ namespace app
                     tools::zFiller(vPolygons[i], -1000); //TODO a parametrer
                     newFeat.setGeometry(vPolygons[i].toMulti());
                     _fsArea->createFeature(newFeat);
-
-                    // bool pouett = vPolygons[i].isValid();
-                    // _logger->log(epg::log::DEBUG, newFeat.getId());
-                    // _logger->log(epg::log::DEBUG, vPolygons[i].toString());
-
                 }
                 
                 sArea2Delete.insert(idOrigin);
             }
 
+            //--
             for( std::set<std::string>::const_iterator sit = sArea2Delete.begin() ; sit!= sArea2Delete.end() ; ++sit )
                 _fsArea->deleteFeature(*sit);
         };
@@ -786,23 +535,6 @@ namespace app
                 if ( country.find("#") != std::string::npos )
                     sIntersectionCp.insert(cpId);
 
-                //DEBUG
-                // if ( cpGeom.distance(ign::geometry::Point(3824761.795,3095190.754)) < 1 ) {
-                //     bool test = true;
-                // }         
-                // if ( cpGeom.distance(ign::geometry::Point(3824769.528,3095194.624)) < 0.1 ) {
-                //     bool test = true;
-                // }
-                // if( cpId == "9876bbf9-653f-4314-be50-ec4f5bde17f9"){
-                //     bool test = true;
-                // }
-                // if( cpId == "4eed7107-867a-400f-9223-871c86c93ecf"){
-                //     bool test = true;
-                // }
-                // if( cpId == "4901d998-87bc-418c-abf6-736de8dbebd2"){
-                //     bool test = true;
-                // }
-
                 if ( sMergedCp.find(cpId) != sMergedCp.end() ) continue;
 
                 // on merge les autres CP sur le contour proches
@@ -877,11 +609,6 @@ namespace app
             std::vector<ign::geometry::Point> & vClEndingPoints,
             std::map<std::string, ign::geometry::LineString> & mModifiedCl
         ) const {
-
-            //DEBUG
-            // if (clId == "a7d109e1-8c58-4f6c-87c0-a4f609761267" || clId == "e1325d66-5c14-48ab-924e-8b01e9b7dbc1" || clId == "1168ce7d-2170-4605-b8a3-104f2d9a3520") {
-            //     bool test = true;
-            // }
 
             double precision = 1e-5;
             double snapDist = 1.;
@@ -964,7 +691,7 @@ namespace app
                 ign::geometry::Point projAxStartPt;
                 double distMinStart = std::numeric_limits<double>::max();
                 bool foundNewStart = false;
-                // std::vector< ign::geometry::Point > vPtIntersectStart = epg::tools::geometry::LineIntersector::compute(clGeom.startPoint(), clGeom.pointN(1), *sideStartPtr);
+               
                 std::vector< ign::geometry::Point > vPtIntersectStart = epg::tools::geometry::LineIntersector::compute(clGeom.startPoint(), clGeom.pointN(1), poly);
                 for (std::vector< ign::geometry::Point >::iterator vit = vPtIntersectStart.begin(); vit != vPtIntersectStart.end(); ++vit) {
                     ign::math::Line2d line(clGeom.pointN(1).toVec2d(), clGeom.startPoint().toVec2d());
@@ -980,7 +707,6 @@ namespace app
                 if ( foundNewStart ) {
                     // projection ortho
                     ign::geometry::Point projOrthoStartPt;
-                    // epg::tools::geometry::projectZ(*sideStartPtr, clGeom.startPoint(), projOrthoStartPt);
                     epg::tools::geometry::projectZ(poly, clGeom.startPoint(), projOrthoStartPt);
 
                     if ( projOrthoStartPt.distance(clGeom.startPoint()) < 0.5 * distMinStart )
@@ -1026,7 +752,7 @@ namespace app
                 ign::geometry::Point projAxEndPt;
                 double distMinEnd = std::numeric_limits<double>::max();
                 bool foundNewEnd = false;
-                // std::vector< ign::geometry::Point > vPtIntersectEnd = epg::tools::geometry::LineIntersector::compute(clGeom.endPoint(), clGeom.pointN(1), *sideEndPtr);
+
                 std::vector< ign::geometry::Point > vPtIntersectEnd = epg::tools::geometry::LineIntersector::compute(clGeom.endPoint(), clGeom.pointN(clGeom.numPoints()-2), poly);
                 for (std::vector< ign::geometry::Point >::iterator vit = vPtIntersectEnd.begin(); vit != vPtIntersectEnd.end(); ++vit) {
                     ign::math::Line2d line(clGeom.pointN(clGeom.numPoints()-2).toVec2d(), clGeom.endPoint().toVec2d());
@@ -1042,7 +768,6 @@ namespace app
                 if ( foundNewEnd ) {
                     // projection ortho
                     ign::geometry::Point projOrthoEndPt;
-                    // epg::tools::geometry::projectZ(*sideEndPtr, clGeom.endPoint(), projOrthoEndPt);
                     epg::tools::geometry::projectZ(poly, clGeom.endPoint(), projOrthoEndPt);
 
                     if ( projOrthoEndPt.distance(clGeom.endPoint()) < 0.5 * distMinEnd )
@@ -1159,10 +884,6 @@ namespace app
         ) const {
             // DEBUG
             _logger->log(epg::log::DEBUG, sectionGeom.toString());
-            // if(sectionGeom.distance(ign::geometry::Point(3801790.18041191,3124509.00261721)) < 1) {
-            //     bool test = true;
-            // }
-
 
             double pathLengthThreshold = 20;
 

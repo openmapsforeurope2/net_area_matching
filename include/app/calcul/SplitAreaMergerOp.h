@@ -14,6 +14,7 @@
 namespace app{
 namespace calcul{
 
+	/// @brief 
 	class SplitAreaMergerOp {
 
 	public:
@@ -28,7 +29,8 @@ namespace calcul{
         /// @brief 
         ~SplitAreaMergerOp();
 
-        /// \brief
+		/// @brief 
+		/// @param verbose 
 		static void compute(
 			bool verbose
 		);

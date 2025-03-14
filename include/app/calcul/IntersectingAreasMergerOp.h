@@ -13,6 +13,7 @@
 namespace app{
 namespace calcul{
 
+	/// @brief 
 	class IntersectingAreasMergerOp {
 
 	public:

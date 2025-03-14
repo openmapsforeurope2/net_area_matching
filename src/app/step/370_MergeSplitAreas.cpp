@@ -33,7 +33,7 @@ namespace step {
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 
-		//--l
+		//--
 		app::calcul::SplitAreaMergerOp::compute(verbose);
 	}
 

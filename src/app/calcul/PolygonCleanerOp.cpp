@@ -125,10 +125,8 @@ namespace app
                 _shapeLogger->writeFeature("pc_country", feat);
             }
 
-
             //--
             _boundaryTool = new epg::tools::MultiLineStringTool(boundaryFilter, *fsBoundary);
-
 
             //--
             _fsArea = context->getDataBaseManager().getFeatureStore(areaTableName, idName, geomName);

@@ -16,6 +16,7 @@
 namespace app{
 namespace calcul{
 
+	/// @brief 
 	class SetAttributeMergedAreasOp {
 
 	public:
@@ -33,7 +34,9 @@ namespace calcul{
         ~SetAttributeMergedAreasOp();
 
 
-		/// \brief
+		/// @brief 
+		/// @param borderCode 
+		/// @param verbose 
 		static void compute(
 			std::string borderCode,
 			bool verbose

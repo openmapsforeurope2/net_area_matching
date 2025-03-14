@@ -44,9 +44,6 @@
 
 		LIST_ATTR_JSON,
 		LIST_ATTR_W
-
-		//MAX_INTERSECT_STANDING_WATER
-
 	};
 
 namespace app{

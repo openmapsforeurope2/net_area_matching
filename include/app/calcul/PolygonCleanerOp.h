@@ -14,6 +14,7 @@
 namespace app{
 namespace calcul{
 
+	/// @brief 
 	class PolygonCleanerOp {
 
 	public:

@@ -9,10 +9,12 @@ namespace tools{
 
     /// @brief 
     /// @param geom 
+    /// @param value 
     void zFiller( ign::geometry::Geometry & geom, double value );
 
     /// @brief 
     /// @param geom 
+    /// @param value 
     void removePointWithZ( ign::geometry::Geometry & geom, double value );
 
 }

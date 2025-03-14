@@ -7,9 +7,9 @@
 namespace app{
 namespace tools{
 
-    /// @brief 
-    /// @param geom 
-    /// @param value 
+    ///
+    ///
+    ///
     void zFiller( ign::geometry::Geometry & geom, double value ) {
         ign::geometry::Geometry::GeometryType geomType = geom.getGeometryType();
         switch( geomType )
@@ -69,9 +69,9 @@ namespace tools{
 
     }
 
-    /// @brief 
-    /// @param geom 
-    /// @param value 
+    ///
+    ///
+    ///
     void removePointWithZ( ign::geometry::Geometry & geom, double value ) {
         ign::geometry::Geometry::GeometryType geomType = geom.getGeometryType();
         switch( geomType )

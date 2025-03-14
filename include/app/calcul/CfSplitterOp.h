@@ -15,6 +15,7 @@
 namespace app{
 namespace calcul{
 
+	/// @brief 
 	class CfSplitterOp {
 
 	public:

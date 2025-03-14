@@ -4,7 +4,7 @@
         {
             "label": "build package",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/hy_matching hy_matching ./build-unix-package.sh",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/area_matching area_matching ./build-unix-package.sh",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -28,7 +28,7 @@
         {
             "label": "build release",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/hy_matching hy_matching ./build-unix-release.sh",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/area_matching area_matching ./build-unix-release.sh",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -52,7 +52,7 @@
         {
             "label": "build debug",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/hy_matching hy_matching ./build-unix-debug.sh",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/area_matching area_matching ./build-unix-debug.sh",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -89,14 +89,14 @@
         {
             "label": "run the code",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/hy_matching hy_matching ./bin/hy_matching --c /usr/local/src/hy_matching/config/epg_parameters.ini --cc be#fr --sp 350",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/area_matching area_matching ./bin/area_matching --c /usr/local/src/area_matching/config/epg_parameters.ini --cc be#fr --sp 350",
             "group": "build",
             "problemMatcher": []
         },
         {
             "label": "prepare to debug",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/hy_matching --name hy_matching_container -it hy_matching ",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/area_matching --name area_matching_container -it area_matching ",
             "group": "build",
             "problemMatcher": []
         }

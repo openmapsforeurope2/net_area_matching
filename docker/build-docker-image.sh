@@ -1,4 +1,4 @@
-PROJECT_NAME=hy_matching
+PROJECT_NAME=area_matching
 
 if [ $# -eq 0 ]
     #Si il n'y a pas d'argument

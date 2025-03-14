@@ -12,6 +12,7 @@
 namespace app{
 namespace calcul{
 
+	/// @brief 
 	class GenerateIntersectionAreaOp {
 
 	public:

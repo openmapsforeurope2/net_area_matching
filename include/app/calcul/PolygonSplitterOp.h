@@ -14,6 +14,7 @@
 namespace app{
 namespace calcul{
 
+	/// @brief 
 	class PolygonSplitterOp {
 
 	public:
@@ -31,7 +32,9 @@ namespace calcul{
         ~PolygonSplitterOp();
 
 
-		/// \brief
+		/// @brief 
+		/// @param borderCode 
+		/// @param verbose 
 		static void compute(
 			std::string borderCode, 
 			bool verbose

@@ -12,6 +12,7 @@
 namespace app{
 namespace calcul{
 
+	/// @brief 
 	class StandingWaterOp {
 
 	public:
@@ -28,11 +29,39 @@ namespace calcul{
         /// @brief 
         ~StandingWaterOp();
 
+		/// @brief 
+		/// @param borderCode 
+		/// @param verbose 
+		static void AddStandingWater(
+			std::string borderCode,
+			bool verbose
+		);
 
+		/// @brief 
+		/// @param borderCode 
+		/// @param verbose 
+		static void SortingStandingWater(
+			std::string borderCode,
+			bool verbose
+		);
 
-		static void AddStandingWater(std::string borderCode, bool verbose);
-
-		static void SortingStandingWater(std::string borderCode, bool verbose);
+	private:
+		//--
+		ign::feature::sql::FeatureStorePostgis*                  _fsArea;
+		//--
+		ign::feature::sql::FeatureStorePostgis*                  _fsAreaStandingWater;
+		//--
+		epg::log::EpgLogger*                                     _logger;
+		//--
+		epg::log::ShapeLogger*                                   _shapeLogger;
+		//--
+		std::string                                              _borderCode;
+		//--
+		std::vector<std::string>								 _vCountriesCodeName;
+		//--
+		std::string												 _attrValueStandingWater;
+		//--
+		bool                                                     _verbose;
 
 
 	private:
@@ -45,30 +74,6 @@ namespace calcul{
 
 		//--
 		void _sortingStandingWater();
-
-
-
-	private:
-		//--
-		ign::feature::sql::FeatureStorePostgis*                  _fsArea;
-		//--
-		ign::feature::sql::FeatureStorePostgis*                  _fsAreaStandingWater;
-
-		//--
-		epg::log::EpgLogger*                                     _logger;
-		//--
-		epg::log::ShapeLogger*                                   _shapeLogger;
-		//--
-		std::string                                              _borderCode;
-		//--
-		std::vector<std::string>								 _vCountriesCodeName;
-		//--
-		bool                                                     _verbose;
-		//--
-		std::string												 _attrValueStandingWater;
-
-
-
     };
 
 }

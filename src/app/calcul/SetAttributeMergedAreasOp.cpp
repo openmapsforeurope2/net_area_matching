@@ -109,29 +109,18 @@ namespace app
 
             ign::feature::FeatureFilter filterArea(countryCodeName+" like '%#%'");
 
-			//epg::ContextS::getInstance()->getDataBaseManager().setValueColumn(_fsArea->getTableName(), wTagName, "modif_attr", countryCodeName + " like '%#%'");
-
             int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ set attribute merged areas % complete ]\n");
 
             ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
-
-			//std::vector < ign::feature::Feature> vArea2modify;
-
             while (itArea->hasNext())
             {
                 ++display;
 
                 ign::feature::Feature fArea = itArea->next();
-                //ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string idOrigin = fArea.getId();
 				//boucler sur les mp ?
 				ign::geometry::MultiPolygon geomArea = fArea.getGeometry().asMultiPolygon();
-
-				//DEBUG
-				// if( geomArea.intersects(ign::geometry::Point(3801162.27798,3124997.67085))) {
-				// 	bool test = true;
-				// }
 
 				ign::feature::Feature featCountry1, featCountry2;
 
@@ -148,7 +137,6 @@ namespace app
 				if ( area1 < 0 && area2 < 0 ) {
 					//pas d'attribut trouve
 					fArea.setAttribute(wTagName, ign::data::String("modif_attr"));
-					//vArea2modify.push_back(fArea);
 					_fsArea->modifyFeature(fArea);
 					continue;
 				}
@@ -167,11 +155,8 @@ namespace app
 				fArea.setAttribute(wTagName, ign::data::String("modif_attr")); 
 				fArea.setAttribute("xy_source", ign::data::String("ome2")); 
 				fArea.setAttribute("z_source", ign::data::String("ome2"));
-				//vArea2modify.push_back(fArea);
 				_fsArea->modifyFeature(fArea);
             }
-			/*for( size_t i = 0; i < vArea2modify.size(); ++i)
-				_fsArea->modifyFeature(vArea2modify[i]);*/
         }
 
 
@@ -197,22 +182,6 @@ namespace app
 				if (geomAreaInit.distance(geomAreaMerged) > 0)
 					continue;
 
-				// ign::geometry::Geometry* geomIntersectedArea = geomAreaInit.Intersection(geomAreaMerged);
-				// double areaIntersected = 0;
-				// if (geomIntersectedArea->isMultiPolygon())
-				// 	areaIntersected = geomIntersectedArea->asMultiPolygon().area();
-				// else if (geomIntersectedArea->isPolygon())
-				// 	areaIntersected = geomIntersectedArea->asPolygon().area();
-				// else if (geomIntersectedArea->isGeometryCollection()) {
-				// 	ign::geometry::GeometryCollection collection = geomIntersectedArea->asGeometryCollection();
-				// 	for (size_t i = 0; i < collection.numGeometries(); ++i) {
-				// 		if (collection.geometryN(i).isMultiPolygon())
-				// 			areaIntersected = collection.geometryN(i).asMultiPolygon().area();
-				// 		else if (collection.geometryN(i).isPolygon())
-				// 			areaIntersected = collection.geometryN(i).asPolygon().area();
-				// 	}
-				// }
-
 				ign::geometry::GeometryPtr geomIntersectedArea(geomAreaInit.Intersection(geomAreaMerged));
 				double areaIntersected = epg::tools::geometry::getArea(*geomIntersectedArea);
 
@@ -220,7 +189,6 @@ namespace app
 					continue;
 				
 				mIntersectedArea[areaIntersected] = fAreaInit;
-
 			}
 
 			if (mIntersectedArea.size() == 0) {
@@ -231,8 +199,6 @@ namespace app
 				fMergedInit = mIntersectedArea.rbegin()->second;
 				return mIntersectedArea.rbegin()->first;
 			}
-
 		}
-
     }
 }

@@ -13,13 +13,13 @@
 namespace app{
 namespace calcul{
 
+	/// @brief 
 	class PolygonMergerOp {
 
 	public:
 
 	
         /// @brief 
-        /// @param borderCode 
         /// @param verbose 
         PolygonMergerOp(
             bool verbose

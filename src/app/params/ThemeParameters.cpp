@@ -45,7 +45,6 @@ namespace params{
 		_initParameter(THRESHOLD_AREA_ATTR, "THRESHOLD_AREA_ATTR"); 
 		_initParameter(LIST_ATTR_JSON, "LIST_ATTR_JSON");
 		_initParameter(LIST_ATTR_W, "LIST_ATTR_W");
-		//_initParameter(MAX_INTERSECT_STANDING_WATER, "MAX_INTERSECT_STANDING_WATER");
 	}
 
 	///

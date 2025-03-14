@@ -187,9 +187,6 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutp(
 		for (size_t i = 0; i < mp.numGeometries(); ++i) {
 			ign::geometry::Polygon const& poly = mp.polygonN(i);
 
-			// if (poly.distance(ign::geometry::Point(3835893.154,3097818.904)) < 0.2) {
-			// 	bool test = true;
-			// }
 			std::vector<std::pair<ign::geometry::Point, ign::math::Vec2d>> vpEndingPtVector = _getEndingVectors(poly);
 
 			for(size_t i = 0 ; i < vpEndingPtVector.size() ; ++i ) {
@@ -237,14 +234,6 @@ std::vector<std::pair<ign::geometry::Point, ign::math::Vec2d>> app::calcul::Gene
 	double douglasPeuckerDist = 15;
 
 	ign::geometry::LineString medialAxis = ome2::geometry::tools::GetEndingPointsOp::computeMedialAxis(poly, douglasPeuckerDist).second;
-
-	//DEBUG
-	// if(medialAxis.startPoint().distance(ign::geometry::Point(3835880.79999,3098307.79995))<1e-1) {
-	// 	bool test = true;
-	// }
-	// if(medialAxis.endPoint().distance(ign::geometry::Point(3835880.79999,3098307.79995))<1e-1) {
-	// 	bool test = true;
-	// }
 
 	ign::feature::Feature featMedialAxis;
 	featMedialAxis.setGeometry(medialAxis);

@@ -2,7 +2,7 @@ cmake_minimum_required( VERSION 2.8.3 )
 cmake_policy(SET CMP0020 NEW)
 
 # Definition du projet
-set(PROJECT_NAME hy_matching)
+set(PROJECT_NAME area_matching)
 project(${PROJECT_NAME})
 
 FIND_PATH(SOCLE_EXTERN_ROOT NAMES SocleExterns.cmake
@@ -38,8 +38,6 @@ add_definitions( "-DBOOST_ALL_NO_LIB" )
 find_package(Boost COMPONENTS locale date_time filesystem system serialization thread program_options regex REQUIRED)
 find_package(Shapelib REQUIRED)
 find_package(Geos REQUIRED)
-#find_package(TinyXML REQUIRED)
-#find_package(CGAL COMPONENTS Core REQUIRED)
 find_package(CGAL REQUIRED)
 find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
@@ -48,7 +46,7 @@ find_package( Qt5 COMPONENTS Widgets Gui Core Xml REQUIRED )
 add_definitions(${QT_DEFINITIONS})
 find_package( Sqlite REQUIRED )
 
-#find_package( IgnSocle COMPONENTS core numeric math tools data filesystem geometry sql feature graph transform xml shapefile cgal REQUIRED )
+
 find_package( IgnSocle COMPONENTS core numeric math tools data filesystem geometry sql feature graph transform shapefile cgal REQUIRED )
 
 
@@ -67,16 +65,6 @@ IF (NOT LibEPG)
 ENDIF()
 
 include (${LibEPG}/LibEPG.cmake)
-
-
-#Find_path(LibGeneralisation_ROOT NAMES LibGeneralisationConfig.cmake
-#PATHS $ENV{LIB_GENERALISATION}
-#	$ENV{LibGeneralisation_ROOT}
-#	../Lib/lib_generalisation
-#	)
-
-#include(${LibGeneralisation_ROOT}/LibGeneralisationConfig.cmake)
-
 
 include_directories(
 	${Boost_INCLUDE_DIRS}
@@ -139,16 +127,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
 #Configuration de l'edition de liens
 target_link_libraries(
 	${PROJECT_NAME} 
-#	${LibGeneralisation_LIBRARIES}
     ${LibEPG_LIBRARIES}
     ${IgnSocle_LIBRARIES}
 	${Pq_LIBRARIES}
 	${Sqlite_LIBRARIES}
     ${Shapelib_LIBRARIES}
 	${CGAL_LIBRARIES}
-	#${CGAL_CORE_LIBRARIES}
-	#${CGAL_LIBRARY}
-	#${CGAL_CORE_LIBRARY}
 	${GMP_LIBRARIES}
 	${MPFR_LIBRARIES}
 	${Geos_LIBRARIES}
@@ -178,15 +162,7 @@ endif ()
 set(CPACK_DEBIAN_PACKAGE_NAME "${PROJECT_NAME}")
 set(CPACK_DEBIAN_FILE_NAME "${PROJECT_NAME}-${VERSION}.deb")
 set(CPACK_DEBIAN_PACKAGE_VERSION "${VERSION}")
-#CPACK_DEBIAN_PACKAGE_ARCHITECTURE
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "IGN")
-#CPACK_DEBIAN_PACKAGE_DESCRIPTION
-#CPACK_DEBIAN_PACKAGE_SECTION
-#CPACK_DEBIAN_ARCHIVE_TYPE
-#CPACK_DEBIAN_COMPRESSION_TYPE
-#CPACK_DEBIAN_PACKAGE_PRIORITY
-#CPACK_PACKAGE_INSTALL_DIRECTORY dossier d'installation sur target system
-
 
 SET(CPACK_OUTPUT_FILE_PREFIX "${CMAKE_INSTALL_PREFIX}/package")
 

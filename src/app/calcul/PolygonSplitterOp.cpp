@@ -39,7 +39,6 @@ namespace app
         ///
         PolygonSplitterOp::~PolygonSplitterOp()
         {
-            
             std::map<std::string, epg::tools::geometry::SegmentIndexedGeometryInterface*>::const_iterator mit;
             for (mit= _mCountryCuttingIndx.begin() ; mit != _mCountryCuttingIndx.end() ; ++mit )
                 delete mit->second;
@@ -48,7 +47,6 @@ namespace app
             for (mit2= _mCountryCuttingGeom.begin() ; mit2 != _mCountryCuttingGeom.end() ; ++mit2 )
                 delete mit2->second;
 
-                
 
             _shapeLogger->closeShape("ps_cutting_ls");
         }
@@ -230,6 +228,5 @@ namespace app
                 _fsArea->deleteFeature(idOrigin);
             }
         }
-        
     }
 }

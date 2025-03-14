@@ -18,9 +18,6 @@ namespace geometry{
 		_numRings(0)
 	{
 		_planarizer.reset( new ign::geometry::graph::tools::SnapRoundPlanarizer< detail::PolygonSplitterGraphType >( _graph, _scale ) );
-		// for( size_t i = 0 ; i < poly.numInteriorRing() ; ++i )
-		// 	_holes.push_back( new ign::geometry::Polygon( poly.interiorRingN(i) ) );
-		// _addGeometry( poly.exteriorRing() );
 
         for( size_t i = 0 ; i < poly.numRings() ; ++i )
 			_addGeometry( poly.ringN(i) );
@@ -33,8 +30,6 @@ namespace geometry{
 	///
 	PolygonSplitter::~PolygonSplitter()
 	{
-		// for( size_t i = 0 ; i < _holes.size() ; ++i )
-		// 	delete _holes[ i ];
 	}
 
 	///
@@ -115,10 +110,6 @@ namespace geometry{
 			{
 				ign::geometry::GeometryPtr geom( _graph.getGeometry( *fit ).clone() );
 
-				// for( size_t i = 0 ; i < _holes.size() ; ++i )
-				// 	if( geom->intersects( *_holes[i] ) )
-				// 		geom.reset( geom->Difference( *_holes[i] ) );
-
 				if (sHoleFaces.find(*fit) != sHoleFaces.end()) continue;
 
 				_getPolygons( *geom, vPolygons );
@@ -136,7 +127,7 @@ namespace geometry{
 		std::set<face_descriptor> sFaceTouchingExtBound;
 		std::set<face_descriptor> sTreatedFaces;
 		std::vector<std::set<face_descriptor>> vsGroups;
-		// std::map<face_descriptor, face_descriptor> mChildParent;
+
 		face_iterator fit, fend;
 		for( _graph.faces( fit, fend ) ; fit != fend ; ++fit ) {
 			sTreatedFaces.insert(*fit);
@@ -159,10 +150,6 @@ namespace geometry{
 			oriented_edge_descriptor startEdge = _graph.getIncidentEdge( *fit );
 			oriented_edge_descriptor nextEdge = startEdge;
 			do{
-
-				//DEBUG
-				ign::geometry::Polygon edgeG = _graph.getGeometry( nextEdge.descriptor );
-
 				std::vector< std::string > vOrigins = _graph.origins( nextEdge.descriptor );
 
 				bool isCuttingEdge = true;
@@ -182,16 +169,7 @@ namespace geometry{
 							vsGroups.push_back(std::set<face_descriptor>());
 							vsGroups.back().insert(*fit);
 							vsGroups.back().insert(foundRf.second);
-						}
-						// if (sTreatedFaces.find(foundRf.second) == sTreatedFaces.end()) {
-							
-						// 	std::map<face_descriptor, face_descriptor>::const_iterator mit = mChildParent.find(*fit);
-
-						// 	face_descriptor fParent = mit != mChildParent.end() ? mit->second : *fit;
-
-						// 	mChildParent.insert(std::make_pair(foundRf.second, fParent));
-						// }
-						
+						}						
 					}
 				}
 
@@ -199,8 +177,10 @@ namespace geometry{
 			}while( nextEdge != startEdge );
 		}
 
+		//--
 		_gatherGroups(vsGroups);
 
+		//--
 		for (std::vector<std::set<face_descriptor>>::const_iterator vit = vsGroups.begin() ; vit != vsGroups.end() ; ++vit ) {
 			bool isHole = true;
 			for (std::set<face_descriptor>::const_iterator sit = vit->begin() ; sit != vit->end() ; ++sit ) {
@@ -213,25 +193,6 @@ namespace geometry{
 			if(isHole)
 				sHoleFaces.insert(vit->begin(), vit->end());
 		}
-
-
-		// std::map<face_descriptor, std::set<face_descriptor>> mGroups;
-		// std::set<face_descriptor> sNoHoleGroups;
-		// for (std::map<face_descriptor, face_descriptor>::const_iterator mit = mChildParent.begin() ; mit != mChildParent.end() ; ++mit) {
-		// 	std::map<face_descriptor, std::set<face_descriptor>>::iterator mg = mGroups.find(mit->second);
-		// 	if (mg == mGroups.end()) {
-		// 		mg = mGroups.insert(std::make_pair(mit->second, std::set<face_descriptor>())).first;
-		// 		mg->second.insert(mit->second);
-		// 		if (sFaceTouchingExtBound.find(mit->second) != sFaceTouchingExtBound.end()) sNoHoleGroups.insert(mg->first);
-		// 	}
-		// 	mg->second.insert(mit->first);
-		// 	if (sFaceTouchingExtBound.find(mit->first) != sFaceTouchingExtBound.end()) sNoHoleGroups.insert(mg->first);
-		// }
-
-		// for (std::map<face_descriptor, std::set<face_descriptor>>::const_iterator mit = mGroups.begin() ; mit != mGroups.end() ; ++mit ) {
-		// 	if (sNoHoleGroups.find(mit->first) != sNoHoleGroups.end() ) continue;
-		// 	sHoleFaces.insert(mit->second.begin(), mit->second.end());
-		// }
 
 		return sHoleFaces;		
 	}
@@ -271,28 +232,34 @@ namespace geometry{
 	{
 		switch( geom.getGeometryType() )
 		{
-			case ign::geometry::Geometry::GeometryTypePolygon :{
-				vPolygons.push_back( geom.asPolygon() );
-				break;}
-			case ign::geometry::Geometry::GeometryTypeMultiPolygon :{
-				ign::geometry::MultiPolygon const& mp = geom.asMultiPolygon();
-				for( size_t i = 0 ; i < mp.numGeometries() ; ++i )
-					vPolygons.push_back( mp.polygonN(i) );
-				break;}
-			case ign::geometry::Geometry::GeometryTypeGeometryCollection :{
-				ign::geometry::GeometryCollection const& gc = geom.asGeometryCollection();
-				for( size_t i = 0 ; i < gc.numGeometries() ; ++i )
+			case ign::geometry::Geometry::GeometryTypePolygon :
 				{
-					if( gc.geometryN(i).isPolygon() )
-						vPolygons.push_back( gc.geometryN(i).asPolygon() );
-					if( gc.geometryN(i).isMultiPolygon() )
-					{
-						ign::geometry::MultiPolygon const& mp = gc.geometryN(i).asMultiPolygon();
-						for( size_t k = 0 ; k < mp.numGeometries() ; ++k )
-							vPolygons.push_back( mp.polygonN(k) );
-					}
+					vPolygons.push_back( geom.asPolygon() );
+					break;
 				}
-				break;}
+			case ign::geometry::Geometry::GeometryTypeMultiPolygon :
+				{
+					ign::geometry::MultiPolygon const& mp = geom.asMultiPolygon();
+					for( size_t i = 0 ; i < mp.numGeometries() ; ++i )
+						vPolygons.push_back( mp.polygonN(i) );
+					break;
+				}
+			case ign::geometry::Geometry::GeometryTypeGeometryCollection :
+				{
+					ign::geometry::GeometryCollection const& gc = geom.asGeometryCollection();
+					for( size_t i = 0 ; i < gc.numGeometries() ; ++i )
+					{
+						if( gc.geometryN(i).isPolygon() )
+							vPolygons.push_back( gc.geometryN(i).asPolygon() );
+						if( gc.geometryN(i).isMultiPolygon() )
+						{
+							ign::geometry::MultiPolygon const& mp = gc.geometryN(i).asMultiPolygon();
+							for( size_t k = 0 ; k < mp.numGeometries() ; ++k )
+								vPolygons.push_back( mp.polygonN(k) );
+						}
+					}
+					break;
+				}
 		}
 	}
 
@@ -336,7 +303,7 @@ namespace geometry{
 				}
 
 				nextEdge = ign::geometry::graph::detail::nextEdge( nextEdge, _graph );
-			}while( nextEdge != startEdge );
+			} while( nextEdge != startEdge );
 
 			if( !_graph[ f ].isFinite ) lFaces.push_front( f );/*non traite*/
 		}

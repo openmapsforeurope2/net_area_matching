@@ -14,9 +14,7 @@ namespace geometry{
 
 	namespace detail{
 
-
-		struct PolygonSplitterFace : 
-			public ign::geometry::graph::FacePropertiesT< ign::geometry::graph::PunctualVertexProperties, ign::geometry::graph::LinearEdgeProperties >  {
+		struct PolygonSplitterFace : public ign::geometry::graph::FacePropertiesT< ign::geometry::graph::PunctualVertexProperties, ign::geometry::graph::LinearEdgeProperties >  {
 			PolygonSplitterFace(){};
 			boost::optional< bool > isFinite;
 		};
@@ -28,6 +26,8 @@ namespace geometry{
 		>  PolygonSplitterGraphType;
 	}
 
+
+	/// @brief 
 	class PolygonSplitter{
 
 		typedef detail::PolygonSplitterGraphType::oriented_edge_descriptor  oriented_edge_descriptor;
@@ -36,17 +36,36 @@ namespace geometry{
 		typedef detail::PolygonSplitterGraphType::face_descriptor           face_descriptor;
 
 	public:
-		/// \brief 
+
+		/// @brief 
+		/// @param poly 
+		/// @param scale 
 		PolygonSplitter( ign::geometry::Polygon const& poly, double scale = 1e7 );
 
 		/// \brief
 		~PolygonSplitter();
 
-		/// \brief
+		/// @brief 
+		/// @param geom 
 		void addCuttingGeometry( ign::geometry::Geometry const& geom );
 
-		/// \brief
+		/// @brief 
+		/// @param vPolygons 
 		void split( std::vector< ign::geometry::Polygon >& vPolygons );
+
+	private:
+
+		//--
+		detail::PolygonSplitterGraphType                                                        _graph;
+		//--
+		double                                                                                  _scale;
+		//--
+		std::auto_ptr< ign::geometry::graph::tools::SnapRoundPlanarizer< detail::PolygonSplitterGraphType > >   _planarizer;
+		//--
+		size_t                                                                                  _count;
+		//--
+		size_t                                                                                  _numRings;
+
 
 	private:
 
@@ -68,24 +87,6 @@ namespace geometry{
 		bool _isBoundary( edge_descriptor e ) const;
 		//--
 		void _gatherGroups( std::vector<std::set<face_descriptor>> & vsGroups ) const;
-
-
-	private:
-
-		//--
-		detail::PolygonSplitterGraphType                                                        _graph;
-		//--
-		double                                                                                  _scale;
-		//--
-		std::auto_ptr< ign::geometry::graph::tools::SnapRoundPlanarizer< detail::PolygonSplitterGraphType > >   _planarizer;
-		//--
-		size_t                                                                                  _count;
-		//--
-		size_t                                                                                  _numRings;
-		//--
-		// std::vector< ign::geometry::Polygon* >                                                  _holes;
-
-
 	
 	};
 

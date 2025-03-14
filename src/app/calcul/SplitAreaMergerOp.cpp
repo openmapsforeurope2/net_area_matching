@@ -159,20 +159,6 @@ namespace app
                 ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string areaId = fArea.getId();
                 std::string const& countryCode = fArea.getAttribute(countryCodeName).toString();
-
-                //DEBUG
-                // if( areaId == "d6f19a5a-048a-4d08-8f5f-123286806402") {
-                //     bool test = true;
-                // }
-                // if(areaId == "97efaf2a-a09a-47be-baea-631689e8484a"){
-                //     bool test = true;
-                // }
-                // if( mp.distance(ign::geometry::Point(3825257.46,3094997.64)) < 0.1) {
-                //     bool test = true;
-                // }
-                // if( mp.distance(ign::geometry::Point(3825260.92,3094996.35)) < 0.1) {
-                //     bool test = true;
-                // }
                 
                 double area = mp.area();
 
@@ -190,15 +176,9 @@ namespace app
                 //DEBUG
                 std::string id = rmit->second.getId();
                 _logger->log(epg::log::DEBUG, id);
-                // if(rmit->second.getId() == "97efaf2a-a09a-47be-baea-631689e8484a"){
-                //     bool test = true;
-                // }
-                // if( rmit->second.getGeometry().distance(ign::geometry::Point(4017241.00,3084812.99)) < 0.1) {
-                //     bool test = true;
-                // }
                 
                 std::map<double, ign::feature::Feature> mNeighbours = _getNeighboursWithArea(rmit->second, filterArea); // TODO confirmer qu'on cherche les voisins "w_tag IS NOT NULL" et non country LIKE%#%
-                // if (sSmallAreas.find(rmit->second.getId()) != sSmallAreas.end()) continue;   WHAT!!!!!!!!!!!!!!!!!!!!!
+
                 if ( rmit->second.getAttribute(countryCodeName).toString().find("#") != std::string::npos ) {
                     //petite surface #, on elimine les candidats qui ne sont pas #
                     std::map<double, ign::feature::Feature>::const_iterator mit = mNeighbours.begin();
@@ -225,10 +205,6 @@ namespace app
                     }
                 }
 
-                //DEBUG
-                std::string id1 = rmit->second.getId();
-                std::string id2 = feat2Merge->getId();
-
                 _addAreas(rmit->second, *feat2Merge, vmAreas);
             }
 
@@ -244,11 +220,6 @@ namespace app
                     ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                     std::string areaId = fArea.getId();
                     std::string identifier = fArea.getAttribute(nationalIdName).toString();
-
-                    //DEBUG
-                    // if (identifier == "{A98CCDE0-8C3F-48C4-8A74-97EB6E4CEEF0}#NL.TOP10NL110946619") {
-                    //     bool test =true;
-                    // }
                     
                     if ( sSmallAreas.find(areaId) != sSmallAreas.end() ) continue;
 
@@ -274,22 +245,11 @@ namespace app
             for (std::vector<std::map<std::string, ign::feature::Feature>>::iterator vit = vmAreas.begin() ; vit != vmAreas.end() ; ++vit) {
                 ++display3;
 
-                //DEBUG
-                int ind = vit-vmAreas.begin();
-
                 double maxArea = 0;
                 ign::feature::Feature* maxFeatPtr = 0;
                 ign::geometry::GeometryPtr resultingGeomPtr(new ign::geometry::MultiPolygon());
                 for(std::map<std::string, ign::feature::Feature>::iterator mit = vit->begin() ; mit != vit->end() ; ++mit) {
                     ign::geometry::MultiPolygon const& mp = mit->second.getGeometry().asMultiPolygon();
-
-                    //DEBUG
-                    // if(mit->second.getId() == "74474327-8a21-4d3e-9266-84b149af3e7a") {
-                    //     bool test =true;
-                    // }
-                    // if(mp.distance(ign::geometry::Point(4017264.7,3084892.4)) < 0.1) {
-                    //     bool test =true;
-                    // }
                     
                     resultingGeomPtr.reset(resultingGeomPtr->Union(mp));
                     double area = mp.area();
@@ -337,9 +297,6 @@ namespace app
         ) const {
             bool foundGroup = false;
             for(std::vector<std::map<std::string, ign::feature::Feature>>::iterator vit = vmAreas.begin() ; vit != vmAreas.end() ; ++vit) {
-
-                //DEBUG
-                int i = vit - vmAreas.begin();
 
                 if( vit->find(feat1.getId()) != vit->end() ) {
                     vit->insert(std::make_pair(feat2.getId(), feat2));
@@ -392,13 +349,11 @@ namespace app
 
                 ign::geometry::GeometryPtr intersectionGeom(areaGeom.Intersection(neighbourGeom));
 
-                //DEBUG
-                ign::geometry::Geometry::GeometryType geomType = intersectionGeom->getGeometryType();
-
                 if( intersectionGeom->isPoint() || intersectionGeom->isMultiPoint() || intersectionGeom->isNull() || intersectionGeom->isEmpty() ) continue;
 
                 mNeighbours.insert(std::make_pair(fNeighbour.getGeometry().asMultiPolygon().area(), fNeighbour));
             }
+
             return mNeighbours;
         }
 
@@ -430,6 +385,7 @@ namespace app
 
                 vNeighbours.push_back(fNeighbour);
             }
+            
             return vNeighbours;
         }
     }
