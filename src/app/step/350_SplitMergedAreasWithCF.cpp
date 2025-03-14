@@ -34,7 +34,7 @@ namespace step {
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 
 		//--
-		app::calcul::CfSplitterOp::compute(verbose);
+		app::calcul::CfSplitterOp::Compute(verbose);
 	}
 
 }

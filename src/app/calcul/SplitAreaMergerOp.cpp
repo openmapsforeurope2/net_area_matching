@@ -44,7 +44,7 @@ namespace app
         ///
         ///
         ///
-        void SplitAreaMergerOp::compute(
+        void SplitAreaMergerOp::Compute(
 			bool verbose
 		) {
             SplitAreaMergerOp splitAreaMergerOp(verbose);

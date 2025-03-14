@@ -33,7 +33,7 @@ namespace step {
 		
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 
-		app::calcul::GenerateCuttingPointsOp::computeByCountry(countryCodeW, verbose);
+		app::calcul::GenerateCuttingPointsOp::ComputeByCountry(countryCodeW, verbose);
 
 
 		//--
@@ -45,7 +45,7 @@ namespace step {
 
 		_epgParams.setParameter(AREA_TABLE, ign::data::String(intAreaTableName));
 
-		app::calcul::GenerateCuttingPointsOp::compute(verbose, false);
+		app::calcul::GenerateCuttingPointsOp::Compute(verbose, false);
 	}
 
 }

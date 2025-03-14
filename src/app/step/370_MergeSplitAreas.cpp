@@ -34,7 +34,7 @@ namespace step {
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 
 		//--
-		app::calcul::SplitAreaMergerOp::compute(verbose);
+		app::calcul::SplitAreaMergerOp::Compute(verbose);
 	}
 
 }

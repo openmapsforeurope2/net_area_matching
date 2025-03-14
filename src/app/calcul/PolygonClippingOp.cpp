@@ -43,7 +43,7 @@ namespace app
         ///
         ///
         ///
-        void PolygonClippingOp::compute(
+        void PolygonClippingOp::Compute(
 			std::string countryCode, 
 			bool verbose
 		) {

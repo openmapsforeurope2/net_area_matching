@@ -31,7 +31,7 @@ namespace step {
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 
-		app::calcul::GenerateIntersectionAreaOp::compute(countryCodeW, verbose);
+		app::calcul::GenerateIntersectionAreaOp::Compute(countryCodeW, verbose);
 	}
 
 }

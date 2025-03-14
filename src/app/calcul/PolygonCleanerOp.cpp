@@ -44,7 +44,7 @@ namespace app
         ///
         ///
         ///
-        void PolygonCleanerOp::compute(
+        void PolygonCleanerOp::Compute(
 			std::string borderCode, 
 			bool verbose
 		) {

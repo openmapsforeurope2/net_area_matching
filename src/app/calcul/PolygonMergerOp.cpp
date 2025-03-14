@@ -45,7 +45,7 @@ namespace app
         ///
         ///
         ///
-        void PolygonMergerOp::compute(
+        void PolygonMergerOp::Compute(
 			bool verbose
 		) {
             PolygonMergerOp PolygonMergerOp(verbose);

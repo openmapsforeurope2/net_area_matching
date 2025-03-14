@@ -31,7 +31,7 @@ namespace calcul{
         ~CfSplitterOp();
 
         /// \brief
-		static void compute(
+		static void Compute(
 			bool verbose
 		);
 

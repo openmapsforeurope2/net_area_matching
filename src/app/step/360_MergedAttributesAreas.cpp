@@ -29,7 +29,7 @@ void app::step::MergedAttributesAreas::onCompute(bool verbose = false)
 
 	app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 	std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
-	app::calcul::SetAttributeMergedAreasOp::compute(countryCodeW, verbose);
+	app::calcul::SetAttributeMergedAreasOp::Compute(countryCodeW, verbose);
 
 }
 

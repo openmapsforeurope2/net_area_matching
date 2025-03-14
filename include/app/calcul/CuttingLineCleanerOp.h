@@ -29,7 +29,7 @@ namespace calcul{
         ~CuttingLineCleanerOp();
 
         /// \brief
-		static void compute(
+		static void Compute(
 			bool verbose
 		);
 

@@ -59,7 +59,7 @@ namespace app
         ///
         ///
         ///
-        void CfSplitterOp::compute(
+        void CfSplitterOp::Compute(
 			bool verbose
 		) {
             CfSplitterOp CfSplitterOp(verbose);

@@ -42,7 +42,7 @@ namespace app
 		///
 		///
 		///
-		void GenerateIntersectionAreaOp::compute(
+		void GenerateIntersectionAreaOp::Compute(
 			std::string borderCode, 
 			bool verbose
 		) {

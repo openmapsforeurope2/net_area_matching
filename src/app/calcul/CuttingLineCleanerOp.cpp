@@ -36,7 +36,7 @@ namespace app
         ///
         ///
         ///
-        void CuttingLineCleanerOp::compute(
+        void CuttingLineCleanerOp::Compute(
 			bool verbose
 		) {
             CuttingLineCleanerOp CuttingLineCleanerOp(verbose);

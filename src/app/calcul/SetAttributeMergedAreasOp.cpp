@@ -44,7 +44,7 @@ namespace app
         ///
         ///
         ///
-        void SetAttributeMergedAreasOp::compute(
+        void SetAttributeMergedAreasOp::Compute(
             std::string borderCode,
 			bool verbose
 		) {

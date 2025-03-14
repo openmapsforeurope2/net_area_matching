@@ -33,14 +33,14 @@ namespace calcul{
 
 
 		/// \brief
-		static void computeByCountry(
+		static void ComputeByCountry(
 			std::string const& borderCode,
             bool verbose,
 			bool resetCpTable = true
 		);
 
 		/// \brief
-		static void compute(
+		static void Compute(
             bool verbose,
 			bool resetCpTable = true
 		);

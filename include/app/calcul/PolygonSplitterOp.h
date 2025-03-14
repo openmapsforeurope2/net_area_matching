@@ -35,7 +35,7 @@ namespace calcul{
 		/// @brief 
 		/// @param borderCode 
 		/// @param verbose 
-		static void compute(
+		static void Compute(
 			std::string borderCode, 
 			bool verbose
 		);

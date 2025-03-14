@@ -38,7 +38,7 @@ namespace calcul{
         ~GenerateCuttingLinesOp();
 
 		/// \brief
-		static void compute(
+		static void Compute(
 			std::string borderCode,
             bool verbose
 		);

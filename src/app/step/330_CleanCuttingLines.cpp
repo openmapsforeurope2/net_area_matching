@@ -28,7 +28,7 @@ namespace step {
 		_epgParams.setParameter(AREA_TABLE, ign::data::String(getLastWorkingTableName(AREA_TABLE_INIT)));
 		
 		//--
-		app::calcul::CuttingLineCleanerOp::compute(verbose);
+		app::calcul::CuttingLineCleanerOp::Compute(verbose);
 	}
 
 }

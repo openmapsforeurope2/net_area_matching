@@ -36,13 +36,13 @@ namespace step {
 		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
 
 		//--
-		app::calcul::PolygonSplitterOp::compute(countryCodeW, verbose);
+		app::calcul::PolygonSplitterOp::Compute(countryCodeW, verbose);
 
 		//--
-		app::calcul::PolygonCleanerOp::compute(countryCodeW, verbose);
+		app::calcul::PolygonCleanerOp::Compute(countryCodeW, verbose);
 
 		//--
-		app::calcul::PolygonMergerOp::compute(verbose);
+		app::calcul::PolygonMergerOp::Compute(verbose);
 	}
 
 }

@@ -31,7 +31,7 @@ namespace calcul{
 
 		/// @brief 
 		/// @param verbose 
-		static void compute(
+		static void Compute(
 			bool verbose
 		);
 

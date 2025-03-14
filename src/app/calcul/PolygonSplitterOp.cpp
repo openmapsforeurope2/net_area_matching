@@ -54,7 +54,7 @@ namespace app
         ///
         ///
         ///
-        void PolygonSplitterOp::compute(
+        void PolygonSplitterOp::Compute(
 			std::string borderCode, 
 			bool verbose
 		) {

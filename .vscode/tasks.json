@@ -73,13 +73,6 @@
                 }
             }
         },
-        // {
-        //     "label": "clean (in container)",
-        //     "type": "shell",
-        //     "command": "docker run --privileged -v c:/vsc_docker_cc_gdb/:/root vsc_docker_cc_gdb make clean",
-        //     "group": "build",
-        //     "problemMatcher": []
-        // },
         {
             "label": "remove containers",
             "type": "shell",

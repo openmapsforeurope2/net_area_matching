@@ -45,7 +45,7 @@ namespace app
         ///
         ///
         ///
-        void IntersectingAreasMergerOp::compute(
+        void IntersectingAreasMergerOp::Compute(
             std::string const& borderCode,
 			bool verbose
 		) {

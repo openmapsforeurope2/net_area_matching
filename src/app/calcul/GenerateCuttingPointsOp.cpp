@@ -45,7 +45,7 @@ app::calcul::GenerateCuttingPointsOp::~GenerateCuttingPointsOp()
 ///
 ///
 ///
-void app::calcul::GenerateCuttingPointsOp::computeByCountry(
+void app::calcul::GenerateCuttingPointsOp::ComputeByCountry(
 	std::string const& borderCode, 
 	bool verbose,
 	bool resetCpTable
@@ -57,7 +57,7 @@ void app::calcul::GenerateCuttingPointsOp::computeByCountry(
 ///
 ///
 ///
-void app::calcul::GenerateCuttingPointsOp::compute(
+void app::calcul::GenerateCuttingPointsOp::Compute(
 	bool verbose,
 	bool resetCpTable
 ) {
