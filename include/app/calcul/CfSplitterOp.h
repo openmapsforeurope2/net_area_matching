@@ -15,22 +15,27 @@
 namespace app{
 namespace calcul{
 
-	/// @brief 
+	/// @brief Classe utilisée pour découper les surfaces avec les cutting features (cuttin points et cutting lines)
 	class CfSplitterOp {
 
 	public:
 
 	
-		/// @brief 
-		/// @param verbose 
+		/// @brief Constructeur
+		/// @param verbose Mode verbeux
 		CfSplitterOp(
             bool verbose
         );
 
-        /// @brief 
+        /// @brief Destructeur
         ~CfSplitterOp();
 
-        /// \brief
+		/// @brief Lance la découpe des surfaces. Des sections de découpe sont calculées à partir des cutting points.
+        /// Pour cela on découpe le contour extérieur des polygones avec les cutting points qui sont localisés sur ce dernier.
+        /// Les projections des cutting points sont réalisés sur ces sudivisions du contour afin de définir des sections
+        /// (qui sont ici des segments). Des découpes sont réalisées aussi selon les cuttings lines. Les cutting lines
+        /// peuvent devoir être prolongées jusqu'au contour extérieur.
+		/// @param verbose Mode verbeux
 		static void Compute(
 			bool verbose
 		);

@@ -164,7 +164,7 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutp(
 	std::string const sectionGeomName = themeParameters->getValue(CUTP_SECTION_GEOM).toString();
 	std::string const natIdIdName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
 
-	// a parametrer
+	//--
 	double sectionWidth = 100;
 
 	ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filter);
@@ -217,7 +217,6 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutp(
 				featCutP.setAttribute(linkedFeatIdName, ign::data::String(linkedNatId));
 				featCutP.setAttribute(sectionGeomName, sectionGeom);
 				_fsCutP->createFeature(featCutP);
-
 			}
 		}
 	}

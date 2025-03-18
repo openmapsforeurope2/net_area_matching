@@ -13,23 +13,25 @@
 namespace app{
 namespace calcul{
 
-	/// @brief 
+	/// @brief Classe utilisée pour fusionner les surfaces de même identifiant national
+	/// A utiliser conjointement avec les classes PolygonSplitterOp et PolygonCleanerOp
 	class PolygonMergerOp {
 
 	public:
 
 	
-        /// @brief 
-        /// @param verbose 
+        /// @brief Constructeur
+        /// @param verbose Mode verbeux
         PolygonMergerOp(
             bool verbose
         );
 
-        /// @brief 
+        /// @brief Destructeur
         ~PolygonMergerOp();
 
 
-		/// \brief
+		/// @brief Lance la fusion des surfaces possédant le même identifiant national
+		/// @param verbose 
 		static void Compute(
 			bool verbose
 		);

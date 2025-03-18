@@ -14,25 +14,30 @@
 namespace app{
 namespace calcul{
 
-	/// @brief 
+	/// @brief Classe utilisée pour supprimer des surfaces hors de leur pays
+	/// A utiliser conjointement avec les classes PolygonSplitterOp et PolygonMergerOp
 	class PolygonCleanerOp {
 
 	public:
 
 	
-        /// @brief 
-        /// @param borderCode 
-        /// @param verbose 
+        /// @brief Constructeur
+        /// @param borderCode Code frontière (code double)
+        /// @param verbose Mode verbeux
         PolygonCleanerOp(
             std::string borderCode,
             bool verbose
         );
 
-        /// @brief 
+        /// @brief Destructeur
         ~PolygonCleanerOp();
 
 
-		/// \brief
+		/// @brief Supprime les surfaces qui n'intersectent pas leur pays et dont
+		/// la demie distance de Hausdorff (éloignement maximum) avec la frontière
+		/// est supérieure à un seuil.
+		/// @param borderCode Code frontière (code double)
+        /// @param verbose Mode verbeux
 		static void Compute(
 			std::string borderCode, 
 			bool verbose

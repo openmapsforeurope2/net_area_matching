@@ -16,27 +16,34 @@
 namespace app{
 namespace calcul{
 
-	/// @brief 
+	/// @brief Classe utilisée pour l'affectation des attributs des surfaces fusionnées
 	class SetAttributeMergedAreasOp {
 
 	public:
 
 	
-        /// @brief 
-        /// @param borderCode 
-        /// @param verbose 
+        /// @brief Constructeur
+        /// @param borderCode Code frontière (code double)
+        /// @param verbose Mode verbeux
 		SetAttributeMergedAreasOp(
 			std::string borderCode,
             bool verbose
         );
 
-        /// @brief 
+        /// @brief Destructeur
         ~SetAttributeMergedAreasOp();
 
 
-		/// @brief 
-		/// @param borderCode 
-		/// @param verbose 
+		/// @brief Lance l'affection des attributs des surfaces fusionnées.
+		/// On recherche les surfaces d'origines des pays 1 (A1) et 2 (A2) ayant 
+		/// la plus grande intersection avec la surface fusionnée. si l'aire
+		/// de A1 représente moins de 10% de l'aire de A2 la surface fusionnée prends 
+		/// les attributs de A2. A l'inverse si l'aire de A2 représente moins de
+		/// 10% de l'aire de A1 la surface fusionnée prends les attributs de A1.
+		/// Dans tous les autres cas les attributs de la surfaces fusionnées
+		/// seront calculés par concaténation des attributs de A1 et A2.
+		/// @param borderCode Code frontière (code double)
+        /// @param verbose Mode verbeux
 		static void Compute(
 			std::string borderCode,
 			bool verbose

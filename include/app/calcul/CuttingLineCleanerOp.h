@@ -13,22 +13,26 @@
 namespace app{
 namespace calcul{
 
-	/// @brief 
+	/// @brief Classe pour le nettoyage des cutting lines orphelines
 	class CuttingLineCleanerOp {
 
 	public:
 
 	
-		/// @brief 
-		/// @param verbose 
+		/// @brief Constructeur
+		/// @param verbose Mode verbeux
 		CuttingLineCleanerOp(
             bool verbose
         );
 
-        /// @brief 
+        /// @brief Destructeur
         ~CuttingLineCleanerOp();
 
-        /// \brief
+		/// \brief Lance le nettoyage. On vérifie que les cutting lines sont toujours en 
+		/// contact avec les surfaces à l'origine de leur création (ses surfaces peuvent 
+		/// avoir été supprimées dans une étape antérieure). Si une cutting line n'est
+		/// en contact avec aucune surface (du même pays), elle est supprimée.
+		/// @param verbose Mode verbeux
 		static void Compute(
 			bool verbose
 		);

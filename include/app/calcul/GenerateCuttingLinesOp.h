@@ -14,7 +14,7 @@
 namespace app{
 namespace calcul{
 
-	/// @brief 
+	/// @brief Classe dédiée à la création des cutting lines
 	class GenerateCuttingLinesOp {
 
 	public:
@@ -26,18 +26,20 @@ namespace calcul{
 
 	public:
 
-        /// @brief 
-        /// @param borderCode 
-        /// @param verbose 
+        /// @brief Constructeur
+        /// @param borderCode Code frontière (code double)
+        /// @param verbose Mode verbeux
 		GenerateCuttingLinesOp(
             std::string borderCode,
             bool verbose
         );
 
-        /// @brief 
+        /// @brief Destructeur
         ~GenerateCuttingLinesOp();
 
-		/// \brief
+		/// \brief Lance la génération des cutting lines. Les cuttings lines
+		/// correspondent à la géométrie linéaire partagée par deux surfaces
+		/// d'un même pays en accostage.
 		static void Compute(
 			std::string borderCode,
             bool verbose

@@ -13,30 +13,31 @@
 namespace app{
 namespace calcul{
 
-	/// @brief 
+	/// @brief Classe dépréciée
 	class PolygonClippingOp {
 
 	public:
 
 	
-        /// @brief 
-        /// @param countryCode 
-        /// @param verbose 
+        /// @brief Constructeur
+        /// @param countryCode Code pays simple
+        /// @param verbose Mode verbeux
         PolygonClippingOp(
             std::string countryCode,
             bool verbose
         );
 
-        /// @brief 
+        /// @brief Destructeur
         ~PolygonClippingOp();
 
 
-		/// \brief
+		/// @brief Lance la découpe
+		/// @param countryCode Code pays simple
+        /// @param verbose Mode verbeux
 		static void Compute(
 			std::string countryCode, 
 			bool verbose
 		);
-
 
 	private:
 		//--

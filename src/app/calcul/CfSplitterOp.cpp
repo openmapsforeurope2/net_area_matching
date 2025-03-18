@@ -359,7 +359,6 @@ namespace app
                         //DEBUG
                         std::string idCl = fCl.getId();
                         _logger->log(epg::log::DEBUG, idCl);
-                        _logger->log(epg::log::DEBUG, clGeom.toString());
 
                         clGeom = _computeCuttingLineGeometry(idCl, clGeom, poly, vClEndingPoints, mModifiedCl);
 

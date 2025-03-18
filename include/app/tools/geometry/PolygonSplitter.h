@@ -27,7 +27,7 @@ namespace geometry{
 	}
 
 
-	/// @brief 
+	/// @brief Classe utilitaire pour découper un polygone
 	class PolygonSplitter{
 
 		typedef detail::PolygonSplitterGraphType::oriented_edge_descriptor  oriented_edge_descriptor;
@@ -37,20 +37,20 @@ namespace geometry{
 
 	public:
 
-		/// @brief 
-		/// @param poly 
-		/// @param scale 
+		/// @brief Constructeur
+		/// @param poly Polygone à découper
+		/// @param scale Précision
 		PolygonSplitter( ign::geometry::Polygon const& poly, double scale = 1e7 );
 
-		/// \brief
+		/// \brief Destructeur
 		~PolygonSplitter();
 
-		/// @brief 
-		/// @param geom 
+		/// @brief Ajoute une géométrie de découpe
+		/// @param geom Géométrie de découpe
 		void addCuttingGeometry( ign::geometry::Geometry const& geom );
 
-		/// @brief 
-		/// @param vPolygons 
+		/// @brief Lance la découpe.
+		/// @param vPolygons Ensemble de polygones résultants de l'opération de découpe
 		void split( std::vector< ign::geometry::Polygon >& vPolygons );
 
 	private:

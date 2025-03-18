@@ -44,7 +44,7 @@ app::calcul::GenerateCuttingLinesOp::~GenerateCuttingLinesOp()
 ///
 ///
 ///
-void app::calcul::GenerateCuttingLinesOp::compute(
+void app::calcul::GenerateCuttingLinesOp::Compute(
 	std::string borderCode, 
 	bool verbose
 ) {
@@ -93,24 +93,6 @@ void app::calcul::GenerateCuttingLinesOp::_init()
     // app parameters
     params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
 
-    // on recupere un buffer autour de la frontiere
-   /* ign::geometry::GeometryPtr boundBuffPtr(new ign::geometry::Polygon());
-    ign::feature::sql::FeatureStorePostgis* fsBoundary = context->getDataBaseManager().getFeatureStore(boundaryTableName, idName, geomName);
-    ign::feature::FeatureIteratorPtr itBoundary = fsBoundary->getFeatures(ign::feature::FeatureFilter(countryCodeName +" = '"+_countryCode+"'"));
-    while (itBoundary->hasNext())
-    {
-        ign::feature::Feature const& fBoundary = itBoundary->next();
-        ign::geometry::LineString const& ls = fBoundary.getGeometry().asLineString();
-
-        ign::geometry::GeometryPtr tmpBuffPtr(ls.buffer(100000));
-
-        boundBuffPtr.reset(boundBuffPtr->Union(*tmpBuffPtr));
-    }*/
-
-    //on recupere la geometry des pays
-
-
-
 	std::string cutlTableName = themeParameters->getValue(CUTL_TABLE).toString();
 	if (cutlTableName == "") {
 		std::string const cutlTableSuffix = themeParameters->getValue(CUTL_TABLE_SUFFIX).toString();
@@ -133,9 +115,6 @@ void app::calcul::GenerateCuttingLinesOp::_init()
 	_fsArea = context->getDataBaseManager().getFeatureStore(areaTableName, idName, geomName);
 	_fsCutL = context->getDataBaseManager().getFeatureStore(cutlTableName, idName, geomName);
 
-	//--
-	//_idGeneratorCutL = epg::sql::tools::IdGeneratorInterfacePtr(epg::sql::tools::IdGeneratorFactory::getNew(*_fsCutL, "CUTTINGLINE"));
-
     //--
     _logger->log(epg::log::INFO, "[END] initialization: " + epg::tools::TimeTools::getTime());
 };
@@ -147,17 +126,21 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 	std::string countryCode
 ) const {
 	epg::Context *context = epg::ContextS::getInstance();
+
     // epg parameters
     epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
     std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
 	std::string const linkedFeatIdName = context->getEpgParameters().getValue(LINKED_FEATURE_ID).toString();
 
+	// theme paramaters
 	params::ThemeParameters * themeParameters = params::ThemeParametersS::getInstance();
 	std::string const natIdIdName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
-	std::map<std::string, std::string> mIdNatId;
 
+	//--
 	GraphType graphArea;
 	ign::geometry::graph::tools::SnapRoundPlanarizer< GraphType >  planarizerGraphArea(graphArea, 100);
+
+	std::map<std::string, std::string> mIdNatId;
 
 	ign::feature::FeatureFilter filterCountry(countryCodeName + " = '" + countryCode + "'");
     ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterCountry);
@@ -175,7 +158,7 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
     }
 	planarizerGraphArea.planarize();
 
-
+	//--
 	GraphType::edge_iterator eit, eitEnd;
 	graphArea.edges(eit, eitEnd);
 	boost::progress_display displayGenerateCL(graphArea.numEdges(), std::cout, "[ GENERATE CUTTING LINES " + countryCode + " ]\n");
@@ -212,10 +195,6 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 		++eit;
 	}
 
-	//fusion des CutL avec les m�mes linkedFeatIdName et qui se touchent (ou presque)
-	/*std::ostringstream ss1;
-	ss1 << linkedFeatIdName << " LIKE '%#%'";
-	ign::feature::FeatureFilter mergeFilter(ss1.str());*/
+	//fusion des CutL avec les mêmes linkedFeatIdName et qui se touchent (ou presque)
 	ome2::calcul::detail::ClMerger::mergeAll(_fsCutL, ign::feature::FeatureFilter());
-
 } 

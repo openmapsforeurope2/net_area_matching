@@ -13,25 +13,28 @@
 namespace app{
 namespace calcul{
 
-	/// @brief 
+	/// @brief Classe utilisée pour la fusion des surfaces qui se chevauchent
+	/// de deux pays
 	class IntersectingAreasMergerOp {
 
 	public:
 
 	
-        /// @brief 
-        /// @param borderCode 
-        /// @param verbose 
+        /// @brief Constructeur
+        /// @param borderCode Code frontière (code double)
+        /// @param verbose Mode verbeux
         IntersectingAreasMergerOp(
 			std::string const& borderCode,
             bool verbose
         );
 
-        /// @brief 
+        /// @brief Destructeur
         ~IntersectingAreasMergerOp();
 
 
-		/// \brief
+		/// @brief Lance la fusion
+		/// @param borderCode Code frontière (code double)
+        /// @param verbose Mode verbeux
 		static void Compute(
 			std::string const& borderCode,
 			bool verbose

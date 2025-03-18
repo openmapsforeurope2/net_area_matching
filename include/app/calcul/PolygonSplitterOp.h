@@ -14,27 +14,29 @@
 namespace app{
 namespace calcul{
 
-	/// @brief 
+	/// @brief Classe utilisée pour découper ('clipper') les surfaces par intersection 
+	/// avec la surface du pays augmentée d'un buffer (dont la distance est paramétrée).
+	/// A utiliser conjointement avec les classes PolygonMergerOp et PolygonCleanerOp
 	class PolygonSplitterOp {
 
 	public:
 
 	
-        /// @brief 
-        /// @param borderCode 
-        /// @param verbose 
+        /// @brief Constructeur
+        /// @param borderCode Code frontère (code double)
+        /// @param verbose Mode verbeux
         PolygonSplitterOp(
             std::string borderCode,
             bool verbose
         );
 
-        /// @brief 
+        /// @brief Destructeur
         ~PolygonSplitterOp();
 
 
-		/// @brief 
-		/// @param borderCode 
-		/// @param verbose 
+		/// @brief Lance la découpe des surfaces
+		/// @param borderCode Code frontère (code double)
+        /// @param verbose Mode verbeux
 		static void Compute(
 			std::string borderCode, 
 			bool verbose
