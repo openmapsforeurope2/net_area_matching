@@ -38,6 +38,17 @@ Pour le moment, seul le thème hydrographie est traité
 ## compilation
 ## utilisation
 
+Paramètres:
+* c [obligatoire] : chemin vers le fichier de configuration
+* cc [obligatoire] : code pays double (exemple : be#fr)
+* sp [obligatoire] : étape(s) à executer (exemples: 320 ; 320,340 ; 310-399)
+
+Exemples d'appels:
+
+~~~
+bin/area_matching --c path/to/config/epg_parmaters.ini --cc be#fr
+bin/area_matching --c path/to/config/epg_parmaters.ini --cc be#fr --sp 350
+~~~
 
 ## Définition
 
