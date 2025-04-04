@@ -91,6 +91,7 @@ namespace app
             std::string const landCoverTypeName = themeParameters->getValue(LAND_COVER_TYPE).toString();
             std::string const landAreaValue = themeParameters->getValue(TYPE_LAND_AREA).toString();
             double const borderOffset = themeParameters->getValue(PS_BORDER_OFFSET).toDouble();
+			std::string const inlandwaterValue = themeParameters->getValue(TYPE_INLAND_WATER).toString();
 
             //on recupere la geometry des pays
             std::vector<std::string> vCountry;
@@ -99,8 +100,8 @@ namespace app
             for (size_t i = 0 ; i < 2 ; ++i) {
                 ign::geometry::MultiLineString* cuttingMlsPtr = new ign::geometry::MultiLineString();
                 ign::feature::sql::FeatureStorePostgis* fsLandmask = context->getDataBaseManager().getFeatureStore(landmaskTableName, idName, geomName);
-                ign::feature::FeatureIteratorPtr itLandmask = fsLandmask->getFeatures(ign::feature::FeatureFilter(landCoverTypeName + " = '" + landAreaValue + "' AND " + countryCodeName + " = '" + vCountry[i] + "'"));
-                while (itLandmask->hasNext())
+				ign::feature::FeatureIteratorPtr itLandmask = fsLandmask->getFeatures(ign::feature::FeatureFilter("(" + landCoverTypeName + " = '" + landAreaValue + "' OR " + landCoverTypeName + " = '" + inlandwaterValue + "') AND " + countryCodeName + " = '" + vCountry[i] + "'"));
+				while (itLandmask->hasNext())
                 {
                     ign::feature::Feature const& fLandmask = itLandmask->next();
                     ign::geometry::MultiPolygon const& mp = fLandmask.getGeometry().asMultiPolygon();
