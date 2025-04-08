@@ -81,6 +81,7 @@ namespace app
             std::string const landCoverTypeName = themeParameters->getValue(LAND_COVER_TYPE_NAME).toString();
             std::string const landAreaValue = themeParameters->getValue(LAND_COVER_TYPE_VALUE).toString();
             double const landmaskBuffer = themeParameters->getValue(PC_LANDMASK_BUFFER).toDouble();
+			std::string const inlandwaterValue = themeParameters->getValue(TYPE_INLAND_WATER).toString();
 
             // on recupere un buffer autour de la frontiere
             ign::geometry::GeometryPtr boundBuffPtr(new ign::geometry::Polygon());
@@ -103,8 +104,9 @@ namespace app
             for (std::vector<std::string>::iterator vit = vCountry.begin() ; vit != vCountry.end() ; ++vit) {
                 ign::geometry::MultiPolygon mpLandmask;
                 ign::feature::sql::FeatureStorePostgis* fsLandmask = context->getDataBaseManager().getFeatureStore(landmaskTableName, idName, geomName);
-                ign::feature::FeatureIteratorPtr itLandmask = fsLandmask->getFeatures(ign::feature::FeatureFilter(landCoverTypeName + " = '" + landAreaValue + "' AND " + countryCodeName + " = '" + *vit + "'"));
-                while (itLandmask->hasNext())
+
+				ign::feature::FeatureIteratorPtr itLandmask = fsLandmask->getFeatures(ign::feature::FeatureFilter("(" + landCoverTypeName + " = '" + landAreaValue + "' OR " + landCoverTypeName + " = '" + inlandwaterValue + "') AND " + countryCodeName + " = '" + *vit + "'"));
+				while (itLandmask->hasNext())
                 {
                     ign::feature::Feature const& fLandmask = itLandmask->next();
                     ign::geometry::MultiPolygon const& mp = fLandmask.getGeometry().asMultiPolygon();

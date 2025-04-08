@@ -166,8 +166,11 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 		++displayGenerateCL;
 
 		std::vector<std::string> vCutlOrigins = graphArea.origins(*eit);
+		std::set<std::string> sCutlOrigins;
+		for (size_t i = 0; i < vCutlOrigins.size(); ++i)
+			sCutlOrigins.insert(vCutlOrigins[i]);
 
-		if (vCutlOrigins.size() == 1) {
+		if (sCutlOrigins.size() == 1) {
 			++eit;
 			continue;
 		}
@@ -179,11 +182,11 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 		featCutL.setGeometry(lsCutl);
 
 		std::string idLinkedValue;
-		for (size_t i = 0; i < vCutlOrigins.size(); ++i) {
-			if (i != 0)
+		for (std::set<std::string>::iterator sit = sCutlOrigins.begin(); sit != sCutlOrigins.end(); ++sit) {
+			if (sit != sCutlOrigins.begin())
 				idLinkedValue+="#";
-			if(mIdNatId.find(vCutlOrigins[i]) != mIdNatId.end())
-				idLinkedValue += mIdNatId.find(vCutlOrigins[i])->second;
+			if(mIdNatId.find(*sit) != mIdNatId.end())
+				idLinkedValue += mIdNatId.find(*sit)->second;
 		}
 
 		featCutL.setAttribute(linkedFeatIdName, ign::data::String(idLinkedValue));
