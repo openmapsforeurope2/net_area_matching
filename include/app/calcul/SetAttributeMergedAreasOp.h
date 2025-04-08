@@ -37,7 +37,7 @@ namespace calcul{
 		/// @brief Lance l'affection des attributs des surfaces fusionnées.
 		/// On recherche les surfaces d'origines des pays 1 (A1) et 2 (A2) ayant 
 		/// la plus grande intersection avec la surface fusionnée. si l'aire
-		/// de A1 représente moins de 10% de l'aire de A2 la surface fusionnée prends 
+		/// de A1 représente moins de 10% de l'aire de A2 la surface fusionnée prend
 		/// les attributs de A2. A l'inverse si l'aire de A2 représente moins de
 		/// 10% de l'aire de A1 la surface fusionnée prends les attributs de A1.
 		/// Dans tous les autres cas les attributs de la surfaces fusionnées

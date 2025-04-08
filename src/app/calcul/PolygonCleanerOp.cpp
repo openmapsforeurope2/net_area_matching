@@ -80,8 +80,8 @@ namespace app
             // app parameters
             params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
             std::string const landmaskTableName = themeParameters->getValue(LANDMASK_TABLE).toString();
-            std::string const landCoverTypeName = themeParameters->getValue(LAND_COVER_TYPE).toString();
-            std::string const landAreaValue = themeParameters->getValue(TYPE_LAND_AREA).toString();
+            std::string const landCoverTypeName = themeParameters->getValue(LAND_COVER_TYPE_NAME).toString();
+            std::string const landAreaValue = themeParameters->getValue(LAND_COVER_TYPE_VALUE).toString();
 
             // on recupere un buffer autour de la frontiere
             ign::geometry::GeometryPtr boundBuffPtr(new ign::geometry::Polygon());

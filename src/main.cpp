@@ -93,25 +93,7 @@ int main(int argc, char *argv[])
         context->loadEpgParameters( themeParameters->getValue(DB_CONF_FILE).toString() );
 
 		//definition AREA_TABLE_INIT_CLEANED
-		std::string codeStepCleaned = "";
-		std::string suiteStepStg = stepSuite.toString();
-		std::vector<std::string> vStepSuiteNumNom;
-		epg::tools::StringTools::Split(suiteStepStg, "\n", vStepSuiteNumNom);
-		for (size_t i = 0; i < vStepSuiteNumNom.size(); ++i) {
-			if (vStepSuiteNumNom[i] == "")
-				continue;
-			std::vector<std::string> vStepSuiteNumNomPair;
-			epg::tools::StringTools::Split(vStepSuiteNumNom[i], " ", vStepSuiteNumNomPair);
-			if (vStepSuiteNumNomPair[1] == "CleanByLandmask") {
-				codeStepCleaned = vStepSuiteNumNomPair[0];
-				epg::tools::StringTools::trim(codeStepCleaned, "[");
-				epg::tools::StringTools::trim(codeStepCleaned, "]");
-				break;
-			}
-		}
-		std::string areaTableNameInitCleaned="";
-		if (codeStepCleaned != "")
-			areaTableNameInitCleaned += "_" + codeStepCleaned + "_";
+		std::string areaTableNameInitCleaned = "_" + ign::data::Integer(app::step::CleanByLandmask().getCode()).toString() + "_";
 		areaTableNameInitCleaned += themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString();
 		themeParameters->setParameter(AREA_TABLE_INIT_CLEANED, ign::data::String(areaTableNameInitCleaned));
 
@@ -155,7 +137,6 @@ int main(int argc, char *argv[])
     }
 
     logFile << "[END] " << epg::tools::TimeTools::getTime() << std::endl;
-
     epg::ContextS::kill();
     epg::log::EpgLoggerS::kill();
     epg::log::ShapeLoggerS::kill();

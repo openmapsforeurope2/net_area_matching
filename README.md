@@ -9,7 +9,7 @@ L'élaboration de la chaîne de production a nécessité le développement d'un 
 
 ## Description
 
-Le présent outil est dédié à la mise en cohérences des surfaces de deux pays autour de leur(s) frontière(s) commune(s).
+Le présent outil est dédié à la mise en cohérence des surfaces de deux pays autour de leur(s) frontière(s) commune(s).
 
 Lorsqu'elle est lancée l'application traite un couple de pays frontaliers. Pour raccorder l'ensemble du réseau d'un pays le programme doit être lancé successivement sur ses différentes frontières (en considérant l'ensemble de ses pays limitrophes).
 

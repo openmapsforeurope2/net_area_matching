@@ -74,7 +74,10 @@ namespace calcul{
             std::vector<std::map<std::string, ign::feature::Feature>> & vmAreas
         ) const;
 
-		//--
+		/// @brief Recherche les objets intersectant l'objet fourni en paramètre
+		/// @param fArea Objet source dont on recherche les voisins
+		/// @param filterArea_ Filtre sur les voisins recherchés
+		/// @return Liste des voisins ordonnés selon leur aire
 		std::map<double, ign::feature::Feature> _getNeighboursWithArea(
             ign::feature::Feature const& fArea,
             ign::feature::FeatureFilter const& filterArea_

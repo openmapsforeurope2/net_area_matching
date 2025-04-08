@@ -64,7 +64,12 @@ namespace calcul{
 		//--
 		void _compute() const;
 
-		//--
+        /// @brief A partir d'un polygon d'un pays, récupère de proche en proche
+		/// en identifiant les chevauchements entre les polygones des deux pays,
+		/// la liste des polygones à fusionner.
+        /// @param mp Géométrie du polygone de départ
+        /// @param country Index correspondant au pays de départ
+        /// @param sIntersectingArea liste des identifiants des surfaces à fusionner
         void _getIntersectingAreas(
             ign::geometry::MultiPolygon const& mp, 
             size_t country, 

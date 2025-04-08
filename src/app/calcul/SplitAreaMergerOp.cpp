@@ -138,7 +138,7 @@ namespace app
             double const areaThreshold = themeParameters->getValue(SAM_SMALL_AREA_THRESHOLD).toDouble();
             double const lengthThreshold = themeParameters->getValue(SAM_SMALL_AREA_LENGTH_THRESHOLD).toDouble();
             std::string const nationalIdName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
-			std::string const wTagName = themeParameters->getParameter(W_TAG).getValue().toString();
+			std::string const wTagName = themeParameters->getParameter(W_TAG_NAME).getValue().toString();
 
             // paquets de areas a merger
             std::vector<std::map<std::string, ign::feature::Feature>> vmAreas;

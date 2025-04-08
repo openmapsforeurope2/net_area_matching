@@ -40,6 +40,9 @@ app::calcul::GenerateCuttingPointsOp::~GenerateCuttingPointsOp()
 {
 	_shapeLogger->closeShape("gcp_medial_axis");
 	_shapeLogger->closeShape("gcp_sections");
+	_shapeLogger->closeShape("gcp_medial_axis_vectors");
+	_shapeLogger->closeShape("gcp_vectors");
+
 }
 
 ///

@@ -14,7 +14,8 @@
 namespace app{
 namespace calcul{
 
-	/// @brief Classe utilisée pour supprimer des surfaces hors de leur pays
+	/// @brief Classe utilisée pour supprimer les surfaces hors de leur pays
+	/// et situées à plus d'une certaine distance de ce dernier.
 	/// A utiliser conjointement avec les classes PolygonSplitterOp et PolygonMergerOp
 	class PolygonCleanerOp {
 

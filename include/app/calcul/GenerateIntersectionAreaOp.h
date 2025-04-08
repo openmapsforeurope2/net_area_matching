@@ -19,7 +19,7 @@ namespace calcul{
 	public:
 
 	
-        /// @brief Condtructeur
+        /// @brief Constructeur
         /// @param borderCode Code frontière (code double)
         /// @param verbose Mode verbeux
 		GenerateIntersectionAreaOp(

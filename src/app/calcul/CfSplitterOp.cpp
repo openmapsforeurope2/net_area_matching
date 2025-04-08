@@ -49,11 +49,16 @@ namespace app
         CfSplitterOp::~CfSplitterOp()
         {
             _shapeLogger->closeShape("cfs_cutting_features");
-            _shapeLogger->closeShape("cfs_medial_axis");
-            _shapeLogger->closeShape("cfs_sides");
-            _shapeLogger->closeShape("cfs_medial_axis_proj");
-            _shapeLogger->closeShape("cfs_side_proj");
-            _shapeLogger->closeShape("cfs_medial_axis_ortho");
+            _shapeLogger->closeShape("cfs_sub_rings");
+            _shapeLogger->closeShape("cfs_proj_to_sub_rings");
+            _shapeLogger->closeShape("cfs_cutting_points");
+            _shapeLogger->closeShape("cfs_long_paths");
+            _shapeLogger->closeShape("cfs_short_paths");
+            _shapeLogger->closeShape("cfs_cl_axial_proj");
+            _shapeLogger->closeShape("cfs_cl_ortho_proj");
+            _shapeLogger->closeShape("cfs_cl_axial_proj_pt");
+            _shapeLogger->closeShape("cfs_cl_ortho_proj_pt");
+            _shapeLogger->closeShape("cfs_cl_common_endings");
         }
 
         ///
@@ -79,12 +84,16 @@ namespace app
             //--
             _shapeLogger = epg::log::ShapeLoggerS::getInstance();
             _shapeLogger->addShape("cfs_cutting_features", epg::log::ShapeLogger::LINESTRING);
-            _shapeLogger->addShape("cfs_medial_axis", epg::log::ShapeLogger::LINESTRING);
-            _shapeLogger->addShape("cfs_sides", epg::log::ShapeLogger::LINESTRING);
-            _shapeLogger->addShape("cfs_medial_axis_proj", epg::log::ShapeLogger::POINT);
-            _shapeLogger->addShape("cfs_side_proj", epg::log::ShapeLogger::LINESTRING);
-            _shapeLogger->addShape("cfs_medial_axis_ortho", epg::log::ShapeLogger::LINESTRING);
-            
+            _shapeLogger->addShape("cfs_sub_rings", epg::log::ShapeLogger::LINESTRING);
+            _shapeLogger->addShape("cfs_proj_to_sub_rings", epg::log::ShapeLogger::LINESTRING);
+            _shapeLogger->addShape("cfs_cutting_points", epg::log::ShapeLogger::POINT);
+            _shapeLogger->addShape("cfs_long_paths", epg::log::ShapeLogger::LINESTRING);
+            _shapeLogger->addShape("cfs_short_paths", epg::log::ShapeLogger::LINESTRING);
+            _shapeLogger->addShape("cfs_cl_axial_proj", epg::log::ShapeLogger::LINESTRING);
+            _shapeLogger->addShape("cfs_cl_ortho_proj", epg::log::ShapeLogger::LINESTRING);
+            _shapeLogger->addShape("cfs_cl_axial_proj_pt", epg::log::ShapeLogger::POINT);
+            _shapeLogger->addShape("cfs_cl_ortho_proj_pt", epg::log::ShapeLogger::POINT);
+            _shapeLogger->addShape("cfs_cl_common_endings", epg::log::ShapeLogger::POINT);
 
             //--
             epg::Context *context = epg::ContextS::getInstance();
@@ -151,7 +160,6 @@ namespace app
 
             //--
             app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-        	std::string const sectionGeomName = themeParameters->getValue(CUTP_SECTION_GEOM).toString();
             double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
 
             ign::feature::FeatureFilter filterArea(countryCodeName + " LIKE '%#%'");
@@ -203,6 +211,14 @@ namespace app
                     }
                         
                     _getAllClEndingPoints(polyWithoutHoles, vCpCl);
+
+                    //DEBUG
+                    for(size_t i = 0 ; i < vCpCl.size() ; ++i) {
+                        ign::feature::Feature feat;
+                        feat.setGeometry(vCpCl[i]);
+                        _shapeLogger->writeFeature("cfs_cutting_points", feat);
+                    }
+
                     std::vector<int> vCpClIndex = _getCpIndex(polyWithoutHoles.exteriorRing(), vCpCl);
                     std::set<size_t> sCuttingIndex = _getCuttingIndex(vCpClIndex);
                     //TODO checker si plus de 1 points dans sCuttingIndex
@@ -212,6 +228,11 @@ namespace app
                     std::vector<epg::tools::geometry::SegmentIndexedGeometryInterface*> vIndexedSubLs;
                     for(size_t i = 0 ; i < vSubLs.size() ; ++i) {
                         vIndexedSubLs.push_back(new epg::tools::geometry::SegmentIndexedGeometry(&vSubLs[i]));
+
+                        //--
+                        ign::feature::Feature feat;
+                        feat.setGeometry(vSubLs[i]);
+                        _shapeLogger->writeFeature("cfs_sub_rings", feat);
                     }
 
                     // seuil (X*largeur moyenne du poly)
@@ -256,6 +277,11 @@ namespace app
                         for ( mit = mDistSubLsProj.begin() ; mit != mDistSubLsProj.end() ; ++mit ) {
                             ign::geometry::LineString ls(cpGeom, mit->second.second);
                             double ratio = _getRatio(polyWithoutHoles, ls);
+
+                            //--
+                            ign::feature::Feature feat;
+                            feat.setGeometry(ls);
+                            _shapeLogger->writeFeature("cfs_proj_to_sub_rings", feat);
 
                             double precision = 1e-5;
 
@@ -314,6 +340,16 @@ namespace app
                                         if( length < pathLengthThreshold) {
                                             if( !sectionGeomPtr ) sectionGeomPtr.reset(new ign::geometry::MultiLineString());
                                             sectionGeomPtr->asMultiLineString().addGeometry( ign::geometry::LineString(cpGeom, vInOutProj[i]) );
+
+                                            //--
+                                            ign::feature::Feature feat;
+                                            feat.setGeometry(foundPath.second);
+                                            _shapeLogger->writeFeature("cfs_short_paths", feat);
+                                        } else {
+                                            //--
+                                            ign::feature::Feature feat;
+                                            feat.setGeometry(foundPath.second);
+                                            _shapeLogger->writeFeature("cfs_long_paths", feat);
                                         }
                                     }
                                     else if( vIntersectInter.size() == 0) {
@@ -704,9 +740,29 @@ namespace app
                     }
                 }
                 if ( foundNewStart ) {
+                    //--
+                    {
+                        ign::feature::Feature feat;
+                        feat.setGeometry(ign::geometry::LineString(clGeom.startPoint(), projAxStartPt));
+                        _shapeLogger->writeFeature("cfs_cl_axial_proj", feat);
+
+                        feat.setGeometry(projAxStartPt);
+                        _shapeLogger->writeFeature("cfs_cl_axial_proj_pt", feat);
+                    }
+
                     // projection ortho
                     ign::geometry::Point projOrthoStartPt;
                     epg::tools::geometry::projectZ(poly, clGeom.startPoint(), projOrthoStartPt);
+
+                    //--
+                    {
+                        ign::feature::Feature feat;
+                        feat.setGeometry(ign::geometry::LineString(clGeom.startPoint(), projOrthoStartPt));
+                        _shapeLogger->writeFeature("cfs_cl_ortho_proj", feat);
+
+                        feat.setGeometry(projOrthoStartPt);
+                        _shapeLogger->writeFeature("cfs_cl_ortho_proj_pt", feat);
+                    }
 
                     if ( projOrthoStartPt.distance(clGeom.startPoint()) < 0.5 * distMinStart )
                         clGeom.startPoint() = projOrthoStartPt;
@@ -722,6 +778,12 @@ namespace app
                     // dans le cas ou 2 CL se touchent on deplacera les 
                     // 2 extrémités en correspondance de la même façon
                     if (startFixed == 1) {
+                        {
+                            ign::feature::Feature feat;
+                            feat.setGeometry(clGeom.startPoint());
+                            _shapeLogger->writeFeature("cfs_cl_common_endings", feat);
+                        }
+
                         ign::geometry::LineString otherClGeom = _getClgeometry(fOtherTouchingStart, mModifiedCl);
                         if (startTouchingStart)
                             otherClGeom.startPoint() = clGeom.startPoint();
@@ -765,9 +827,29 @@ namespace app
                     }
                 }
                 if ( foundNewEnd ) {
+                    //--
+                    {
+                        ign::feature::Feature feat;
+                        feat.setGeometry(ign::geometry::LineString(clGeom.endPoint(), projAxEndPt));
+                        _shapeLogger->writeFeature("cfs_cl_axial_proj", feat);
+
+                        feat.setGeometry(projAxEndPt);
+                        _shapeLogger->writeFeature("cfs_cl_axial_proj_pt", feat);
+                    }
+
                     // projection ortho
                     ign::geometry::Point projOrthoEndPt;
                     epg::tools::geometry::projectZ(poly, clGeom.endPoint(), projOrthoEndPt);
+
+                    //--
+                    {
+                        ign::feature::Feature feat;
+                        feat.setGeometry(ign::geometry::LineString(clGeom.endPoint(), projOrthoEndPt));
+                        _shapeLogger->writeFeature("cfs_cl_ortho_proj", feat);
+
+                        feat.setGeometry(projOrthoEndPt);
+                        _shapeLogger->writeFeature("cfs_cl_ortho_proj_pt", feat);
+                    }
 
                     if ( projOrthoEndPt.distance(clGeom.endPoint()) < 0.5 * distMinEnd )
                         clGeom.endPoint() = projOrthoEndPt;
@@ -783,6 +865,12 @@ namespace app
                     // dans le cas ou 2 CL se touchent on deplacera les 
                     // 2 extrémités en correspondance de la même façon
                     if (endFixed == 1) {
+                        {
+                            ign::feature::Feature feat;
+                            feat.setGeometry(clGeom.endPoint());
+                            _shapeLogger->writeFeature("cfs_cl_common_endings", feat);
+                        }
+
                         ign::geometry::LineString otherClGeom = _getClgeometry(fOtherTouchingEnd, mModifiedCl);
                         if (endTouchingStart)
                             otherClGeom.startPoint() = clGeom.endPoint();

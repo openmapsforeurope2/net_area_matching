@@ -85,13 +85,10 @@ namespace app
             //--
 		    epg::tools::StringTools::Split(_borderCode, "#", _vCountry);
 
-			std::string listAttrWName = themeParameters->getValue(LIST_ATTR_W).toString();
-			std::string listAttrJsonName = themeParameters->getValue(LIST_ATTR_JSON).toString();
+			std::string listAttrWName = themeParameters->getValue(AM_LIST_ATTR_W).toString();
+			std::string listAttrJsonName = themeParameters->getValue(AM_LIST_ATTR_JSON).toString();
 			_attrMergerOnBorder.setLists(listAttrWName, listAttrJsonName, "/");
-
-			_thresholdAreaAttr = themeParameters->getValue(THRESHOLD_AREA_ATTR).toDouble();
         }
-
 
         ///
         ///
@@ -104,7 +101,7 @@ namespace app
             std::string const idName = epgParams.getValue(ID).toString();
 			//--
 			app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-			std::string const wTagName = themeParameters->getParameter(W_TAG).getValue().toString();
+			std::string const wTagName = themeParameters->getParameter(W_TAG_NAME).getValue().toString();
 			std::string separator = "#";
 
             ign::feature::FeatureFilter filterArea(countryCodeName+" like '%#%'");
@@ -159,7 +156,9 @@ namespace app
             }
         }
 
-
+		///
+        ///
+        ///
 		double SetAttributeMergedAreasOp::_getAreaMergedByCountry(
 			ign::geometry::MultiPolygon& geomAreaMerged,
 			ign::feature::FeatureFilter& filterArroundAreaFromCountry,

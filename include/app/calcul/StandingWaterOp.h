@@ -74,10 +74,10 @@ namespace calcul{
 		void _init();
 		
 		//--
-		void _addStandingWater();
+		void _addStandingWater() const;
 
 		//--
-		void _sortingStandingWater();
+		void _sortingStandingWater() const;
     };
 
 }
