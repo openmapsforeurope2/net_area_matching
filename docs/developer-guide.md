@@ -1,4 +1,4 @@
-![under_construction](docs/images/under_construction.png)
+![under_construction](images/under_construction.png)
 
 
 
@@ -8,47 +8,31 @@ La présente documentation, à destination des développeurs, a pour objectif de
 
 # Installation
 
-L'installation de l'application nécessite la compilation préalable de librairies internes et externes à l'IGN.
-
-Voici le graphe des dépendances :
-
 ## Code source 
 
-https://github.com/openmapsforeurope2/area_matching.git
+Le code source de l'application est disponible sur le dépôt https://github.com/openmapsforeurope2/area_matching.git
 
 ## Dépendances 
 
-### Socle vecteur 
+L'installation de l'application nécessite la compilation préalable de bibliothèques internes et externes à l'IGN.
 
-L’outil a été développé à partir du Socle vecteur de l’IGN. Celui-ci est récupérable sur le dépôt SVN suivant : https://codes-ign.ign.fr/svn/sd-socle/trunk 
+Voici le graphe des dépendances :
+![dependencies](images/dependencies.png)
 
-Il est nécessaire de créer une variable d’environnement nommée IGN_SOCLE_DIR pointant vers le dossier d’installation du socle (ign-socle) pour que l’outil fonctionne. 
+### Socle IGN 
+
+Le socle logiciel de l'IGN regroupe un ensemble de bibliothèques développées en interne qui permettent d'unifier l'accès aux bibliothèques c++ de traitement et de stockage de données géographiques. On y trouve également de nombreux algorithmes et outils développés pour les besoins spécifiques de l'IGN.
+On y trouve notamment des modèles de données pivots (géométries, objet attributaire), des fonctions de lecture/écriture de conteneurs d'objets, des opérations sur les géométries...
+
+Le code source du socle ce trouve sur le dépôt https://codes-ign.ign.fr/svn/sd-socle/trunk
 
 ### LibEPG 
 
-Une bibliothèque de fonctions de généralisation spécifiques aux produits européens est également très largement utilisée. Il s’agit de la bibliothèque LibEPG, qui peut être récupérée sur le serveur de dépôt Git : 
+Cette bibliothèque, développée à l'IGN et s'appuyant essentiellement sur le socle logiciel, contient de nombreux algorithmes et fonctions utilitaires dédiés spécifiquement aux besoins des produits européens (EGM/ERM) ainsi qu'au projet [OME2](https://github.com/openmapsforeurope2/OME2).
+Elle comporte essentiellement des fonctions de généralisations, des fonctions utiles au management du processus tels que des utilitaires de log, d'orchestration, de gestion du contexte).
+On y trouve également des opérateurs permettant d'encapsuler des objets géométriques complexes afin d'en optimiser la manipulation (par l'utilisation de graphes, d'indexes...) et ainsi d'accroitre les performances globales des processus.
 
-http://gitlab.dockerforge.ign.fr/europe/libepg.git 
-
-Il est nécessaire de créer une variable d’environnement nommée LibEPG_ROOT pointant vers le dossier ..\LibEPG\lib. 
-
-
-## Liste des librairies dynamiques nécessaires 
-
-Pour un sytème unix :
-
-- libecpg_compat.so.3
-- libecpg.so.6
-- libgmp.so.10
-- libmpfr.so.6
-- libpgtypes.so.3
-- libpq.so.5
-- libQt5Core.so.5
-- libQt5Gui.so.5
-- libQt5Widgets.so.5
-- libQt5Xml.so.5
-- libShapelib.so
-- libsqlite3.so
+Le code source de la bibliothèque libepg ce trouve sur le dépôt http://gitlab.dockerforge.ign.fr/europe/libepg.git 
 
 
 # Configuration
@@ -62,35 +46,20 @@ On trouve dans le [dossier de configuration](https://github.com/openmapsforeurop
 - theme_parameters.ini : configuration des paramètres spécifiques à l'application.
 
 
-Catégorie ? Nom Step(s) Description Commentaire
-
-
-# Organisation du code 
-
-## Organisation générale 
-
-
-
-
-## Gestion des tables 
-
-Pour chaque étapes peuvent être définies des données de travail qui seront modifiées par le traitement. Pour chacune des classes d'objets traitées une table de travail préfixée du numéro d'étape est créée. Ce sont ces tables de travail qui constituent les données de sortie de l'étape et qui seront consommées, le cas échéant,lors d'étape postérieur travaillant sur ces mêmes données.
-
-
-## Fonctionnement détaillé
+# Fonctionnement du processus
 
 Le traitement de mise en cohérence des objets surfacique est lancé pour un couple de pays frontaliers.
 
-### Etapes préliminaires
+## Etapes préliminaires
 
 Les données sur lesquelles ce traitement est lancé doivent avoir été nettoyées en amont à l'aide de l'outil **clean** du projet [data-tools](https://github.com/openmapsforeurope2/data-tools) qui permet de supprimer les surfaces ou portions de surfaces trop éloignées de leur pays.
 Cet outil doit être utilisé sur des tables de travail dans lesquelles sont extraites les données des deux pays à traiter autour de leur frontière commune.
 
-### Principe général du traitement
+## Principe général du traitement
 
 Le processus de mise en cohérence des surfaces est décomposé en une succession d'étapes clés.
 Afin d'orchestrer l'enchainement de ces étapes l'application utilise l'outil **epg::step::StepSuite** de la bibliothèque **libepg**. Ce dernier permet de lancer une succession de **epg::step::Step** dans lesquels sont décrits les traitements de chaque étape.
-Les traitements de chaque étape sont lancés sur une ou plusieurs tables de travail dédiées, préfixées du numéro de l'étape. A l'initialisation d'un **epg::step::Step** (étape) chaque table de travail est copiée à partir de la table de travail d'une étape antérieur (qui n'est pas nécessairement l'étape immédiatement antérieure, car toutes les étapes ne travaillent pas nécessairement sur les mêmes données).
+Les traitements de chaque étape sont lancés sur une ou plusieurs tables de travail dédiées, préfixées du numéro de l'étape. A l'initialisation d'un **epg::step::Step** (étape) chaque table de travail est copiée à partir de la table de travail d'une étape antérieur (qui n'est pas nécessairement l'étape immédiatement antérieure, car toutes les étapes ne travaillent pas sur les mêmes données).
 
 Les étapes qui composent le traitement de mise en cohérence sont les suivantes :
 
@@ -108,7 +77,7 @@ Les étapes qui composent le traitement de mise en cohérence sont les suivantes
 
 L'outil **epg::step::StepSuite** donne la possibilité de ne lancer que certaines étapes ou une plage de plusieurs étapes.
 
-### Lancement du traitement
+## Lancement du traitement
 
 Exemple de lancement du traitement complet sur les pays France (code pays 'fr') et Belgique (code pays 'be'):
 ```
@@ -118,19 +87,21 @@ area_matching --c path/to/config/epg_parameters.ini --cc be#fr
 A noter que l'on renseigne pour le paramètre --cc le code de la frontière séparant les deux pays à traiter. Le code pays est toujours composé de la même manière, c'est à dire en concaténant les codes <u>par ordre alphabétique</u>.
 
 
+## Les étapes - fonctionnement détaillé
+
 ### 301 : AddStandingWater
 
 Les objets de la table 301_standing_water des deux pays sont copiés dans la table 301_watercourse_area. Les objets copiés sont supprimés de la table 301_standing_water.
 Un champ $IS_STANDING_WATER_NAME est ajouté à la table 301_standing_water afin de pouvoir identifier les objets ayants été importés de la table 301_standing_water.
 
-![301](docs/images/301.png)
+![301](images/301.png)
 
 #### Données de travail :
 
 | table                          | entrée | sortie | entitée de travail | description                                                 |
 |--------------------------------|--------|--------|--------------------|-------------------------------------------------------------|
 | AREA_TABLE_INIT                | X      | X      | X                  | Table des surfaces à traiter                                |
-| AREA_TABLE_INIT_STANDING_WATER | x      | X      | X                  | Table des surfaces à exporter vers la table AREA_TABLE_INIT |
+| AREA_TABLE_INIT_STANDING_WATER | X      | X      | X                  | Table des surfaces à exporter vers la table AREA_TABLE_INIT |
 
 
 #### Principaux opérateurs de calcul utilisés :
@@ -169,10 +140,10 @@ Sa structure est la suivante:
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::StandingWaterOp
 
-#### Description détaillée du traitement :
+#### Description du traitement :
 Le traitement est réalisé pays par pays. Le principe consiste à construire un graphe planaire à partir de tous les contours des polygones d'un pays. On parcourt ensuite les arcs du graphe est on identifie les arcs possédant plusieurs origines puisqu'ils correspondent à des portions de contours partagées. les arcs adjacents possédant les mêmes origines sont fusionnés. Ce sont ces arcs fusionnés qui constituent les futures sections de découpage et qui sont enregistrés dans la table des 'cutting lines'.
 
-![310_with_key](docs/images/310_with_key.png)
+![310_with_key](images/310_with_key.png)
 
 ### 320 : CleanByLandmask
 
@@ -191,7 +162,7 @@ L'objectif de cette étape est de supprimer les surfaces et portions de surfaces
 - app::calcul::PolygonCleanerOp
 - app::calcul::PolygonMergerOp
 
-#### Description détaillée du traitement :
+#### Description du traitement :
 ##### 1) Découpe des surface
 
 Paramètres utilisés: 
@@ -204,9 +175,9 @@ Paramètres utilisés:
 
 Les surfaces débordant de leur pays sont découpées suivant un ensemble de linéaires correspondant aux frontières internationnales décalées d'une certaine distance vers l'exterieur du pays.
 
-![320_0_with_key](docs/images/320_0_with_key.png)
-![320_1_cutting_geom_with_key](docs/images/320_1_cutting_geom_with_key.png)
-![320_1_with_key](docs/images/320_1_with_key.png)
+![320_0_with_key](images/320_0_with_key.png)
+![320_1_cutting_geom_with_key](images/320_1_cutting_geom_with_key.png)
+![320_1_with_key](images/320_1_with_key.png)
 
 Afin d'optimiser les calculs, la géométrie de découpe, parcourant l'intégralité du contour du pays, est indexée (ses segments sont indexés dans le quadtree de la classe **epg::tools::geometry::SegmentIndexedGeometry**). Ainsi lorsque l'on souhaite réaliser la découpe d'un polygone, on récupère tout d'abord l'ensemble des segments de découpe situés dans sa boite englobante, puis on utilise uniquement ces segments comme géométrie de découpe (la découpe est réalisée à l'aide de la classe **epg::tools::geometry::PolygonSplitter**)
 
@@ -223,7 +194,7 @@ Paramètres utilisés:
 
 L'objectif est ici de supprimer les surfaces hors de leur pays qui s'éloignent de plus d'une certaine distance de ce dernier. Afin de calculer si une surface dépasse un seuil d'éloignement on calcul la demi-distance de Hausdorff entre la surface et la frontière.
 
-![320_2_with_key](docs/images/320_2_with_key.png)
+![320_2_with_key](images/320_2_with_key.png)
 
 Dans un soucis d'optimisation, à l'initialisation de l'opérateur est calculé une surface de travail qui correspond à la zone frontalière du pays traité. Cette zone est calculée par intersection entre la surface du pays et un buffer autour de la frontière. Deplus, afin d'accélérer la calcul de la distance de Hausdorff entre les surfaces et la frontière cette dernière est encapsulé dans la classe de calcul **epg::tools::MultiLineStringTool** qui réalise une indexation spatiale et qui permet de couper l'effort de calcul en cas de dépassant d'un seuil d'éloignement.
 Attention : il faut veiller à ce que le rayon du buffer (la profondeur de la zone de travail) soit égal ou supérieur à la distance d'extraction (paramètre de la fonction data-tools::border_extract), afin de ne pas supprimer des objets qui seraient situés à l'intérieur du pays.
@@ -239,7 +210,7 @@ Paramètres utilisés:
 
 les surfaces précédemment découpées qui n'ont pas été supprimées sont fusionnées. Pour cela on fusionne entre elles l'ensemble des surfaces possédant la même valeur pour le champ NATIONAL_IDENTIFIER_NAME.
 
-![320_3_with_key](docs/images/320_3_with_key.png)
+![320_3_with_key](images/320_3_with_key.png)
 
 Notes: 
 - Afin d'éviter la création de trous fins, toutes les fusions sont précédées d'une étape de snapping (utilisation de la fonction ign::geometry::algorithm::SnapOpGeos::SnapTo).
@@ -256,13 +227,13 @@ Cette étape permet de supprimer les 'cutting lines' qui, suite au nettoyage ré
 | table           | entrée | sortie | entitée de travail | description                  |
 |-----------------|--------|--------|--------------------|------------------------------|
 | AREA_TABLE_INIT | X      |        |                    | Table des surfaces à traiter |
-| CUTL_TABLE      | X      | x      |                    | Table des 'cutting lines'    |
+| CUTL_TABLE      | X      | X      |                    | Table des 'cutting lines'    |
 
 
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::CuttingLineCleanerOp
 
-#### Description détaillée du traitement :
+#### Description du traitement :
 
 Paramètre utilisés: 
 | paramètre                | description                                                                           |
@@ -300,7 +271,7 @@ Sa structure est la suivante:
 - app::calcul::GenerateIntersectionAreaOp
 
 
-#### Description détaillée du traitement :
+#### Description du traitement :
 
 Paramètre utilisés: 
 | paramètre                | description                                                                                        |
@@ -310,7 +281,7 @@ Paramètre utilisés:
 
 L'opérateur parcourt toutes les surfaces de la table AREA_TABLE_INIT appartenant à 'country 1' et calcule les surfaces de chevauchement avec chacune des surfaces de cette même table appartenant à 'country 2' avec lesquelles elles présentent des intersections. Les résultats sont enregistrés dans la table INTERSECTION_AREA_TABLE.
 
-![334_with_key](docs/images/334_with_key.png)
+![334_with_key](images/334_with_key.png)
 
 
 ### 335 : GenerateCuttingPoints
@@ -324,7 +295,7 @@ Cette étape traite de la génération des 'cutting points'. Ces points seront u
 | AREA_TABLE_INIT         | X      |        |                    | Table des surfaces à traiter       |
 | INTERSECTION_AREA_TABLE | X      |        |                    | Table des surface de chevauchement |
 | CUTL_TABLE              | X      |        |                    | Table des 'cutting lines'          |
-| CUTP_TABLE              |        | x      |                    | Table des 'cutting points'         |
+| CUTP_TABLE              |        | X      |                    | Table des 'cutting points'         |
 
 Note : la table en sortie CUTP_TABLE n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
 
@@ -342,7 +313,7 @@ Sa structure est la suivante:
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::GenerateCuttingPointsOp
 
-#### Description détaillée du traitement :
+#### Description du traitement :
 
 Paramètre utilisés: 
 | paramètre                | description                                                                                        |
@@ -358,7 +329,7 @@ Le calcul des 'cutting points' consiste à parcourir les surfaces de la table AR
 Le même calcul est effectué en parcourant la table INTERSECTION_AREA_TABLE.
 
 
-![335_with_key](docs/images/335_with_key.png)
+![335_with_key](images/335_with_key.png)
 
 
 ### 340 : MergeAreas
@@ -374,17 +345,17 @@ Il est ici question de la fusion des surfaces de deux pays frontaliers.
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::IntersectingAreasMergerOp
 
-#### Description détaillée du traitement :
+#### Description du traitement :
 
 Le processus de fusion des surfaces se déroule en deux étapes :
 
 1. on génère les listes d'identifiants constituant le groupes de surfaces à fusionner. Pour constituer un groupe on part d'un polygone du pays 1 et on recherche tout les polygones du pays 2 qui le chevauchent, puis on parcourt tous ces polygones pour trouver les polygones du pays 1 qui les chevauchent et ainsi de suite jusqu'à ce qu'on ne trouve plus de voisins.
 
-![340_1_with_key](docs/images/340_1_with_key.png)
+![340_1_with_key](images/340_1_with_key.png)
 
 2. pour chaque groupe, on fusionne les polygones qui le constitue. Un seul polygone doit résulter de la fusion d'un groupe puisque les polygones qui le composent représente un ensemble continue surfaces se chevauchant de proche en proche.
 
-![340_2_with_key](docs/images/340_2_with_key.png)
+![340_2_with_key](images/340_2_with_key.png)
 
 
 ### 350 : SplitMergedAreasWithCF
@@ -397,12 +368,12 @@ Lors de cette étape les surfaces précedemment fusionnées seront découpées s
 |-------------------------|--------|--------|--------------------|------------------------------------|
 | AREA_TABLE_INIT         | X      | X      | X                  | Table des surfaces à traiter       |
 | CUTL_TABLE              | X      |        |                    | Table des 'cutting lines'          |
-| CUTP_TABLE              | x      |        |                    | Table des 'cutting points'         |
+| CUTP_TABLE              | X      |        |                    | Table des 'cutting points'         |
 
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::CfSplitterOp
 
-#### Description détaillée du traitement :
+#### Description du traitement :
 
 Paramètre utilisés: 
 | paramètre                | description                                                                                        |
@@ -413,28 +384,28 @@ Paramètre utilisés:
 Afin de calculer l'ensemble des sections de découpe on parcourt les surfaces de la table AREA_TABLE_INIT. Pour la suite du calcul des géométries de découpe on prend comme référence pour chacune de ces surfaces le polygone sans trous.
 Pour chaque surface, la première étape consiste à récupérer tous les 'cuttings points' situés sur le contour extérieur du polygone ainsi que les extrémités des 'cutting lines' liées à cette surface. Ces ponctuels sont utilisés pour, dans un deuxième temps, découper le contour extérieur du polygon en plusieurs sub-divisions de contour.
 
-![350_1_with_key](docs/images/350_1_with_key.png)
+![350_1_with_key](images/350_1_with_key.png)
 
 Le principe du calcul des sections de découpe à partir des 'cuttings points' consiste à calculer les projections des cuttings points sur les sous-contours proches. A défaut de pouvoir sélectionner le meilleur candidat (section la plus pertinente), l'approche choisie consiste à conserver l'ensemble des géométrie de découpe (pour un cutting point donné on prend l'ensemble des segments ['cutting point' projection]). La découpe va ainsi générer une multitude de petites surfaces qui seront fusionnées dans les étapes suivantes (seront agrégés les polygones ayant la même surface d'origine).
 Si un 'cutting point' est suffisamment proche d'un autre 'cutting point' (à une distance inférieure à DIST_SNAP_MERGE_CF) pour lequel une section de découpe a déjà été calculé, il est est ignoré.
 
-![350_2_with_key](docs/images/350_2_with_key.png)
+![350_2_with_key](images/350_2_with_key.png)
 
 Pour chacune des section ['cutting point' projection] on calcul la proportion du segment situé à l'intérieur de la surface. Si le ratio est proche de zéro (presque entièrement hors surface) on ignore la section. Sinon on calcul le point d'intersection 'pt_inter' entre le segment ['cutting point' projection] et le contour extérieur de la surface et on calcul la longeur du chemin qu'il faut parcourir sur le contour extérieur pour aller de 'cutting point' à 'pt_inter'. Si le chemin est court on considère que cela signifie que si le segment ['cutting point' projection] n'est pas entièrement contenu dans la surface cela est du à un artefact créé lors de la fusion des surfaces.
 Si le chemin est long, on considère alors que la section n'est pas légitime et on l'ignore. 
 
 Note : pour le calcul des chemins on utilise l'opérateur **epg::tools::MultiLineStringTool** qui encapsule le contour du polygone sous la forme d'un graphe simple d'adjacence.
 
-![350_5_with_key](docs/images/350_5_with_key.png)
+![350_5_with_key](images/350_5_with_key.png)
 
 Les géométries de découpe définies par les 'cutting lines' doivent souvent être prolongées à leurs extrémités afin d'atteindre les bords des surfaces fusionnées. La projection axiale est privilégiée (prolongement du dernier segment de la 'cutting line'). Cependant afin de s'assurer que la projection s'effectue bien sur la portion de contour la plus proche, on calcul également la projection orthogonale de l'extrémité de la 'cutting line' sur le contour et si la distance de projection axiale et supérieure à deux fois la distance de projection orthogonale, on choisira alors la projection orthogonale plutot que la projection axiale.
 
-![350_3_with_key](docs/images/350_3_with_key.png)
+![350_3_with_key](images/350_3_with_key.png)
 
 Une fois la section de découpe calculée, afin de s'affranchir des problèmes de précision et de s'assurer que la découpe sera bien réalisée, on prolonge légèrement les deux extrémités de cette géométrie.
 Lorsque plusieurs 'cutting lines' sont originellement en contact à une extrémité, on s'assure que, pour cette extrémité, les 'cutting lines' sont projetés sur le même point. 
 
-![350_4_with_key](docs/images/350_4_with_key.png)
+![350_4_with_key](images/350_4_with_key.png)
 
 Une fois que toutes les géométries de coupure calculées à partir des 'cutting lines' et des 'cutting points' on utilise l'opérateur **app::tools::geometry::PolygonSplitter** pour découper le polygone (avec trous) selon les sections. Le principe de fonctionnement de cet opérateur consiste à onstruire un graphe planaire à partir des sections et des contours du polygone. On extrait ensuite les faces de ce graphe correspondant à des portions du polygone.
 
@@ -453,7 +424,7 @@ Suite à la fusion des surfaces des deux pays frontaliers, puis à la découpe d
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::SetAttributeMergedAreasOp
 
-#### Description détaillée du traitement :
+#### Description du traitement :
 
 Paramètre utilisés: 
 | paramètre                | description                                                                                        |
@@ -481,7 +452,7 @@ Cette étape a pour objectif d'agréger autant que possible la multitude de surf
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::SplitAreaMergerOp
 
-#### Description détaillée du traitement :
+#### Description du traitement :
 
 Paramètre utilisés: 
 | paramètre                       | description                                                                                        |
@@ -504,7 +475,7 @@ Enfin pour chaque groupe on fusionne l'ensemble des surfaces qui le constituent.
 
 L'ensemble du traitement décrit ci-avant et répéter jusqu'à ce que plus aucune fusion de soit réalisée.
 
-![370_3_with_key](docs/images/370_3_with_key.png)
+![370_3_with_key](images/370_3_with_key.png)
 
 ### 399 : SortingStandingWater
 
@@ -515,12 +486,12 @@ Dans cette étape on réalise l'export des surfaces de la table 399_watercourse_
 | table                          | entrée | sortie | entitée de travail | description                                                 |
 |--------------------------------|--------|--------|--------------------|-------------------------------------------------------------|
 | AREA_TABLE_INIT                | X      | X      | X                  | Table des surfaces à exporter                               |
-| AREA_TABLE_INIT_STANDING_WATER | x      | X      | X                  | Table cible où importer les surfaces                        |
+| AREA_TABLE_INIT_STANDING_WATER | X      | X      | X                  | Table cible où importer les surfaces                        |
 
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::StandingWaterOp
 
-#### Description détaillée du traitement :
+#### Description du traitement :
 
 Paramètre utilisés: 
 | paramètre                       | description                                                                                        |
