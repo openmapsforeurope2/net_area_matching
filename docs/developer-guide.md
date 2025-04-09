@@ -17,7 +17,8 @@ Le code source de l'application est disponible sur le dépôt https://github.com
 L'installation de l'application nécessite la compilation préalable de bibliothèques internes et externes à l'IGN.
 
 Voici le graphe des dépendances :
-![dependencies](images/dependencies.png)
+
+<img src="images/dependencies.png" width="500" height="auto">
 
 ### Socle IGN 
 
@@ -91,10 +92,9 @@ A noter que l'on renseigne pour le paramètre --cc le code de la frontière sép
 
 ### 301 : AddStandingWater
 
-Les objets de la table 301_standing_water des deux pays sont copiés dans la table 301_watercourse_area. Les objets copiés sont supprimés de la table 301_standing_water.
-Un champ $IS_STANDING_WATER_NAME est ajouté à la table 301_standing_water afin de pouvoir identifier les objets ayants été importés de la table 301_standing_water.
+Les objets de la table de travail des **'standing waters'** des deux pays sont copiés dans la table de travail des **'watercourse areas'**. Les objets copiés sont supprimés de la table des **'standing waters'**.
 
-![301](images/301.png)
+![301_with_key](images/301_with_key.png)
 
 #### Données de travail :
 
@@ -105,18 +105,19 @@ Un champ $IS_STANDING_WATER_NAME est ajouté à la table 301_standing_water afin
 
 
 #### Principaux opérateurs de calcul utilisés :
-- app::calcul::StandingWaterOp
+- **app::calcul::StandingWaterOp**
 
+#### Description du traitement :
 Paramètre utilisés: 
 | paramètre                       | description                                                                                        |
 |---------------------------------|----------------------------------------------------------------------------------------------------|
 | IS_STANDING_WATER_NAME          | nom du champ indiquant si l'objet est de type 'standing water'                                     |
 
-Un champ IS_STANDING_WATER_NAME de type character varying(255) est ajouté à la table AREA_TABLE_INIT et renseigné pour chaque objet importé depuis la table AREA_TABLE_INIT_STANDING_WATER. Chaque objet importé dans la table AREA_TABLE_INIT est supprimé de la table AREA_TABLE_INIT_STANDING_WATER.
+Un champ **IS_STANDING_WATER_NAME** de type character varying(255) est ajouté à la table **AREA_TABLE_INIT** et renseigné pour chaque objet importé depuis la table **AREA_TABLE_INIT_STANDING_WATER**. Chaque objet importé dans la table **AREA_TABLE_INIT** est supprimé de la table **AREA_TABLE_INIT_STANDING_WATER**.
 
 ### 310 : GenerateCuttingLines
 
-Le but est de générer les 'cutting lines'. Une 'cutting line' est une portion de contour partagée par deux polygones d'un même pays.
+Le but est de générer les **'cutting lines'**. Une **'cutting line'** est une portion de contour partagée par deux polygones d'un même pays.
 
 #### Données de travail :
 
@@ -125,9 +126,9 @@ Le but est de générer les 'cutting lines'. Une 'cutting line' est une portion 
 | AREA_TABLE_INIT | X      | X      | X                  | Table des surfaces à traiter |
 | CUTL_TABLE      |        | X      |                    | Table des 'cutting lines'    |
 
-Note : la table en sortie CUTL_TABLE n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
+Note : la table en sortie **CUTL_TABLE** n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
 
-La table CUTL_TABLE dans laquelle sont enregistrées les 'cutting lines' est effacée si elle existe déjà puis créée.
+La table **CUTL_TABLE** dans laquelle sont enregistrées les 'cutting lines' est effacée si elle existe déjà puis créée.
 Sa structure est la suivante:
 
 | champ             | type                   |
@@ -138,10 +139,10 @@ Sa structure est la suivante:
 
 
 #### Principaux opérateurs de calcul utilisés :
-- app::calcul::StandingWaterOp
+- **app::calcul::StandingWaterOp**
 
 #### Description du traitement :
-Le traitement est réalisé pays par pays. Le principe consiste à construire un graphe planaire à partir de tous les contours des polygones d'un pays. On parcourt ensuite les arcs du graphe est on identifie les arcs possédant plusieurs origines puisqu'ils correspondent à des portions de contours partagées. les arcs adjacents possédant les mêmes origines sont fusionnés. Ce sont ces arcs fusionnés qui constituent les futures sections de découpage et qui sont enregistrés dans la table des 'cutting lines'.
+Le traitement est réalisé pays par pays. Le principe consiste à construire un graphe planaire à partir de tous les contours des polygones d'un pays. On parcourt ensuite les arcs du graphe est on identifie les arcs possédant plusieurs origines puisqu'ils correspondent à des portions de contours partagées. les arcs adjacents possédant les mêmes origines sont fusionnés. Ce sont ces arcs fusionnés qui constituent les futures sections de découpage et qui sont enregistrés dans la table des **'cutting lines'**.
 
 ![310_with_key](images/310_with_key.png)
 
@@ -175,9 +176,7 @@ Paramètres utilisés:
 
 Les surfaces débordant de leur pays sont découpées suivant un ensemble de linéaires correspondant aux frontières internationnales décalées d'une certaine distance vers l'exterieur du pays.
 
-![320_0_with_key](images/320_0_with_key.png)
-![320_1_cutting_geom_with_key](images/320_1_cutting_geom_with_key.png)
-![320_1_with_key](images/320_1_with_key.png)
+![320_with_key](images/320_with_key.png)
 
 Afin d'optimiser les calculs, la géométrie de découpe, parcourant l'intégralité du contour du pays, est indexée (ses segments sont indexés dans le quadtree de la classe **epg::tools::geometry::SegmentIndexedGeometry**). Ainsi lorsque l'on souhaite réaliser la découpe d'un polygone, on récupère tout d'abord l'ensemble des segments de découpe situés dans sa boite englobante, puis on utilise uniquement ces segments comme géométrie de découpe (la découpe est réalisée à l'aide de la classe **epg::tools::geometry::PolygonSplitter**)
 
@@ -196,7 +195,7 @@ L'objectif est ici de supprimer les surfaces hors de leur pays qui s'éloignent 
 
 ![320_2_with_key](images/320_2_with_key.png)
 
-Dans un soucis d'optimisation, à l'initialisation de l'opérateur est calculé une surface de travail qui correspond à la zone frontalière du pays traité. Cette zone est calculée par intersection entre la surface du pays et un buffer autour de la frontière. Deplus, afin d'accélérer la calcul de la distance de Hausdorff entre les surfaces et la frontière cette dernière est encapsulé dans la classe de calcul **epg::tools::MultiLineStringTool** qui réalise une indexation spatiale et qui permet de couper l'effort de calcul en cas de dépassant d'un seuil d'éloignement.
+Dans un soucis d'optimisation, à l'initialisation de l'opérateur est calculée une surface de travail qui correspond à la zone frontalière du pays traité. Cette zone est calculée par intersection entre la surface du pays et un buffer autour de la frontière. Deplus, afin d'accélérer la calcul de la distance de Hausdorff entre les surfaces et la frontière cette dernière est encapsulé dans la classe de calcul **epg::tools::MultiLineStringTool** qui réalise une indexation spatiale et qui permet de couper l'effort de calcul en cas de dépassant d'un seuil d'éloignement.
 Attention : il faut veiller à ce que le rayon du buffer (la profondeur de la zone de travail) soit égal ou supérieur à la distance d'extraction (paramètre de la fonction data-tools::border_extract), afin de ne pas supprimer des objets qui seraient situés à l'intérieur du pays.
 
 
