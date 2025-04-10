@@ -115,7 +115,7 @@ Les objets de la table de travail des _'standing waters'_ des deux pays sont cop
 
 
 #### Principaux opérateurs de calcul utilisés :
-- **app::calcul::StandingWaterOp**
+- app::calcul::StandingWaterOp
 
 #### Description du traitement :
 Paramètre utilisés: 
