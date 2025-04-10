@@ -60,7 +60,7 @@ Cet outil doit être utilisé sur des tables de travail dans lesquelles sont ext
 
 Le processus de mise en cohérence des surfaces est décomposé en une succession d'étapes clés.
 Afin d'orchestrer l'enchainement de ces étapes l'application utilise l'outil **epg::step::StepSuite** de la bibliothèque **libepg**. Ce dernier permet de lancer une succession de **epg::step::Step** dans lesquels sont décrits les traitements de chaque étape.
-Les traitements de chaque étape sont lancés sur une ou plusieurs tables de travail dédiées, préfixées du numéro de l'étape. A l'initialisation d'un **epg::step::Step** (étape) chaque table de travail est copiée à partir de la table de travail d'une étape antérieur (qui n'est pas nécessairement l'étape immédiatement antérieure, car toutes les étapes ne travaillent pas sur les mêmes données).
+Les traitements de chaque étape sont lancés sur une ou plusieurs tables de travail dédiées, préfixées du numéro de l'étape. A l'initialisation d'un **epg::step::Step** (étape) chaque table de travail est copiée à partir de la table de travail d'une étape précédente (qui n'est pas nécessairement l'étape immédiatement antérieure, car toutes les étapes ne travaillent pas sur les mêmes données).
 
 Les étapes qui composent le traitement de mise en cohérence sont les suivantes :
 
@@ -80,19 +80,29 @@ L'outil **epg::step::StepSuite** donne la possibilité de ne lancer que certaine
 
 ## Lancement du traitement
 
-Exemple de lancement du traitement complet sur les pays France (code pays 'fr') et Belgique (code pays 'be'):
+Exemple de lancement du traitement complet sur les pays France (code pays 'fr') et Belgique (code pays 'be') :
 ```
 area_matching --c path/to/config/epg_parameters.ini --cc be#fr
 ```
-
 A noter que l'on renseigne pour le paramètre --cc le code de la frontière séparant les deux pays à traiter. Le code pays est toujours composé de la même manière, c'est à dire en concaténant les codes <u>par ordre alphabétique</u>.
+
+Exemple du lancement d'une seule étape :
+```
+area_matching --c path/to/config/epg_parameters.ini --cc be#fr --sp 340
+```
+
+Exemple de lancement d'une plage d'étapes :
+```
+area_matching --c path/to/config/epg_parameters.ini --cc be#fr --sp 340-370
+```
+Ici toutes les étapes de 340 à 370 (incluses) sont jouées.
 
 
 ## Les étapes - fonctionnement détaillé
 
 ### 301 : AddStandingWater
 
-Les objets de la table de travail des **'standing waters'** des deux pays sont copiés dans la table de travail des **'watercourse areas'**. Les objets copiés sont supprimés de la table des **'standing waters'**.
+Les objets de la table de travail des _'standing waters'_ des deux pays sont copiés dans la table de travail des _'watercourse areas'_. Les objets copiés sont supprimés de la table des _'standing waters'_.
 
 ![301_with_key](images/301_with_key.png)
 
@@ -113,11 +123,11 @@ Paramètre utilisés:
 |---------------------------------|----------------------------------------------------------------------------------------------------|
 | IS_STANDING_WATER_NAME          | nom du champ indiquant si l'objet est de type 'standing water'                                     |
 
-Un champ **IS_STANDING_WATER_NAME** de type character varying(255) est ajouté à la table **AREA_TABLE_INIT** et renseigné pour chaque objet importé depuis la table **AREA_TABLE_INIT_STANDING_WATER**. Chaque objet importé dans la table **AREA_TABLE_INIT** est supprimé de la table **AREA_TABLE_INIT_STANDING_WATER**.
+Un champ _IS_STANDING_WATER_NAME_ de type _character varying(255)_ est ajouté à la table _AREA_TABLE_INIT_ et renseigné pour chaque objet importé depuis la table _AREA_TABLE_INIT_STANDING_WATER_. Chaque objet importé dans la table _AREA_TABLE_INIT_ est supprimé de la table _AREA_TABLE_INIT_STANDING_WATER_.
 
 ### 310 : GenerateCuttingLines
 
-Le but est de générer les **'cutting lines'**. Une **'cutting line'** est une portion de contour partagée par deux polygones d'un même pays.
+Le but est de générer les _'cutting lines'_. Une _'cutting line'_ est une portion de contour partagée par deux polygones d'un même pays.
 
 #### Données de travail :
 
@@ -126,9 +136,9 @@ Le but est de générer les **'cutting lines'**. Une **'cutting line'** est une 
 | AREA_TABLE_INIT | X      | X      | X                  | Table des surfaces à traiter |
 | CUTL_TABLE      |        | X      |                    | Table des 'cutting lines'    |
 
-Note : la table en sortie **CUTL_TABLE** n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
+Note : la table en sortie _CUTL_TABLE_ n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
 
-La table **CUTL_TABLE** dans laquelle sont enregistrées les 'cutting lines' est effacée si elle existe déjà puis créée.
+La table _CUTL_TABLE_ dans laquelle sont enregistrées les 'cutting lines' est effacée si elle existe déjà puis créée.
 Sa structure est la suivante:
 
 | champ             | type                   |
@@ -139,10 +149,10 @@ Sa structure est la suivante:
 
 
 #### Principaux opérateurs de calcul utilisés :
-- **app::calcul::StandingWaterOp**
+- app::calcul::StandingWaterOp
 
 #### Description du traitement :
-Le traitement est réalisé pays par pays. Le principe consiste à construire un graphe planaire à partir de tous les contours des polygones d'un pays. On parcourt ensuite les arcs du graphe est on identifie les arcs possédant plusieurs origines puisqu'ils correspondent à des portions de contours partagées. les arcs adjacents possédant les mêmes origines sont fusionnés. Ce sont ces arcs fusionnés qui constituent les futures sections de découpage et qui sont enregistrés dans la table des **'cutting lines'**.
+Le traitement est réalisé pays par pays. Le principe consiste à construire un graphe planaire à partir de tous les contours des polygones d'un pays. On parcourt ensuite les arcs du graphe est on identifie les arcs possédant plusieurs origines puisqu'ils correspondent à des portions de contours partagées. les arcs adjacents possédant les mêmes origines sont fusionnés. Ce sont ces arcs fusionnés qui constituent les futures sections de découpage et qui sont enregistrés dans la table des _'cutting lines'_.
 
 ![310_with_key](images/310_with_key.png)
 
@@ -196,7 +206,8 @@ L'objectif est ici de supprimer les surfaces hors de leur pays qui s'éloignent 
 ![320_2_with_key](images/320_2_with_key.png)
 
 Dans un soucis d'optimisation, à l'initialisation de l'opérateur est calculée une surface de travail qui correspond à la zone frontalière du pays traité. Cette zone est calculée par intersection entre la surface du pays et un buffer autour de la frontière. Deplus, afin d'accélérer la calcul de la distance de Hausdorff entre les surfaces et la frontière cette dernière est encapsulé dans la classe de calcul **epg::tools::MultiLineStringTool** qui réalise une indexation spatiale et qui permet de couper l'effort de calcul en cas de dépassant d'un seuil d'éloignement.
-Attention : il faut veiller à ce que le rayon du buffer (la profondeur de la zone de travail) soit égal ou supérieur à la distance d'extraction (paramètre de la fonction data-tools::border_extract), afin de ne pas supprimer des objets qui seraient situés à l'intérieur du pays.
+
+_Attention : il faut veiller à ce que le rayon du buffer (la profondeur de la zone de travail) soit égal ou supérieur à la distance d'extraction (paramètre de la fonction data-tools::border_extract), afin de ne pas supprimer des objets qui seraient situés à l'intérieur du pays._
 
 
 ##### 3) Fusion des surfaces découpées
@@ -207,7 +218,7 @@ Paramètres utilisés:
 | NATIONAL_IDENTIFIER_NAME | nom du champ pour l'identifiant national |
 
 
-les surfaces précédemment découpées qui n'ont pas été supprimées sont fusionnées. Pour cela on fusionne entre elles l'ensemble des surfaces possédant la même valeur pour le champ NATIONAL_IDENTIFIER_NAME.
+les surfaces précédemment découpées qui n'ont pas été supprimées sont fusionnées. Pour cela on fusionne entre elles l'ensemble des surfaces possédant la même valeur pour le champ _NATIONAL_IDENTIFIER_NAME_.
 
 ![320_3_with_key](images/320_3_with_key.png)
 
@@ -241,7 +252,7 @@ Paramètre utilisés:
 | NATIONAL_IDENTIFIER_NAME | nom du champ pour l'identifiant national                                              |
 
 
-L'opérateur de calcul parcourt l'ensemble des 'cutting lines'. Pour chacune d'entre elles il vérifie si une de ses deux surfaces adjacentes (dont les identifiants sont concaténés dans le champ LINKED_FEATURE_ID) existe et est en contact avec sa géométrie. Sinon on vérifie si une autre surface du même pays n'est pas en contact (les surface adjacentes peuvent avoir changé d'identifiant suite au découpage réalisé à l'étape précédente). Si une 'cutting line' n'est pas en contact avec aucune surfaces appartenant au même pays elle est supprimée.
+L'opérateur de calcul parcourt l'ensemble des _'cutting lines'_. Pour chacune d'entre elles il vérifie si une de ses deux surfaces adjacentes (dont les identifiants sont concaténés dans le champ _LINKED_FEATURE_ID_) existe et est en contact avec sa géométrie. Sinon on vérifie si une autre surface du même pays n'est pas en contact (les surface adjacentes peuvent avoir changé d'identifiant suite au découpage réalisé à l'étape précédente). Si une _'cutting line'_ n'est pas en contact avec aucune surfaces appartenant au même pays elle est supprimée.
 
 ### 334 : GenerateIntersectionAreas
 
@@ -254,9 +265,9 @@ Etape consistant à générer les surfaces représentant les zones de chevauchem
 | AREA_TABLE_INIT         | X      |        |                    | Table des surfaces à traiter        |
 | INTERSECTION_AREA_TABLE |        | X      |                    | Table des surfaces de chevauchement |
 
-Note : la table en sortie INTERSECTION_AREA_TABLE n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
+Note : la table en sortie _INTERSECTION_AREA_TABLE_ n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
 
-La table INTERSECTION_AREA_TABLE dans laquelle sont enregistrées les surfaces de chevauchement est effacée si elle existe déjà puis créée.
+La table _INTERSECTION_AREA_TABLE_ dans laquelle sont enregistrées les surfaces de chevauchement est effacée si elle existe déjà puis créée.
 Sa structure est la suivante:
 
 | champ             | type                   |
@@ -278,14 +289,14 @@ Paramètre utilisés:
 | LINKED_FEATURE_ID        | champ contenant les identifiants nationaux des surfaces à l'origine de la surface de chevauchement |
 | NATIONAL_IDENTIFIER_NAME | nom du champ pour l'identifiant national                                                           |
 
-L'opérateur parcourt toutes les surfaces de la table AREA_TABLE_INIT appartenant à 'country 1' et calcule les surfaces de chevauchement avec chacune des surfaces de cette même table appartenant à 'country 2' avec lesquelles elles présentent des intersections. Les résultats sont enregistrés dans la table INTERSECTION_AREA_TABLE.
+L'opérateur parcourt toutes les surfaces de la table _AREA_TABLE_INIT_ appartenant à 'country 1' et calcule les surfaces de chevauchement avec chacune des surfaces de cette même table appartenant à 'country 2' avec lesquelles elles présentent des intersections. Les résultats sont enregistrés dans la table _INTERSECTION_AREA_TABLE_.
 
 ![334_with_key](images/334_with_key.png)
 
 
 ### 335 : GenerateCuttingPoints
 
-Cette étape traite de la génération des 'cutting points'. Ces points seront utilisés par la suite comme références pour construire des sections de coupure de surfaces.
+Cette étape traite de la génération des _'cutting points'_. Ces points seront utilisés par la suite comme références pour construire des sections de coupure de surfaces.
 
 #### Données de travail :
 
@@ -296,9 +307,9 @@ Cette étape traite de la génération des 'cutting points'. Ces points seront u
 | CUTL_TABLE              | X      |        |                    | Table des 'cutting lines'          |
 | CUTP_TABLE              |        | X      |                    | Table des 'cutting points'         |
 
-Note : la table en sortie CUTP_TABLE n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
+Note : la table en sortie _CUTP_TABLE_ n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
 
-La table CUTP_TABLE dans laquelle sont enregistrées les surfaces de chevauchement est effacée si elle existe déjà puis créée.
+La table _CUTP_TABLE_ dans laquelle sont enregistrées les surfaces de chevauchement est effacée si elle existe déjà puis créée.
 Sa structure est la suivante:
 
 | champ             | type                   |
@@ -323,9 +334,9 @@ Paramètre utilisés:
 | CUTP_SECTION_GEOM        | nom du champ pour stocker la section de coupure                                                    |
 
 
-Le calcul des 'cutting points' consiste à parcourir les surfaces de la table AREA_TABLE_INIT en traitant successivement chacun des deux pays frontaliers. Pour chacune des surfaces on détermine quels en sont les 'vecteurs extrèmes' ('ending vectors'). On considère que chaque surface possède deux 'extrémités' qui sont choisis parmis les points de leur contour extérieur. C'est point correspondent aux extrémités de l'axe médian de la surface. On définit les 'vecteurs extrémes' comme étant les deux vecteurs ayant pour origines les 'extrémités' et tangeant à l'axe médian. Les points 'extrèmités' sont enregistrés dans la table CUTP_TABLE, on leur associe en plus de leur géométrie ponctuelle une géométrie linéaire (section) qui est un segment de droite centré sur le ponctuel et orthogonal au vecteur extrème. Si un point 'extrèmité' est situé à moins de la distance DIST_SNAP_MERGE_CF d'une 'cutting line' issue de la même surface, il n'est pas engistré (ce qui revient à fusionner ce point à la 'cutting line').
+Le calcul des _'cutting points'_ consiste à parcourir les surfaces de la table _AREA_TABLE_INIT_ en traitant successivement chacun des deux pays frontaliers. Pour chacune des surfaces on détermine quels en sont les 'vecteurs extrèmes' (_'ending vectors'_). On considère que chaque surface possède deux 'extrémités' qui sont choisis parmis les points de leur contour extérieur. C'est point correspondent aux extrémités de l'axe médian de la surface. On définit les 'vecteurs extrémes' comme étant les deux vecteurs ayant pour origines les 'extrémités' et tangeant à l'axe médian. Les points 'extrèmités' sont enregistrés dans la table _CUTP_TABLE_, on leur associe en plus de leur géométrie ponctuelle une géométrie linéaire (section) qui est un segment de droite centré sur le ponctuel et orthogonal au vecteur extrème. Si un point 'extrèmité' est situé à moins de la distance _DIST_SNAP_MERGE_CF_ d'une 'cutting line' issue de la même surface, il n'est pas engistré (ce qui revient à fusionner ce point à la 'cutting line').
 
-Le même calcul est effectué en parcourant la table INTERSECTION_AREA_TABLE.
+Le même calcul est effectué en parcourant la table _INTERSECTION_AREA_TABLE_.
 
 
 ![335_with_key](images/335_with_key.png)
@@ -359,7 +370,7 @@ Le processus de fusion des surfaces se déroule en deux étapes :
 
 ### 350 : SplitMergedAreasWithCF
 
-Lors de cette étape les surfaces précedemment fusionnées seront découpées suivant les 'cutting features' ('cutting points' et 'cutting lines').
+Lors de cette étape les surfaces précedemment fusionnées seront découpées suivant les _'cutting features'_ (_'cutting points'_ et _'cutting lines'_).
 
 #### Données de travail :
 
@@ -380,38 +391,38 @@ Paramètre utilisés:
 | DIST_SNAP_MERGE_CF       | distance minimum entre un 'cutting points'                                                         |
 
 
-Afin de calculer l'ensemble des sections de découpe on parcourt les surfaces de la table AREA_TABLE_INIT. Pour la suite du calcul des géométries de découpe on prend comme référence pour chacune de ces surfaces le polygone sans trous.
-Pour chaque surface, la première étape consiste à récupérer tous les 'cuttings points' situés sur le contour extérieur du polygone ainsi que les extrémités des 'cutting lines' liées à cette surface. Ces ponctuels sont utilisés pour, dans un deuxième temps, découper le contour extérieur du polygon en plusieurs sub-divisions de contour.
+Afin de calculer l'ensemble des sections de découpe on parcourt les surfaces de la table _AREA_TABLE_INIT_. Pour la suite du calcul des géométries de découpe on prend comme référence pour chacune de ces surfaces le polygone sans trous.
+Pour chaque surface, la première étape consiste à récupérer tous les 'cuttings points' situés sur le contour extérieur du polygone ainsi que les extrémités des _'cutting lines'_ liées à cette surface. Ces ponctuels sont utilisés pour, dans un deuxième temps, découper le contour extérieur du polygon en plusieurs sub-divisions de contour.
 
 ![350_1_with_key](images/350_1_with_key.png)
 
-Le principe du calcul des sections de découpe à partir des 'cuttings points' consiste à calculer les projections des cuttings points sur les sous-contours proches. A défaut de pouvoir sélectionner le meilleur candidat (section la plus pertinente), l'approche choisie consiste à conserver l'ensemble des géométrie de découpe (pour un cutting point donné on prend l'ensemble des segments ['cutting point' projection]). La découpe va ainsi générer une multitude de petites surfaces qui seront fusionnées dans les étapes suivantes (seront agrégés les polygones ayant la même surface d'origine).
-Si un 'cutting point' est suffisamment proche d'un autre 'cutting point' (à une distance inférieure à DIST_SNAP_MERGE_CF) pour lequel une section de découpe a déjà été calculé, il est est ignoré.
+Le principe du calcul des sections de découpe à partir des _'cuttings points'_ consiste à calculer les projections des cuttings points sur les sous-contours proches. A défaut de pouvoir sélectionner le meilleur candidat (section la plus pertinente), l'approche choisie consiste à conserver l'ensemble des géométrie de découpe (pour un cutting point donné on prend l'ensemble des segments [_'cutting point'_ _projection_]). La découpe va ainsi générer une multitude de petites surfaces qui seront fusionnées dans les étapes suivantes (seront agrégés les polygones ayant la même surface d'origine).
+Si un _'cutting point'_ est suffisamment proche d'un autre _'cutting point'_ (à une distance inférieure à _DIST_SNAP_MERGE_CF_) pour lequel une section de découpe a déjà été calculé, il est est ignoré.
 
 ![350_2_with_key](images/350_2_with_key.png)
 
-Pour chacune des section ['cutting point' projection] on calcul la proportion du segment situé à l'intérieur de la surface. Si le ratio est proche de zéro (presque entièrement hors surface) on ignore la section. Sinon on calcul le point d'intersection 'pt_inter' entre le segment ['cutting point' projection] et le contour extérieur de la surface et on calcul la longeur du chemin qu'il faut parcourir sur le contour extérieur pour aller de 'cutting point' à 'pt_inter'. Si le chemin est court on considère que cela signifie que si le segment ['cutting point' projection] n'est pas entièrement contenu dans la surface cela est du à un artefact créé lors de la fusion des surfaces.
+Pour chacune des section [_'cutting point'_ _projection_] on calcul la proportion du segment situé à l'intérieur de la surface. Si le ratio est proche de zéro (presque entièrement hors surface) on ignore la section. Sinon on calcul le point d'intersection _'pt_inter'_ entre le segment [_'cutting point'_ _projection_] et le contour extérieur de la surface et on calcul la longeur du chemin qu'il faut parcourir sur le contour extérieur pour aller de _'cutting point'_ à _'pt_inter'_. Si le chemin est court on considère que cela signifie que si le segment [_'cutting point'_ _projection_] n'est pas entièrement contenu dans la surface cela est du à un artefact créé lors de la fusion des surfaces.
 Si le chemin est long, on considère alors que la section n'est pas légitime et on l'ignore. 
 
 Note : pour le calcul des chemins on utilise l'opérateur **epg::tools::MultiLineStringTool** qui encapsule le contour du polygone sous la forme d'un graphe simple d'adjacence.
 
 ![350_5_with_key](images/350_5_with_key.png)
 
-Les géométries de découpe définies par les 'cutting lines' doivent souvent être prolongées à leurs extrémités afin d'atteindre les bords des surfaces fusionnées. La projection axiale est privilégiée (prolongement du dernier segment de la 'cutting line'). Cependant afin de s'assurer que la projection s'effectue bien sur la portion de contour la plus proche, on calcul également la projection orthogonale de l'extrémité de la 'cutting line' sur le contour et si la distance de projection axiale et supérieure à deux fois la distance de projection orthogonale, on choisira alors la projection orthogonale plutot que la projection axiale.
+Les géométries de découpe définies par les _'cutting lines'_ doivent souvent être prolongées à leurs extrémités afin d'atteindre les bords des surfaces fusionnées. La projection axiale est privilégiée (prolongement du dernier segment de la _'cutting line'_). Cependant afin de s'assurer que la projection s'effectue bien sur la portion de contour la plus proche, on calcul également la projection orthogonale de l'extrémité de la _'cutting line'_ sur le contour et si la distance de projection axiale et supérieure à deux fois la distance de projection orthogonale, on choisira alors la projection orthogonale plutot que la projection axiale.
 
 ![350_3_with_key](images/350_3_with_key.png)
 
 Une fois la section de découpe calculée, afin de s'affranchir des problèmes de précision et de s'assurer que la découpe sera bien réalisée, on prolonge légèrement les deux extrémités de cette géométrie.
-Lorsque plusieurs 'cutting lines' sont originellement en contact à une extrémité, on s'assure que, pour cette extrémité, les 'cutting lines' sont projetés sur le même point. 
+Lorsque plusieurs _'cutting lines'_ sont originellement en contact à une extrémité, on s'assure que, pour cette extrémité, les _'cutting lines'_ sont projetés sur le même point. 
 
 ![350_4_with_key](images/350_4_with_key.png)
 
-Une fois que toutes les géométries de coupure calculées à partir des 'cutting lines' et des 'cutting points' on utilise l'opérateur **app::tools::geometry::PolygonSplitter** pour découper le polygone (avec trous) selon les sections. Le principe de fonctionnement de cet opérateur consiste à onstruire un graphe planaire à partir des sections et des contours du polygone. On extrait ensuite les faces de ce graphe correspondant à des portions du polygone.
+Une fois que toutes les géométries de coupure calculées à partir des _'cutting lines'_ et des _'cutting points'_ on utilise l'opérateur **app::tools::geometry::PolygonSplitter** pour découper le polygone (avec trous) selon les sections. Le principe de fonctionnement de cet opérateur consiste à onstruire un graphe planaire à partir des sections et des contours du polygone. On extrait ensuite les faces de ce graphe correspondant à des portions du polygone.
 
 
 ### 360 : MergedAttributesAreas
 
-Suite à la fusion des surfaces des deux pays frontaliers, puis à la découpe de ces surfaces fusionnées par les 'cutting features', cette étape consiste à affecter des attributs à ces nouveaux polygones.
+Suite à la fusion des surfaces des deux pays frontaliers, puis à la découpe de ces surfaces fusionnées par les _'cutting features'_, cette étape consiste à affecter des attributs à ces nouveaux polygones.
 
 #### Données de travail :
 
@@ -428,14 +439,14 @@ Suite à la fusion des surfaces des deux pays frontaliers, puis à la découpe d
 Paramètre utilisés: 
 | paramètre                | description                                                                                        |
 |--------------------------|----------------------------------------------------------------------------------------------------|
-| AM_LIST_ATTR_W              | liste des attributs de travail qu'il ne faut pas fusionner                                         |
-| AM_LIST_ATTR_JSON           | liste des attributs de type json                                                                   |
-| W_TAG_NAME                    | champ de travail pour marquer les surfaces issues de la fusion                                     |
+| AM_LIST_ATTR_W           | liste des attributs de travail qu'il ne faut pas fusionner                                         |
+| AM_LIST_ATTR_JSON        | liste des attributs de type json                                                                   |
+| W_TAG_NAME               | champ de travail pour marquer les surfaces issues de la fusion                                     |
 
 Afin d'établir un lien entre les nouvelles surfaces issues de la fusion/découpe et les objets surfaciques d'origines, pour chacune d'entre elles on détermine avec quel objet source appartenant au pays 'A' elle possède la plus grande intersection et on identifie de la même façon l'objet du pays 'B' avec lequel elle présente le plus grand recouvrement.
 Si l'aire de A représente moins de 10% de l'aire de B la surface fusionnée prend les attributs de B. A l'inverse si l'aire de B représente moins de 10% de l'aire de A la surface fusionnée prends les attributs de B. Dans tous les autres cas les attributs de la surfaces fusionnées seront calculés par concaténation des attributs de A et B à l'aide de l'opérateur **ome2::calcul::utils::AttributeMerger**.
 
-Lors du parcours des surfaces fusionnées/découpées on renseigne le champ W_TAG_NAME afin de conserver la trace des surfaces issue de la fusion. En effet, cette information peut être perdue à cette étape puisque des surface issues de la fusion/découpe peuvent se voir affecter les attributs d'un seul pays (jusqu'ici les surfaces issues de la fusion étaient facilement identifiables puisque possédant une code pays en '#'). Cette information sera utile lors de l'étape **app::step::MergeSplitAreas** afin d'identifier les surfaces à traiter.
+Lors du parcours des surfaces fusionnées/découpées on renseigne le champ _W_TAG_NAME_ afin de conserver la trace des surfaces issue de la fusion. En effet, cette information peut être perdue à cette étape puisque des surface issues de la fusion/découpe peuvent se voir affecter les attributs d'un seul pays (jusqu'ici les surfaces issues de la fusion étaient facilement identifiables puisque possédant une code pays en '#'). Cette information sera utile lors de l'étape **app::step::MergeSplitAreas** afin d'identifier les surfaces à traiter.
 
 
 ### 370 : MergeSplitAreas
@@ -459,16 +470,16 @@ Paramètre utilisés:
 | SAM_SMALL_AREA_THRESHOLD        | seuil en dessous duquel une surface est considérée comme petite                                    |
 | SAM_SMALL_AREA_LENGTH_THRESHOLD | seuil de longeur pour une petite surface (longeur de l'axe médian)                                 |
 | NATIONAL_IDENTIFIER_NAME        | nom du champ pour l'identifiant national                                                           |
-| W_TAG_NAME                           | champ de travail ici utilisé pour marquer les surfaces issues de la fusion                         |
+| W_TAG_NAME                      | champ de travail ici utilisé pour marquer les surfaces issues de la fusion                         |
 
 L'ensemble du traitement décrit ci-après ne s'applique qu'aux surfaces issu de la fusion des surfaces des deux pays frontaliers (objets possédant un champ W_TAG_NAME non nul).
 
-La première étape du processus consiste à établir une liste des petites surfaces ordonnées selon leur aire (l'ordonnancement permet d'assurer la répétabilité des agrégations). Ne sont pas ajoutées à cette liste les petites surfaces avec un code pays simple (sans '#') de longeur supérieur au seuil SAM_SMALL_AREA_LENGTH_THRESHOLD.
+La première étape du processus consiste à établir une liste des petites surfaces ordonnées selon leur aire (l'ordonnancement permet d'assurer la répétabilité des agrégations). Ne sont pas ajoutées à cette liste les petites surfaces avec un code pays simple (sans '#') de longeur supérieur au seuil _SAM_SMALL_AREA_LENGTH_THRESHOLD_.
 
-Dans un deuxième temps on cherche a constituer des paquets d'objets à fusionner. Pour cela on parcourt les petites surfaces par ordre décroissant d'aire et pour chacune d'entre elles, on recherche le meilleur candidat à fusionner qui est le plus grand voisin possédant la même valeur pour le champ NATIONAL_IDENTIFIER_NAME, ou, à défaut, le plus grand voisin.
+Dans un deuxième temps on cherche a constituer des paquets d'objets à fusionner. Pour cela on parcourt les petites surfaces par ordre décroissant d'aire et pour chacune d'entre elles, on recherche le meilleur candidat à fusionner qui est le plus grand voisin possédant la même valeur pour le champ _NATIONAL_IDENTIFIER_NAME_, ou, à défaut, le plus grand voisin.
 A noter qu'une surface '#' (avec un code pays double) ne pourra être fusionnée qu'avec une autre surface '#'.
 
-On poursuit la constitution des groupes d'objets à fusionner en parcourant les surfaces qui ne sont pas petites et en les associant à leur plus grand voisin possédant la même valeur pour le champ NATIONAL_IDENTIFIER_NAME.
+On poursuit la constitution des groupes d'objets à fusionner en parcourant les surfaces qui ne sont pas petites et en les associant à leur plus grand voisin possédant la même valeur pour le champ _NATIONAL_IDENTIFIER_NAME_.
 
 Enfin pour chaque groupe on fusionne l'ensemble des surfaces qui le constituent. L'objet résultant possèdera les attributs de la plus grande surface du groupe.
 
@@ -478,7 +489,7 @@ L'ensemble du traitement décrit ci-avant et répéter jusqu'à ce que plus aucu
 
 ### 399 : SortingStandingWater
 
-Dans cette étape on réalise l'export des surfaces de la table 399_watercourse_area marquées comme étant des 'standing water' pour les importer dans la table 399_standing_water.
+Dans cette étape on réalise l'export des surfaces de la table de travail des _'watercourse areas'_ marquées comme étant des _'standing waters'_ pour les importer dans la table de travail des _'standing waters'_.
 
 #### Données de travail :
 
@@ -497,7 +508,7 @@ Paramètre utilisés:
 |---------------------------------|----------------------------------------------------------------------------------------------------|
 | IS_STANDING_WATER_NAME          | nom du champ indiquant si l'objet est de type 'standing water'                                     |
 
-Tous les objets pour lesquels la valeur du champ IS_STANDING_WATER_NAME est celle initialement renseignée à l'import depuis la table AREA_TABLE_INIT_STANDING_WATER sont exportés depuis la table AREA_TABLE_INIT vers la table AREA_TABLE_INIT_STANDING_WATER. Les objets exportés sont supprimés de la table AREA_TABLE_INIT.
+Tous les objets pour lesquels la valeur du champ _IS_STANDING_WATER_NAME_ est celle initialement renseignée à l'import depuis la table _AREA_TABLE_INIT_STANDING_WATER_ sont exportés depuis la table _AREA_TABLE_INIT_ vers la table _AREA_TABLE_INIT_STANDING_WATER_. Les objets exportés sont supprimés de la table _AREA_TABLE_INIT_.
 
 
 # Glossaire
