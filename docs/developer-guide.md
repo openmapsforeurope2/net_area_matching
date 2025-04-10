@@ -22,8 +22,8 @@ Voici le graphe des dépendances :
 
 ### Socle IGN 
 
-Le socle logiciel de l'IGN regroupe un ensemble de bibliothèques développées en interne qui permettent d'unifier l'accès aux bibliothèques c++ de traitement et de stockage de données géographiques. On y trouve également de nombreux algorithmes et outils développés pour les besoins spécifiques de l'IGN.
-On y trouve notamment des modèles de données pivots (géométries, objet attributaire), des fonctions de lecture/écriture de conteneurs d'objets, des opérations sur les géométries...
+Le socle logiciel de l'IGN regroupe un ensemble de bibliothèques développées en interne qui permettent d'unifier l'accès aux bibliothèques c++ de traitement et de stockage de données géographiques.
+On y trouve notamment des modèles de données pivots (géométries, objet attributaire), des fonctions de lecture/écriture de conteneurs d'objets, des opérations sur les géométries, de nombreux algorithmes et outils spécifiquement conçus pour répondre à des problématiques géomaticiennes...
 
 Le code source du socle ce trouve sur le dépôt https://codes-ign.ign.fr/svn/sd-socle/trunk
 
@@ -110,8 +110,8 @@ Les objets de la table de travail des _'standing waters'_ des deux pays sont cop
 
 | table                          | entrée | sortie | entitée de travail | description                                                 |
 |--------------------------------|--------|--------|--------------------|-------------------------------------------------------------|
-| AREA_TABLE_INIT                | X      | X      | X                  | Table des surfaces à traiter                                |
-| AREA_TABLE_INIT_STANDING_WATER | X      | X      | X                  | Table des surfaces à exporter vers la table AREA_TABLE_INIT |
+| AREA_TABLE_INIT                | X      | X      | X                  | table des surfaces à traiter                                |
+| AREA_TABLE_INIT_STANDING_WATER | X      | X      | X                  | table des surfaces à exporter vers la table AREA_TABLE_INIT |
 
 
 #### Principaux opérateurs de calcul utilisés :
@@ -133,8 +133,8 @@ Le but est de générer les _'cutting lines'_. Une _'cutting line'_ est une port
 
 | table           | entrée | sortie | entitée de travail | description                  |
 |-----------------|--------|--------|--------------------|------------------------------|
-| AREA_TABLE_INIT | X      | X      | X                  | Table des surfaces à traiter |
-| CUTL_TABLE      |        | X      |                    | Table des 'cutting lines'    |
+| AREA_TABLE_INIT | X      | X      | X                  | table des surfaces à traiter |
+| CUTL_TABLE      |        | X      |                    | table des 'cutting lines'    |
 
 Note : la table en sortie _CUTL_TABLE_ n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
 
@@ -164,9 +164,9 @@ L'objectif de cette étape est de supprimer les surfaces et portions de surfaces
 
 | table                 | entrée | sortie | entitée de travail | description                   |
 |-----------------------|--------|--------|--------------------|-------------------------------|
-| AREA_TABLE_INIT       | X      | X      | X                  | Table des surfaces à traiter  |
-| TARGET_BOUNDARY_TABLE | X      |        |                    | Table des frontières          |
-| LANDMASK_TABLE        | X      |        |                    | Table des emprises nationales |
+| AREA_TABLE_INIT       | X      | X      | X                  | table des surfaces à traiter  |
+| TARGET_BOUNDARY_TABLE | X      |        |                    | table des frontières          |
+| LANDMASK_TABLE        | X      |        |                    | table des emprises nationales |
 
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::PolygonSplitterOp
@@ -236,8 +236,8 @@ Cette étape permet de supprimer les 'cutting lines' qui, suite au nettoyage ré
 
 | table           | entrée | sortie | entitée de travail | description                  |
 |-----------------|--------|--------|--------------------|------------------------------|
-| AREA_TABLE_INIT | X      |        |                    | Table des surfaces à traiter |
-| CUTL_TABLE      | X      | X      |                    | Table des 'cutting lines'    |
+| AREA_TABLE_INIT | X      |        |                    | table des surfaces à traiter |
+| CUTL_TABLE      | X      | X      |                    | table des 'cutting lines'    |
 
 
 #### Principaux opérateurs de calcul utilisés :
@@ -262,8 +262,8 @@ Etape consistant à générer les surfaces représentant les zones de chevauchem
 
 | table                   | entrée | sortie | entitée de travail | description                         |
 |-------------------------|--------|--------|--------------------|-------------------------------------|
-| AREA_TABLE_INIT         | X      |        |                    | Table des surfaces à traiter        |
-| INTERSECTION_AREA_TABLE |        | X      |                    | Table des surfaces de chevauchement |
+| AREA_TABLE_INIT         | X      |        |                    | table des surfaces à traiter        |
+| INTERSECTION_AREA_TABLE |        | X      |                    | table des surfaces de chevauchement |
 
 Note : la table en sortie _INTERSECTION_AREA_TABLE_ n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
 
@@ -302,10 +302,10 @@ Cette étape traite de la génération des _'cutting points'_. Ces points seront
 
 | table                   | entrée | sortie | entitée de travail | description                        |
 |-------------------------|--------|--------|--------------------|------------------------------------|
-| AREA_TABLE_INIT         | X      |        |                    | Table des surfaces à traiter       |
-| INTERSECTION_AREA_TABLE | X      |        |                    | Table des surface de chevauchement |
-| CUTL_TABLE              | X      |        |                    | Table des 'cutting lines'          |
-| CUTP_TABLE              |        | X      |                    | Table des 'cutting points'         |
+| AREA_TABLE_INIT         | X      |        |                    | table des surfaces à traiter       |
+| INTERSECTION_AREA_TABLE | X      |        |                    | table des surface de chevauchement |
+| CUTL_TABLE              | X      |        |                    | table des 'cutting lines'          |
+| CUTP_TABLE              |        | X      |                    | table des 'cutting points'         |
 
 Note : la table en sortie _CUTP_TABLE_ n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
 
@@ -350,7 +350,7 @@ Il est ici question de la fusion des surfaces de deux pays frontaliers.
 
 | table                   | entrée | sortie | entitée de travail | description                        |
 |-------------------------|--------|--------|--------------------|------------------------------------|
-| AREA_TABLE_INIT         | X      | X      | X                  | Table des surfaces à traiter       |
+| AREA_TABLE_INIT         | X      | X      | X                  | table des surfaces à traiter       |
 
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::IntersectingAreasMergerOp
@@ -376,9 +376,9 @@ Lors de cette étape les surfaces précedemment fusionnées seront découpées s
 
 | table                   | entrée | sortie | entitée de travail | description                        |
 |-------------------------|--------|--------|--------------------|------------------------------------|
-| AREA_TABLE_INIT         | X      | X      | X                  | Table des surfaces à traiter       |
-| CUTL_TABLE              | X      |        |                    | Table des 'cutting lines'          |
-| CUTP_TABLE              | X      |        |                    | Table des 'cutting points'         |
+| AREA_TABLE_INIT         | X      | X      | X                  | table des surfaces à traiter       |
+| CUTL_TABLE              | X      |        |                    | table des 'cutting lines'          |
+| CUTP_TABLE              | X      |        |                    | table des 'cutting points'         |
 
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::CfSplitterOp
@@ -428,8 +428,8 @@ Suite à la fusion des surfaces des deux pays frontaliers, puis à la découpe d
 
 | table                   | entrée | sortie | entitée de travail | description                                                                     |
 |-------------------------|--------|--------|--------------------|---------------------------------------------------------------------------------|
-| AREA_TABLE_INIT         | X      | X      | X                  | Table des surfaces à traiter                                                    |
-| AREA_TABLE_INIT_CLEANED | X      |        |                    | Table des surfaces de référence issue de l'étape **app::step::CleanByLandmask** |
+| AREA_TABLE_INIT         | X      | X      | X                  | table des surfaces à traiter                                                    |
+| AREA_TABLE_INIT_CLEANED | X      |        |                    | table des surfaces de référence issue de l'étape **app::step::CleanByLandmask** |
 
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::SetAttributeMergedAreasOp
@@ -457,7 +457,7 @@ Cette étape a pour objectif d'agréger autant que possible la multitude de surf
 
 | table                   | entrée | sortie | entitée de travail | description                                                                     |
 |-------------------------|--------|--------|--------------------|---------------------------------------------------------------------------------|
-| AREA_TABLE_INIT         | X      | X      | X                  | Table des surfaces à traiter                                                    |
+| AREA_TABLE_INIT         | X      | X      | X                  | table des surfaces à traiter                                                    |
 
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::SplitAreaMergerOp
@@ -495,8 +495,8 @@ Dans cette étape on réalise l'export des surfaces de la table de travail des _
 
 | table                          | entrée | sortie | entitée de travail | description                                                 |
 |--------------------------------|--------|--------|--------------------|-------------------------------------------------------------|
-| AREA_TABLE_INIT                | X      | X      | X                  | Table des surfaces à exporter                               |
-| AREA_TABLE_INIT_STANDING_WATER | X      | X      | X                  | Table cible où importer les surfaces                        |
+| AREA_TABLE_INIT                | X      | X      | X                  | table des surfaces à exporter                               |
+| AREA_TABLE_INIT_STANDING_WATER | X      | X      | X                  | table cible où importer les surfaces                        |
 
 #### Principaux opérateurs de calcul utilisés :
 - app::calcul::StandingWaterOp
