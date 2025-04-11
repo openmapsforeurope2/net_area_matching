@@ -14,7 +14,7 @@
 // EPG
 #include <epg/Context.h>
 #include <epg/params/EpgParameters.h>
-#include <epg/sql/tools/numFeatures.h>
+#include <ome2/feature/sql/featureStorePostgisTools.h>
 #include <epg/sql/DataBaseManager.h>
 #include <epg/tools/StringTools.h>
 #include <epg/tools/TimeTools.h>
@@ -163,7 +163,7 @@ namespace app
             double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
 
             ign::feature::FeatureFilter filterArea(countryCodeName + " LIKE '%#%'");
-            int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
+            int numFeatures = ome2::feature::sql::numFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ cp splitter  % complete ]\n");
 
             //--

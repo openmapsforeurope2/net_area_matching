@@ -9,7 +9,7 @@
 // EPG
 #include <epg/Context.h>
 #include <epg/params/EpgParameters.h>
-#include <epg/sql/tools/numFeatures.h>
+#include <ome2/feature/sql/featureStorePostgisTools.h>
 #include <epg/sql/DataBaseManager.h>
 #include <epg/tools/StringTools.h>
 #include <epg/tools/TimeTools.h>
@@ -182,7 +182,7 @@ namespace app
             std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
 
             ign::feature::FeatureFilter filterArea;
-            int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
+            int numFeatures = ome2::feature::sql::numFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ polygon splitter  % complete ]\n");
 
             ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);

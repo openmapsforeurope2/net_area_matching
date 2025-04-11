@@ -8,7 +8,7 @@
 // EPG
 #include <epg/Context.h>
 #include <epg/params/EpgParameters.h>
-#include <epg/sql/tools/numFeatures.h>
+#include <ome2/feature/sql/featureStorePostgisTools.h>
 #include <epg/sql/DataBaseManager.h>
 #include <epg/tools/StringTools.h>
 #include <epg/tools/TimeTools.h>
@@ -119,7 +119,7 @@ namespace app
 
             ign::feature::FeatureFilter filterArea1(countryCodeName+"='"+country1+"'");
 
-            int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea1);
+            int numFeatures = ome2::feature::sql::numFeatures(*_fsArea, filterArea1);
             boost::progress_display display(numFeatures, std::cout, "[ computing area intersections % complete ]\n");
 
             ign::feature::FeatureIteratorPtr itArea1 = _fsArea->getFeatures(filterArea1);

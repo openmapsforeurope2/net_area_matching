@@ -8,7 +8,6 @@
 // EPG
 #include <epg/Context.h>
 #include <epg/params/EpgParameters.h>
-#include <epg/sql/tools/numFeatures.h>
 #include <epg/sql/DataBaseManager.h>
 #include <epg/tools/StringTools.h>
 #include <epg/tools/TimeTools.h>
@@ -17,6 +16,7 @@
 //OME2
 #include <ome2/geometry/tools/GetEndingPointsOp.h>
 #include <ome2/geometry/tools/lineStringTools.h>
+#include <ome2/feature/sql/featureStorePostgisTools.h>
 
 
 ///
@@ -171,7 +171,7 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutp(
 	double sectionWidth = 100;
 
 	ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filter);
-	size_t numArea2load = context->getDataBaseManager().numFeatures(*_fsArea, filter);
+	size_t numArea2load = ome2::feature::sql::numFeatures(*_fsArea, filter);
 	boost::progress_display display(numArea2load, std::cout, "[ GENERATE CUTTING POINTS ]\n");
 	while (itArea->hasNext()) {
 		++display;
