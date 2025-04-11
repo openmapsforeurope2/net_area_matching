@@ -10,6 +10,8 @@
 #include <epg/tools/TimeTools.h>
 #include <epg/tools/StringTools.h>
 
+#include <ome2/feature/sql/NotDestroyedTools.h>
+
 
 namespace app
 {
@@ -117,12 +119,12 @@ namespace app
 			//--
 			ign::feature::FeatureFilter filterCountries("(" + countryCodeName + " = '" + _vCountriesCodeName[0] + "' or " + countryCodeName + " = '" + _vCountriesCodeName[1] + "')");
 
-			int numFeaturesStandingWater = context->getDataBaseManager().numFeatures(*_fsAreaStandingWater, filterCountries);
+			int numFeaturesStandingWater = ome2::feature::sql::numFeatures(*_fsAreaStandingWater, filterCountries);
 			boost::progress_display display(numFeaturesStandingWater, std::cout, "[ IMPORT STANDING WATER ]\n");
 
 			std::set<std::string> sIdStandingArea2delete;
 
-			ign::feature::FeatureIteratorPtr itStandingArea = _fsAreaStandingWater->getFeatures(filterCountries);
+			ign::feature::FeatureIteratorPtr itStandingArea = ome2::feature::sql::getFeatures(_fsAreaStandingWater,filterCountries);
 			while (itStandingArea->hasNext()) {
 				++display;
 				ign::feature::Feature fStandingArea = itStandingArea->next();
@@ -166,12 +168,12 @@ namespace app
 			//--
 			ign::feature::FeatureFilter filterStandingArea(attrIsStandingWaterName + " = '" + _attrValueStandingWater + "'");
 
-			int numFeaturesStandingWater = context->getDataBaseManager().numFeatures(*_fsArea, filterStandingArea);
+			int numFeaturesStandingWater = ome2::feature::sql::numFeatures(*_fsArea, filterStandingArea);
 			boost::progress_display display(numFeaturesStandingWater, std::cout, "[ EXPORT STANDING WATER ]\n");
 
 			std::set<std::string> sIdStandingArea2delete;
 
-			ign::feature::FeatureIteratorPtr itStandingArea = _fsArea->getFeatures(filterStandingArea);
+			ign::feature::FeatureIteratorPtr itStandingArea = ome2::feature::sql::getFeatures(_fsArea,filterStandingArea);
 			while (itStandingArea->hasNext()) {
 				++display;
 				ign::feature::Feature fStandingArea = itStandingArea->next();

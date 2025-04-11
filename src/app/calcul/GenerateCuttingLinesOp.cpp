@@ -12,7 +12,7 @@
 // EPG
 #include <epg/Context.h>
 #include <epg/params/EpgParameters.h>
-#include <ome2/feature/sql/featureStorePostgisTools.h>
+#include <ome2/feature/sql/NotDestroyedTools.h>
 #include <epg/sql/DataBaseManager.h>
 #include <epg/tools/StringTools.h>
 #include <epg/tools/TimeTools.h>
@@ -143,7 +143,7 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 	std::map<std::string, std::string> mIdNatId;
 
 	ign::feature::FeatureFilter filterCountry(countryCodeName + " = '" + countryCode + "'");
-    ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterCountry);
+    ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filterCountry);
 	size_t numArea2load = ome2::feature::sql::numFeatures(*_fsArea, filterCountry);
 	boost::progress_display displayGrapLoad(numArea2load, std::cout, "[ LOADING GRAPH AREA "+ countryCode +" ]\n");
     while (itArea->hasNext()){

@@ -16,7 +16,7 @@
 //OME2
 #include <ome2/geometry/tools/GetEndingPointsOp.h>
 #include <ome2/geometry/tools/lineStringTools.h>
-#include <ome2/feature/sql/featureStorePostgisTools.h>
+#include <ome2/feature/sql/NotDestroyedTools.h>
 
 
 ///
@@ -170,7 +170,7 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutp(
 	//--
 	double sectionWidth = 100;
 
-	ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filter);
+	ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filter);
 	size_t numArea2load = ome2::feature::sql::numFeatures(*_fsArea, filter);
 	boost::progress_display display(numArea2load, std::cout, "[ GENERATE CUTTING POINTS ]\n");
 	while (itArea->hasNext()) {
@@ -352,7 +352,7 @@ bool app::calcul::GenerateCuttingPointsOp::_hasCutLArroundEndingPt(
 	app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 	double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
 
-	ign::feature::FeatureIteratorPtr itCutLArroundEndPt = _fsCutL->getFeatures(filterArroundEndPt);
+	ign::feature::FeatureIteratorPtr itCutLArroundEndPt = ome2::feature::sql::getFeatures(_fsCutL,filterArroundEndPt);
 	bool hasCutLArround = false;
 	while (itCutLArroundEndPt->hasNext()) {
 		ign::feature::Feature fCutLArroundEndPt = itCutLArroundEndPt->next();

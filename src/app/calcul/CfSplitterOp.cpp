@@ -14,7 +14,7 @@
 // EPG
 #include <epg/Context.h>
 #include <epg/params/EpgParameters.h>
-#include <ome2/feature/sql/featureStorePostgisTools.h>
+#include <ome2/feature/sql/NotDestroyedTools.h>
 #include <epg/sql/DataBaseManager.h>
 #include <epg/tools/StringTools.h>
 #include <epg/tools/TimeTools.h>
@@ -169,7 +169,7 @@ namespace app
             //--
             std::set<std::string> sArea2Delete;
 
-            ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filterArea);
             while (itArea->hasNext())
             {
                 ++display;
@@ -386,7 +386,7 @@ namespace app
                     std::map<std::string, ign::geometry::LineString> mModifiedCl;
 
                     ign::feature::FeatureFilter filterCl ("ST_INTERSECTS(" + geomName + ", ST_GeomFromText('" + poly.toString() + "'))");
-                    ign::feature::FeatureIteratorPtr itCl = _fsCl->getFeatures(filterCl);
+                    ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::getFeatures(_fsCl, filterCl);
                     while (itCl->hasNext())
                     {
                         ign::feature::Feature const& fCl = itCl->next();
@@ -510,7 +510,7 @@ namespace app
             std::string const geomName = epgParams.getValue(GEOM).toString();
 
             ign::feature::FeatureFilter filterCl("ST_INTERSECTS(" + geomName + ", ST_GeomFromText('" + poly.toString() + "'))");
-            ign::feature::FeatureIteratorPtr itCl = _fsCl->getFeatures(filterCl);
+            ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::getFeatures(_fsCl,filterCl);
             while (itCl->hasNext())
             {
                 ign::feature::Feature const& fCl = itCl->next();
@@ -557,7 +557,7 @@ namespace app
             double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
 
             ign::feature::FeatureFilter filterCp("ST_INTERSECTS(" + geomName + ", ST_GeomFromText('" + poly.toString() + "'))");
-            ign::feature::FeatureIteratorPtr itCp = _fsCp->getFeatures(filterCp);
+            ign::feature::FeatureIteratorPtr itCp = ome2::feature::sql::getFeatures(_fsCp, filterCp);
 
             std::set<std::string> sMergedCp;
             while (itCp->hasNext())
@@ -664,7 +664,7 @@ namespace app
 
 			clGeom.setFillZ(0);
             ign::feature::FeatureFilter filterCl("ST_DISTANCE(" + geomName + ", ST_GeomFromText('" + clGeom.toString() + "')) < 0.1");
-            ign::feature::FeatureIteratorPtr itCl = _fsCl->getFeatures(filterCl);
+            ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::getFeatures(_fsCl, filterCl);
             while (itCl->hasNext()) {
                 ign::feature::Feature const& fOtherCl = itCl->next();
                 ign::geometry::LineString otherClGeom = fOtherCl.getGeometry().asLineString();
