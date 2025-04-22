@@ -8,14 +8,13 @@
 // EPG
 #include <epg/Context.h>
 #include <epg/params/EpgParameters.h>
-#include <epg/sql/tools/numFeatures.h>
 #include <epg/sql/DataBaseManager.h>
 #include <epg/tools/TimeTools.h>
 #include <epg/tools/FilterTools.h>
 
 //OME2
 #include <ome2/geometry/tools/GetEndingPointsOp.h>
-
+#include <ome2/feature/sql/NotDestroyedTools.h>
 
 namespace app
 {
@@ -147,10 +146,10 @@ namespace app
             std::set<std::string> sSmallAreas;
 
             ign::feature::FeatureFilter filterArea(wTagName + " IS NOT NULL");
-            int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
+            int numFeatures = ome2::feature::sql::numFeatures(*_fsArea, filterArea);
 
             boost::progress_display display1(numFeatures, std::cout, "[ SAM [1/3] searching small areas % complete ]\n");
-            ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filterArea);
             while (itArea->hasNext())
             {
                 ++display1;
@@ -211,7 +210,7 @@ namespace app
             if (mergeByNatId) {
 
                 boost::progress_display display2(numFeatures, std::cout, "[ SAM [2/3] gathering areas to merge % complete ]\n");
-                ign::feature::FeatureIteratorPtr itArea2 = _fsArea->getFeatures(filterArea);
+                ign::feature::FeatureIteratorPtr itArea2 = ome2::feature::sql::getFeatures(_fsArea,filterArea);
                 while (itArea2->hasNext())
                 {
                     ++display2;
@@ -336,7 +335,7 @@ namespace app
 
             ign::feature::FeatureFilter filterArea = filterArea_;
             epg::tools::FilterTools::addAndConditions(filterArea, "ST_INTERSECTS(" + geomName + ", ST_SetSRID(ST_GeomFromText('" + areaGeom.toString() + "'),3035))");
-            ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea, filterArea);
             
             while (itArea->hasNext())
             {
@@ -376,7 +375,7 @@ namespace app
 
             ign::feature::FeatureFilter filterArea = filterArea_;
             epg::tools::FilterTools::addAndConditions(filterArea, "ST_INTERSECTS(" + geomName + ", ST_SetSRID(ST_GeomFromText('" + areaGeom.toString() + "'),3035))");
-            ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea, filterArea);
             
             while (itArea->hasNext())
             {

@@ -8,7 +8,7 @@
 // EPG
 #include <epg/Context.h>
 #include <epg/params/EpgParameters.h>
-#include <epg/sql/tools/numFeatures.h>
+#include <ome2/feature/sql/NotDestroyedTools.h>
 #include <epg/sql/DataBaseManager.h>
 #include <epg/tools/StringTools.h>
 #include <epg/tools/TimeTools.h>
@@ -79,14 +79,14 @@ namespace app
             params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
             std::string const landmaskTableName = themeParameters->getValue(LANDMASK_TABLE).toString();
             std::string const landCoverTypeName = themeParameters->getValue(LAND_COVER_TYPE_NAME).toString();
-            std::string const landAreaValue = themeParameters->getValue(LAND_COVER_TYPE_VALUE).toString();
+            std::string const landAreaValue = themeParameters->getValue(TYPE_LAND_AREA).toString();
             double const landmaskBuffer = themeParameters->getValue(PC_LANDMASK_BUFFER).toDouble();
 			std::string const inlandwaterValue = themeParameters->getValue(TYPE_INLAND_WATER).toString();
 
             // on recupere un buffer autour de la frontiere
             ign::geometry::GeometryPtr boundBuffPtr(new ign::geometry::Polygon());
             ign::feature::sql::FeatureStorePostgis* fsBoundary = context->getDataBaseManager().getFeatureStore(boundaryTableName, idName, geomName);
-            ign::feature::FeatureIteratorPtr itBoundary = fsBoundary->getFeatures(ign::feature::FeatureFilter(countryCodeName +" = '"+_countryCode+"'"));
+            ign::feature::FeatureIteratorPtr itBoundary = ome2::feature::sql::getFeatures(fsBoundary,ign::feature::FeatureFilter(countryCodeName +" = '"+_countryCode+"'"));
             while (itBoundary->hasNext())
             {
                 ign::feature::Feature const& fBoundary = itBoundary->next();
@@ -105,7 +105,7 @@ namespace app
                 ign::geometry::MultiPolygon mpLandmask;
                 ign::feature::sql::FeatureStorePostgis* fsLandmask = context->getDataBaseManager().getFeatureStore(landmaskTableName, idName, geomName);
 
-				ign::feature::FeatureIteratorPtr itLandmask = fsLandmask->getFeatures(ign::feature::FeatureFilter("(" + landCoverTypeName + " = '" + landAreaValue + "' OR " + landCoverTypeName + " = '" + inlandwaterValue + "') AND " + countryCodeName + " = '" + *vit + "'"));
+				ign::feature::FeatureIteratorPtr itLandmask = ome2::feature::sql::getFeatures(fsLandmask,ign::feature::FeatureFilter("(" + landCoverTypeName + " = '" + landAreaValue + "' OR " + landCoverTypeName + " = '" + inlandwaterValue + "') AND " + countryCodeName + " = '" + *vit + "'"));
 				while (itLandmask->hasNext())
                 {
                     ign::feature::Feature const& fLandmask = itLandmask->next();
@@ -139,7 +139,7 @@ namespace app
             epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
             std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
 
-            ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(ign::feature::FeatureFilter(countryCodeName +" = '"+_countryCode+"'"));
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,ign::feature::FeatureFilter(countryCodeName +" = '"+_countryCode+"'"));
             while (itArea->hasNext())
             {
                 ign::feature::Feature const& fArea = itArea->next();

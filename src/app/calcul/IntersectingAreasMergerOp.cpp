@@ -9,7 +9,7 @@
 // EPG
 #include <epg/Context.h>
 #include <epg/params/EpgParameters.h>
-#include <epg/sql/tools/numFeatures.h>
+#include <ome2/feature/sql/NotDestroyedTools.h>
 #include <epg/sql/DataBaseManager.h>
 #include <epg/tools/StringTools.h>
 #include <epg/tools/TimeTools.h>
@@ -100,10 +100,10 @@ namespace app
 
             ign::feature::FeatureFilter filterArea(countryCodeName+"='"+_vCountry[idCountryRef]+"'");
 
-            int numFeatures = epg::sql::tools::numFeatures(*_fsArea, filterArea);
+            int numFeatures = ome2::feature::sql::numFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ intersecting areas merger (1/2) % complete ]\n");
 
-            ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filterArea);
 
             std::list<std::set<std::string>> lsAreas2Merge;
             std::set<std::string> sTreatedArea;
@@ -132,7 +132,7 @@ namespace app
 
             for (std::list<std::set<std::string>>::const_iterator lit = lsAreas2Merge.begin() ; lit != lsAreas2Merge.end() ; ++lit) {
                 ign::feature::FeatureFilter filterArea(idName + " IN " +_toSqlList(*lit));
-                ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
+                ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filterArea);
 
                 ign::geometry::GeometryPtr mergedGeomPtr(new ign::geometry::MultiPolygon());
                 while (itArea->hasNext())
@@ -183,7 +183,7 @@ namespace app
                 epg::tools::FilterTools::addAndConditions(filterArea, "ST_INTERSECTS(" + geomName + ", ST_SetSRID(ST_GeomFromText('" + stack.front().second.toString() + "'),3035))");
                 epg::tools::FilterTools::addAndConditions(filterArea, idName + " NOT IN " +_toSqlList(sIntersectingArea));
 
-                ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterArea);
+                ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filterArea);
 
                 while (itArea->hasNext())
                 {

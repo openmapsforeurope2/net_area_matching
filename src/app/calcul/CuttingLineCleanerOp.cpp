@@ -9,6 +9,7 @@
 #include <epg/tools/StringTools.h>
 #include <epg/tools/TimeTools.h>
 
+#include <ome2/feature/sql/NotDestroyedTools.h>
 
 namespace app
 {
@@ -99,7 +100,7 @@ namespace app
             std::set<std::string> sCl2Delete;
 
             ign::feature::FeatureFilter filterCl;
-            ign::feature::FeatureIteratorPtr itCl = _fsCl->getFeatures(filterCl);
+            ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::getFeatures(_fsCl,filterCl);
             while (itCl->hasNext())
             {
                 ign::feature::Feature const& fCl = itCl->next();
@@ -113,7 +114,7 @@ namespace app
                 for (size_t i = 0 ; i < vIds.size() ; ++i) {
                     ign::feature::Feature fArea;
 					ign::feature::FeatureFilter filterAreaLinked(natIdIdName +" = '" + vIds[i] + "'");
-                    ign::feature::FeatureIteratorPtr itArea = _fsArea->getFeatures(filterAreaLinked);
+                    ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filterAreaLinked);
 	
                     while(itArea->hasNext()) {
 						ign::feature::Feature fArea = itArea->next();
