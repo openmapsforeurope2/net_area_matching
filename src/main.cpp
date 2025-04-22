@@ -19,6 +19,7 @@
 
 namespace po = boost::program_options;
 
+
 int main(int argc, char *argv[])
 {
     epg::Context* context = epg::ContextS::getInstance();
@@ -28,7 +29,7 @@ int main(int argc, char *argv[])
 	std::string     stepCode = "";
 	std::string     countryCode = "";
 	bool            verbose = true;
-
+    
 	epg::step::StepSuite< app::params::ThemeParametersS > stepSuite;
     app::step::tools::initSteps(stepSuite);
 
@@ -63,7 +64,7 @@ int main(int argc, char *argv[])
             std::cout << desc << std::endl;
             return 1;
         }
-
+   
         //parametres EPG
 		context->loadEpgParameters( epgParametersFile );
 
@@ -118,8 +119,6 @@ int main(int argc, char *argv[])
 		stepSuite.run(stepCode, verbose);
 
 		logger->log(epg::log::INFO, "[END HY MATCHING PROCESS ] " + epg::tools::TimeTools::getTime());
-	
-
     }
     catch( ign::Exception &e )
     {
@@ -135,14 +134,14 @@ int main(int argc, char *argv[])
         logFile << e.what() << std::endl;
         returnValue = 1;
     }
-
+    
     logFile << "[END] " << epg::tools::TimeTools::getTime() << std::endl;
     epg::ContextS::kill();
     epg::log::EpgLoggerS::kill();
     epg::log::ShapeLoggerS::kill();
     app::params::ThemeParametersS::kill();
-    
+
     logFile.close();
 
-    return returnValue ;
+    return returnValue;
 }

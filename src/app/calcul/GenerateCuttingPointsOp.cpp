@@ -181,6 +181,9 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutp(
 		std::string const linkedNatId = fArea.getAttribute(natIdIdName).toString();
 		std::string const countryCode = fArea.getAttribute(countryCodeName).toString();
 
+		//DEBUG
+		_logger->log(epg::log::DEBUG, idOrigin);
+
 		//--
 		std::vector<std::string> vLkid;
 		epg::tools::StringTools::Split(linkedNatId, "#", vLkid);

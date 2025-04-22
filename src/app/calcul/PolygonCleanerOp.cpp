@@ -105,21 +105,20 @@ namespace app
 		    epg::tools::StringTools::Split(_borderCode, "#", vCountry);
 
             for (std::vector<std::string>::iterator vit = vCountry.begin() ; vit != vCountry.end() ; ++vit) {
-                ign::geometry::MultiPolygon mpLandmask;
+                _mCountryGeomPtr.insert(std::make_pair(*vit, ign::geometry::GeometryPtr(new ign::geometry::Polygon()) ));
+                // ign::geometry::GeometryPtr landmaskUnionPtr(new ign::geometry::Polygon());
                 ign::feature::sql::FeatureStorePostgis* fsLandmask = context->getDataBaseManager().getFeatureStore(landmaskTableName, idName, geomName);
                 ign::feature::FeatureIteratorPtr itLandmask = ome2::feature::sql::getFeatures(fsLandmask,ign::feature::FeatureFilter("("+landCoverTypeName + " = '" + landAreaValue +"' OR "+ landCoverTypeName + " = '" + inlandwaterValue + "') AND " + countryCodeName + " = '" + *vit + "'"));
                 while (itLandmask->hasNext())
                 {
                     ign::feature::Feature const& fLandmask = itLandmask->next();
                     ign::geometry::MultiPolygon const& mp = fLandmask.getGeometry().asMultiPolygon();
-                    for (int i = 0; i < mp.numGeometries(); ++i)
-                    {
-                        mpLandmask.addGeometry(mp.polygonN(i));
-                    }
-                }
 
-                //on calcul la geometry de travail
-                _mCountryGeomPtr.insert(std::make_pair(*vit, ign::geometry::GeometryPtr(boundBuffPtr->Intersection(mpLandmask)) ));
+                    //on calcul la geometry de travail
+                    ign::geometry::GeometryPtr intersectionPtr(boundBuffPtr->Intersection(mp));
+                    if( (intersectionPtr->isPolygon() || intersectionPtr->isMultiPolygon()) && !intersectionPtr->isNull() && !intersectionPtr->isEmpty())
+                        _mCountryGeomPtr[*vit].reset(_mCountryGeomPtr[*vit]->Union(*intersectionPtr));
+                }
 
                 ign::feature::Feature feat;
                 feat.setGeometry(*_mCountryGeomPtr[*vit]);
