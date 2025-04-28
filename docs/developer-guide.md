@@ -61,17 +61,27 @@ Ce fonctionnement permet de conserver les résultats intermédiaires du processu
 
 Les étapes qui composent le traitement de mise en cohérence sont les suivantes :
 
-*301* - import dans la table de travail des objets de type 'standing water'
-*310* - génération des 'cutting lines'
-*320* - suppression des surfaces hors pays
-*330* - nettoyage des 'cutting lines' orphelines
-*334* - génération de surfaces par intersection des surfaces des deux pays. Ces surfaces sont stockées dans une table dédiée.
-*335* - génération des 'cutting point'
-*340* - fusion des surfaces des deux pays présentant des zones de chevauchement
-*350* - découpe des surfaces fusionnées avec les 'cutting lines' et les sections générées à partir des 'cutting point'
-*360* - affectation des attributs aux surfaces résultant de la fusion/découpe
-*370* - agrégation des surfaces issues de la fusion/découpe
-*399* - export des surfaces de type 'standing water'
+**301** - import dans la table de travail des objets de type 'standing water'
+<br>
+**310** - génération des 'cutting lines'
+<br>
+**320** - suppression des surfaces hors pays
+<br>
+**330** - nettoyage des 'cutting lines' orphelines
+<br>
+**334** - génération de surfaces par intersection des surfaces des deux pays. Ces surfaces sont stockées dans une table dédiée.
+<br>
+**335** - génération des 'cutting point'
+<br>
+**340** - fusion des surfaces des deux pays présentant des zones de chevauchement
+<br>
+**350** - découpe des surfaces fusionnées avec les 'cutting lines' et les sections générées à partir des 'cutting point'
+<br>
+**360** - affectation des attributs aux surfaces résultant de la fusion/découpe
+<br>
+**370** - agrégation des surfaces issues de la fusion/découpe
+<br>
+**399** - export des surfaces de type 'standing water'
 
 L'outil **epg::step::StepSuite** donne la possibilité de ne lancer que certaines étapes ou une plage de plusieurs étapes.
 

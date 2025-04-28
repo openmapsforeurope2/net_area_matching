@@ -22,17 +22,27 @@ Le processus de mise en cohérence est décomposé en plusieurs étapes. Un num�
 
 Voici l'ensemble des étapes constitutives du processus de raccordement:
 
-*301* - ajout des surfaces de la table standing_water dans la table watercourse_area
-*310* - génération des _'cutting lines'_
-*320* - suppression des surfaces hors pays
-*330* - nettoyage des _'cutting lines'_ orphelines
-*334* - génération de surfaces par intersection des surfaces des deux pays. Ces surfaces sont stockées dans une table dédiée.
-*335* - génération des _'cutting point'
-*340* - fusion des surfaces des deux pays présentant des zones de chevauchement
-*350* - découpe des surfaces fusionnées avec les _'cutting lines'_ et les sections générées à partir des _'cutting point'
-*360* - affectation des attributs aux surfaces résultant de la fusion/découpe
-*370* - fusion des petites surfaces et des surfaces possédant les mêmes attributs
-*399* - extraction des surfaces ajoutées à l'étape 301 et réintégration dans leur table d'origine standing_water
+**301** - ajout des surfaces de la table standing_water dans la table watercourse_area
+<br>
+**310** - génération des _'cutting lines'_
+<br>
+**320** - suppression des surfaces hors pays
+<br>
+**330** - nettoyage des _'cutting lines'_ orphelines
+<br>
+**334** - génération de surfaces par intersection des surfaces des deux pays. Ces surfaces sont stockées dans une table dédiée.
+<br>
+**335** - génération des _'cutting point'
+<br>
+**340** - fusion des surfaces des deux pays présentant des zones de chevauchement
+<br>
+**350** - découpe des surfaces fusionnées avec les _'cutting lines'_ et les sections générées à partir des _'cutting point'
+<br>
+**360** - affectation des attributs aux surfaces résultant de la fusion/découpe
+<br>
+**370** - fusion des petites surfaces et des surfaces possédant les mêmes attributs
+<br>
+**399** - extraction des surfaces ajoutées à l'étape 301 et réintégration dans leur table d'origine standing_water
 
 > _Précisions_ :
 > - _'Cutting line' : arc représentant la portion de contour partagé entre deux surface adjacente d'un même pays. Cet arc est utilisé pour la découpe de surfaces._
