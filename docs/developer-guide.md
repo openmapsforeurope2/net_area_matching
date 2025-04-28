@@ -1,7 +1,3 @@
-![under_construction](images/under_construction.png)
-
-
-
 # Introduction
 
 La présente documentation, à destination des développeurs, a pour objectif de présenter le détail du fonctionnement du processus de mise en cohérences des surfaciques aux frontières ainsi que les principaux outils mis en oeuvre.
@@ -10,7 +6,7 @@ La présente documentation, à destination des développeurs, a pour objectif de
 
 ## Code source 
 
-Le code source de l'application est disponible sur le dépôt https://github.com/openmapsforeurope2/area_matching.git
+Le code source de l'application est disponible sur le dépôt [area_matching](https://github.com/openmapsforeurope2/area_matching.git)
 
 ## Dépendances 
 
@@ -25,7 +21,7 @@ Voici le graphe des dépendances :
 Le socle logiciel de l'IGN regroupe un ensemble de bibliothèques développées en interne qui permettent d'unifier l'accès aux bibliothèques c++ de traitement et de stockage de données géographiques.
 On y trouve notamment des modèles de données pivots (géométries, objet attributaire), des fonctions de lecture/écriture de conteneurs d'objets, des opérations sur les géométries, de nombreux algorithmes et outils spécifiquement conçus pour répondre à des problématiques géomaticiennes...
 
-Le code source du socle ce trouve sur le dépôt https://codes-ign.ign.fr/svn/sd-socle/trunk
+Le code source du socle ce trouve sur le dépôt [sd-socle](http://gitlab.forge-idi.ign.fr/socle/sd-socle.git)
 
 ### LibEPG 
 
@@ -33,7 +29,7 @@ Cette bibliothèque, développée à l'IGN et s'appuyant essentiellement sur le 
 Elle comporte essentiellement des fonctions de généralisations, des fonctions utiles au management du processus tels que des utilitaires de log, d'orchestration, de gestion du contexte).
 On y trouve également des opérateurs permettant d'encapsuler des objets géométriques complexes afin d'en optimiser la manipulation (par l'utilisation de graphes, d'indexes...) et ainsi d'accroitre les performances globales des processus.
 
-Le code source de la bibliothèque libepg ce trouve sur le dépôt http://gitlab.dockerforge.ign.fr/europe/libepg.git 
+Le code source de la bibliothèque libepg ce trouve sur le dépôt [libepg](http://gitlab.dockerforge.ign.fr/europe/libepg.git)
 
 
 # Configuration
@@ -49,32 +45,33 @@ On trouve dans le [dossier de configuration](https://github.com/openmapsforeurop
 
 # Fonctionnement du processus
 
-Le traitement de mise en cohérence des objets surfacique est lancé pour un couple de pays frontaliers.
+Le traitement de mise en cohérence des objets surfaciques est lancé pour un couple de pays frontaliers.
 
 ## Etapes préliminaires
 
-Les données sur lesquelles ce traitement est lancé doivent avoir été nettoyées en amont à l'aide de l'outil **clean** du projet [data-tools](https://github.com/openmapsforeurope2/data-tools) qui permet de supprimer les surfaces ou portions de surfaces trop éloignées de leur pays.
+Les données sur lesquelles ce traitement est lancé doivent avoir été nettoyées en amont à l'aide de l'outil **clean** du projet [data-tools](https://github.com/openmapsforeurope2/data-tools) qui permet de supprimer les objets trop éloignés de leur pays.
 Cet outil doit être utilisé sur des tables de travail dans lesquelles sont extraites les données des deux pays à traiter autour de leur frontière commune.
 
 ## Principe général du traitement
 
 Le processus de mise en cohérence des surfaces est décomposé en une succession d'étapes clés.
-Afin d'orchestrer l'enchainement de ces étapes l'application utilise l'outil **epg::step::StepSuite** de la bibliothèque **libepg**. Ce dernier permet de lancer une succession de **epg::step::Step** dans lesquels sont décrits les traitements de chaque étape.
-Les traitements de chaque étape sont lancés sur une ou plusieurs tables de travail dédiées, préfixées du numéro de l'étape. A l'initialisation d'un **epg::step::Step** (étape) chaque table de travail est copiée à partir de la table de travail d'une étape précédente (qui n'est pas nécessairement l'étape immédiatement antérieure, car toutes les étapes ne travaillent pas sur les mêmes données).
+Afin d'orchestrer l'enchainement de ces étapes l'application utilise l'outil **epg::step::StepSuite** de la bibliothèque **libepg**. Ce dernier permet de lancer une succession de **epg::step::Step** dans lesquels sont implémentés les traitements de chaque étape.
+Un code (numéro à trois chiffres) est attribué à chaque étape. Les étapes sont ordonnancées selon cette numérotation. Si une étape transforme les données sur lesquelles elle travaille, une ou plusieurs tables dédiées préfixées du code de l'étape sont créées. Ces créations sont réalisées en copiant les tables d'une étape antérieure (qui n'est pas nécessairement l'étape immédiatement antérieure, car toutes les étapes ne travaillent pas sur les mêmes données).
+Ce fonctionnement permet de conserver les résultats intermédiaires du processus. Cela donne la possibilité d'arrêter et de reprendre le traitement en cours de processus et facilite le travail de d'analyse et de deboggage.
 
 Les étapes qui composent le traitement de mise en cohérence sont les suivantes :
 
-301. import dans la table de travail des objets de type 'standing water'
-310. génération des 'cutting lines'
-320. suppression des surfaces hors pays
-330. nettoyage des 'cutting lines' orphelines
-334. génération de surfaces par intersection des surfaces des deux pays. Ces surfaces sont stockées dans une table dédiée.
-335. génération des 'cutting point'
-340. fusion des surfaces des deux pays présentant des zones de chevauchement
-350. découpe des surfaces fusionnées avec les 'cutting lines' et les sections générées à partir des 'cutting point'
-360. affectation des attributs aux surfaces résultant de la fusion/découpe
-370. agrégation des surfaces issues de la fusion/découpe
-399. export des surfaces de type 'standing water'
+*301* - import dans la table de travail des objets de type 'standing water'
+*310* - génération des 'cutting lines'
+*320* - suppression des surfaces hors pays
+*330* - nettoyage des 'cutting lines' orphelines
+*334* - génération de surfaces par intersection des surfaces des deux pays. Ces surfaces sont stockées dans une table dédiée.
+*335* - génération des 'cutting point'
+*340* - fusion des surfaces des deux pays présentant des zones de chevauchement
+*350* - découpe des surfaces fusionnées avec les 'cutting lines' et les sections générées à partir des 'cutting point'
+*360* - affectation des attributs aux surfaces résultant de la fusion/découpe
+*370* - agrégation des surfaces issues de la fusion/découpe
+*399* - export des surfaces de type 'standing water'
 
 L'outil **epg::step::StepSuite** donne la possibilité de ne lancer que certaines étapes ou une plage de plusieurs étapes.
 
