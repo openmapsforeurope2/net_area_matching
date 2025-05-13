@@ -106,10 +106,10 @@ namespace app
 
             ign::feature::FeatureFilter filterArea(countryCodeName+" like '%#%'");
 
-            int numFeatures = ome2::feature::sql::numFeatures(*_fsArea, filterArea);
+            int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ set attribute merged areas % complete ]\n");
 
-            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
             while (itArea->hasNext())
             {
                 ++display;
@@ -168,7 +168,7 @@ namespace app
 			std::map<double, ign::feature::Feature> mIntersectedArea;
 			//recup fs table source -> table init sans step
 			//filtre sur les feat de la table source
-			ign::feature::FeatureIteratorPtr itAreaInit = ome2::feature::sql::getFeatures(_fsAreaInitCleaned,filterArroundAreaFromCountry);
+			ign::feature::FeatureIteratorPtr itAreaInit = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsAreaInitCleaned,filterArroundAreaFromCountry);
 
 			while (itAreaInit->hasNext())
 			{

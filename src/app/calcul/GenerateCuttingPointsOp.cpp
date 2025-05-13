@@ -170,8 +170,8 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutp(
 	//--
 	double sectionWidth = 100;
 
-	ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filter);
-	size_t numArea2load = ome2::feature::sql::numFeatures(*_fsArea, filter);
+	ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filter);
+	size_t numArea2load = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filter);
 	boost::progress_display display(numArea2load, std::cout, "[ GENERATE CUTTING POINTS ]\n");
 	while (itArea->hasNext()) {
 		++display;
@@ -355,7 +355,7 @@ bool app::calcul::GenerateCuttingPointsOp::_hasCutLArroundEndingPt(
 	app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 	double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
 
-	ign::feature::FeatureIteratorPtr itCutLArroundEndPt = ome2::feature::sql::getFeatures(_fsCutL,filterArroundEndPt);
+	ign::feature::FeatureIteratorPtr itCutLArroundEndPt = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCutL,filterArroundEndPt);
 	bool hasCutLArround = false;
 	while (itCutLArroundEndPt->hasNext()) {
 		ign::feature::Feature fCutLArroundEndPt = itCutLArroundEndPt->next();

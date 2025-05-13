@@ -105,7 +105,7 @@ namespace app
             for( std::list<std::string>::const_iterator lit = lNatIds.begin(); lit != lNatIds.end() ; ++lit ) {
                 ++display;
 
-                ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,ign::feature::FeatureFilter(natIdName+"='"+*lit+"'"));
+                ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,ign::feature::FeatureFilter(natIdName+"='"+*lit+"'"));
 
                 ign::geometry::GeometryPtr mergedGeomPtr(new ign::geometry::MultiPolygon());
                 ign::feature::Feature mergedFeat;

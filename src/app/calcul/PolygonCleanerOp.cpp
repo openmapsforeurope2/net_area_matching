@@ -89,7 +89,7 @@ namespace app
             ign::feature::sql::FeatureStorePostgis* fsBoundary = context->getDataBaseManager().getFeatureStore(boundaryTableName, idName, geomName);
             ign::feature::FeatureFilter boundaryFilter(countryCodeName + "='" + _borderCode +"'");
 
-            ign::feature::FeatureIteratorPtr itBoundary = ome2::feature::sql::getFeatures(fsBoundary,boundaryFilter);
+            ign::feature::FeatureIteratorPtr itBoundary = ome2::feature::sql::NotDestroyedTools::GetFeatures(*fsBoundary,boundaryFilter);
             while (itBoundary->hasNext())
             {
                 ign::feature::Feature const& fBoundary = itBoundary->next();
@@ -108,7 +108,7 @@ namespace app
                 _mCountryGeomPtr.insert(std::make_pair(*vit, ign::geometry::GeometryPtr(new ign::geometry::Polygon()) ));
                 // ign::geometry::GeometryPtr landmaskUnionPtr(new ign::geometry::Polygon());
                 ign::feature::sql::FeatureStorePostgis* fsLandmask = context->getDataBaseManager().getFeatureStore(landmaskTableName, idName, geomName);
-                ign::feature::FeatureIteratorPtr itLandmask = ome2::feature::sql::getFeatures(fsLandmask,ign::feature::FeatureFilter("("+landCoverTypeName + " = '" + landAreaValue +"' OR "+ landCoverTypeName + " = '" + inlandwaterValue + "') AND " + countryCodeName + " = '" + *vit + "'"));
+                ign::feature::FeatureIteratorPtr itLandmask = ome2::feature::sql::NotDestroyedTools::GetFeatures(*fsLandmask,ign::feature::FeatureFilter("("+landCoverTypeName + " = '" + landAreaValue +"' OR "+ landCoverTypeName + " = '" + inlandwaterValue + "') AND " + countryCodeName + " = '" + *vit + "'"));
                 while (itLandmask->hasNext())
                 {
                     ign::feature::Feature const& fLandmask = itLandmask->next();
@@ -149,10 +149,10 @@ namespace app
             double const distanceMax = themeParameters->getValue(PC_DISTANCE_THRESHOLD).toDouble();
 
             ign::feature::FeatureFilter filterArea;
-            int numFeatures = ome2::feature::sql::numFeatures(*_fsArea, filterArea);
+            int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ polygon cleaner  % complete ]\n");
 
-            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
             while (itArea->hasNext())
             {
                 ++display;

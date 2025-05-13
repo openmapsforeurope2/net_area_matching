@@ -119,10 +119,10 @@ namespace app
 
             ign::feature::FeatureFilter filterArea1(countryCodeName+"='"+country1+"'");
 
-            int numFeatures = ome2::feature::sql::numFeatures(*_fsArea, filterArea1);
+            int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea1);
             boost::progress_display display(numFeatures, std::cout, "[ computing area intersections % complete ]\n");
 
-            ign::feature::FeatureIteratorPtr itArea1 = ome2::feature::sql::getFeatures(_fsArea,filterArea1);
+            ign::feature::FeatureIteratorPtr itArea1 = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea1);
 
             while (itArea1->hasNext())
             {
@@ -135,7 +135,7 @@ namespace app
 				ign::feature::FeatureFilter filterArea2(countryCodeName+"='"+country2+"'");
 				epg::tools::FilterTools::addAndConditions(filterArea2, "ST_INTERSECTS(" + geomName + ", ST_SetSRID(ST_GeomFromText('" + areaGeom1.toString() + "'),3035))");
 
-				ign::feature::FeatureIteratorPtr itArea2 = ome2::feature::sql::getFeatures(_fsArea,filterArea2);
+				ign::feature::FeatureIteratorPtr itArea2 = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea2);
 
 				while (itArea2->hasNext())
 				{
@@ -168,7 +168,7 @@ namespace app
 			ign::feature::FeatureFilter filterArea(countryCodeName+"='"+_vCountry[1-countryIndex]+"'");
 			epg::tools::FilterTools::addAndConditions(filterArea, "ST_INTERSECTS(" + geomName + ", ST_SetSRID(ST_GeomFromText('" + geom.toString() + "'),3035))");
 
-            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea, filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterArea);
 
 			ign::geometry::GeometryPtr areaUnionPtr(new ign::geometry::Polygon());
 

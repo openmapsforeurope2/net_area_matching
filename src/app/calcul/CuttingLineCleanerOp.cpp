@@ -100,7 +100,7 @@ namespace app
             std::set<std::string> sCl2Delete;
 
             ign::feature::FeatureFilter filterCl;
-            ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::getFeatures(_fsCl,filterCl);
+            ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCl,filterCl);
             while (itCl->hasNext())
             {
                 ign::feature::Feature const& fCl = itCl->next();
@@ -114,7 +114,7 @@ namespace app
                 for (size_t i = 0 ; i < vIds.size() ; ++i) {
                     ign::feature::Feature fArea;
 					ign::feature::FeatureFilter filterAreaLinked(natIdIdName +" = '" + vIds[i] + "'");
-                    ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filterAreaLinked);
+                    ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterAreaLinked);
 	
                     while(itArea->hasNext()) {
 						ign::feature::Feature fArea = itArea->next();

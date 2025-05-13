@@ -143,8 +143,8 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 	std::map<std::string, std::string> mIdNatId;
 
 	ign::feature::FeatureFilter filterCountry(countryCodeName + " = '" + countryCode + "'");
-    ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filterCountry);
-	size_t numArea2load = ome2::feature::sql::numFeatures(*_fsArea, filterCountry);
+    ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterCountry);
+	size_t numArea2load = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterCountry);
 	boost::progress_display displayGrapLoad(numArea2load, std::cout, "[ LOADING GRAPH AREA "+ countryCode +" ]\n");
     while (itArea->hasNext()){
 		++displayGrapLoad;

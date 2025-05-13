@@ -163,13 +163,13 @@ namespace app
             double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
 
             ign::feature::FeatureFilter filterArea(countryCodeName + " LIKE '%#%'");
-            int numFeatures = ome2::feature::sql::numFeatures(*_fsArea, filterArea);
+            int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ cp splitter  % complete ]\n");
 
             //--
             std::set<std::string> sArea2Delete;
 
-            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
             while (itArea->hasNext())
             {
                 ++display;
@@ -386,7 +386,7 @@ namespace app
                     std::map<std::string, ign::geometry::LineString> mModifiedCl;
 
                     ign::feature::FeatureFilter filterCl ("ST_INTERSECTS(" + geomName + ", ST_GeomFromText('" + poly.toString() + "'))");
-                    ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::getFeatures(_fsCl, filterCl);
+                    ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCl, filterCl);
                     while (itCl->hasNext())
                     {
                         ign::feature::Feature const& fCl = itCl->next();
@@ -510,7 +510,7 @@ namespace app
             std::string const geomName = epgParams.getValue(GEOM).toString();
 
             ign::feature::FeatureFilter filterCl("ST_INTERSECTS(" + geomName + ", ST_GeomFromText('" + poly.toString() + "'))");
-            ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::getFeatures(_fsCl,filterCl);
+            ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCl,filterCl);
             while (itCl->hasNext())
             {
                 ign::feature::Feature const& fCl = itCl->next();
@@ -557,7 +557,7 @@ namespace app
             double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
 
             ign::feature::FeatureFilter filterCp("ST_INTERSECTS(" + geomName + ", ST_GeomFromText('" + poly.toString() + "'))");
-            ign::feature::FeatureIteratorPtr itCp = ome2::feature::sql::getFeatures(_fsCp, filterCp);
+            ign::feature::FeatureIteratorPtr itCp = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCp, filterCp);
 
             std::set<std::string> sMergedCp;
             while (itCp->hasNext())
@@ -664,7 +664,7 @@ namespace app
 
 			clGeom.setFillZ(0);
             ign::feature::FeatureFilter filterCl("ST_DISTANCE(" + geomName + ", ST_GeomFromText('" + clGeom.toString() + "')) < 0.1");
-            ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::getFeatures(_fsCl, filterCl);
+            ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCl, filterCl);
             while (itCl->hasNext()) {
                 ign::feature::Feature const& fOtherCl = itCl->next();
                 ign::geometry::LineString otherClGeom = fOtherCl.getGeometry().asLineString();

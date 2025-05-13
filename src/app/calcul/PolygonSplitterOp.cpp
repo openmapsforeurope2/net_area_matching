@@ -100,7 +100,7 @@ namespace app
             for (size_t i = 0 ; i < 2 ; ++i) {
                 ign::geometry::MultiLineString* cuttingMlsPtr = new ign::geometry::MultiLineString();
                 ign::feature::sql::FeatureStorePostgis* fsLandmask = context->getDataBaseManager().getFeatureStore(landmaskTableName, idName, geomName);
-				ign::feature::FeatureIteratorPtr itLandmask = ome2::feature::sql::getFeatures(fsLandmask,ign::feature::FeatureFilter("(" + landCoverTypeName + " = '" + landAreaValue + "' OR " + landCoverTypeName + " = '" + inlandwaterValue + "') AND " + countryCodeName + " = '" + vCountry[i] + "'"));
+				ign::feature::FeatureIteratorPtr itLandmask = ome2::feature::sql::NotDestroyedTools::GetFeatures(*fsLandmask,ign::feature::FeatureFilter("(" + landCoverTypeName + " = '" + landAreaValue + "' OR " + landCoverTypeName + " = '" + inlandwaterValue + "') AND " + countryCodeName + " = '" + vCountry[i] + "'"));
 				while (itLandmask->hasNext())
                 {
                     ign::feature::Feature const& fLandmask = itLandmask->next();
@@ -182,10 +182,10 @@ namespace app
             std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
 
             ign::feature::FeatureFilter filterArea;
-            int numFeatures = ome2::feature::sql::numFeatures(*_fsArea, filterArea);
+            int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ polygon splitter  % complete ]\n");
 
-            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::getFeatures(_fsArea,filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
             while (itArea->hasNext())
             {
                 ++display;
