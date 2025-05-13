@@ -8,7 +8,7 @@
         "request": "launch",
         "program": "/usr/local/src/area_matching/bin/area_matchingd",
         "cwd": "/usr/local/src/area_matching",
-        "args": ["--c", "/usr/local/src/area_matching/config/epg_parameters.ini", "--cc", "be#lu", "--sp", "301-399"],
+        "args": ["--c", "/usr/local/src/area_matching/config/epg_parameters.ini", "--cc", "be#lu", "--sp", "320"],
         "stopAtEntry": true,
         "environment": [{ "name": "config", "value": "Debug" }],
         "externalConsole": true,

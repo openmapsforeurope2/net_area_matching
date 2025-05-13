@@ -185,7 +185,7 @@ namespace app
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ polygon splitter  % complete ]\n");
 
-            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterArea);
             while (itArea->hasNext())
             {
                 ++display;
@@ -198,7 +198,7 @@ namespace app
                 std::map<std::string, epg::tools::geometry::SegmentIndexedGeometryInterface*>::const_iterator mit = _mCountryCuttingIndx.find(countryCode);
                 if (mit == _mCountryCuttingIndx.end()) {
                     _logger->log(epg::log::ERROR, "Unknown country [country code] " + countryCode);
-                    return;
+                    continue;
                 }
 
                 std::vector<ign::geometry::LineString> vLs;

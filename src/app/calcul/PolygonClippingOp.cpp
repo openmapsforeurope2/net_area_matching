@@ -149,7 +149,7 @@ namespace app
                 std::map<std::string, ign::geometry::GeometryPtr>::const_iterator mit = _mCountryGeomWithBuffPtr.find(_countryCode);
                 if (mit == _mCountryGeomWithBuffPtr.end()) {
                     _logger->log(epg::log::ERROR, "Unknown country [country code] " + _countryCode);
-                    return;
+                    continue;
                 }
 
                 //TODO ne traiter que les polygones qui chevauchent le landmask
