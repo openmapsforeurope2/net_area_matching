@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
         {
             if (!boost::filesystem::create_directory(logDir))
             {
-                std::string mError = "le dossier " + logDirectory + " ne peut être cree";
+                std::string mError = "the directory " + logDirectory + " cannot be created";
                 IGN_THROW_EXCEPTION(mError);
             }
         }
@@ -89,6 +89,8 @@ int main(int argc, char *argv[])
 		themeParametersFile = context->getConfigParameters().getValue(THEME_PARAMETER_FILE).toString();
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
         epg::params::tools::loadParams(*themeParameters, themeParametersFile, countryCode);
+        if (themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString() == "")
+            IGN_THROW_EXCEPTION("country code " + countryCode + " unknown in theme parameter file");
 
         //info de connection db
         context->loadEpgParameters( themeParameters->getValue(DB_CONF_FILE).toString() );
