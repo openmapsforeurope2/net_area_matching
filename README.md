@@ -16,6 +16,8 @@ Lorsqu'elle est lancée l'application traite un couple de pays frontaliers. Pour
 
 ## Fonctionnement
 
+Le fonctionnement détaillé est décrit dans la [documentation programmeur](https://github.com/openmapsforeurope2/area_matching/blob/main/docs/developer-guide.md ) de cet outil.
+
 Le programme ne manipule pas directement les données de production. Les données à traiter, localisées autour de la frontière, sont extraites dans une table de travail. A l'issu du traitement les données dérivées sont injectées dans la table source en remplacement des données initiales.
 
 Le processus de mise en cohérence est décomposé en plusieurs étapes. Un numéro est attribué à chaque étape. Une table de travail préfixée de ce numéro est délivrée en sortie de chaque étape. Chaque étape prend en données d'entrées les tables de travail générées lors d'étapes antérieures.
