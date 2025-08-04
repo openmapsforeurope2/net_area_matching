@@ -198,7 +198,7 @@ namespace app
 
                 const ign::feature::Feature* feat2Merge = &mNeighbours.rbegin()->second;
                 for( std::map<double, ign::feature::Feature>::const_reverse_iterator rmit2 = mNeighbours.rbegin() ; rmit2 != mNeighbours.rend() ; ++rmit2 ) {
-                    if( rmit2->second.getAttribute(nationalIdName).toString() == idNat ) {
+                    if( rmit2->second.getAttribute(nationalIdName).toString() == idNat && rmit2->second.getAttribute(countryCodeName).toString() == idNat ) {
                         feat2Merge = &rmit2->second;
                         break;
                     }
@@ -218,16 +218,18 @@ namespace app
                     ign::feature::Feature const& fArea = itArea2->next();
                     ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                     std::string areaId = fArea.getId();
-                    std::string identifier = fArea.getAttribute(nationalIdName).toString();
+                    std::string const& identifier = fArea.getAttribute(nationalIdName).toString();
+                    std::string const& countryCode = fArea.getAttribute(countryCodeName).toString();
                     
                     if ( sSmallAreas.find(areaId) != sSmallAreas.end() ) continue;
 
                     std::vector<ign::feature::Feature> vNeighbours = _getNeighbours(fArea, filterArea); // TODO confirmer qu'on cherche les voisins "w_tag IS NOT NULL" et non country LIKE%#%
 
                     for (std::vector<ign::feature::Feature>::const_iterator vit = vNeighbours.begin() ; vit != vNeighbours.end() ; ++vit) {
-                        std::string identifierNeighbour = vit->getAttribute(nationalIdName).toString();
-
-                        if( identifierNeighbour == identifier ) {
+                        std::string const& identifierNeighbour = vit->getAttribute(nationalIdName).toString();
+                        std::string const& countryCodeNeighbour = vit->getAttribute(countryCodeName).toString();
+                        
+                        if( identifierNeighbour == identifier && countryCode == countryCodeNeighbour ) {
 
                             _shapeLogger->writeFeature("sam_same_id_merged", *vit);
                             _shapeLogger->writeFeature("sam_same_id_merged", fArea);
