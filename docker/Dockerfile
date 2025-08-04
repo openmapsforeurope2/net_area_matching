@@ -3,7 +3,7 @@ FROM libepg
 ARG GIT_BRANCH
 ARG NB_PROC
 
-ENV APP_DIR_SRC=/usr/local/src/area_matching/                                              
+ENV APP_DIR_SRC=/usr/local/src/net_area_matching/                                              
 
 WORKDIR $APP_DIR_SRC/../
 

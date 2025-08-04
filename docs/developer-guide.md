@@ -6,7 +6,7 @@ La présente documentation, à destination des développeurs, a pour objectif de
 
 ## Code source 
 
-Le code source de l'application est disponible sur le dépôt [area_matching](https://github.com/openmapsforeurope2/area_matching.git)
+Le code source de l'application est disponible sur le dépôt [net_area_matching](https://github.com/openmapsforeurope2/net_area_matching.git)
 
 ## Dépendances 
 
@@ -36,7 +36,7 @@ Le code source de la bibliothèque libepg ce trouve sur le dépôt [libepg](http
 
 L'outil s'appuie sur de nombreux paramètres de configuration permettant d'adapter le comportement des algorithmes en fonctions des spécificités nationales (sémantique, précision, échelle, conventions de modélisation...).
 
-On trouve dans le [dossier de configuration](https://github.com/openmapsforeurope2/area_matching/tree/main/config) les fichiers suivants :
+On trouve dans le [dossier de configuration](https://github.com/openmapsforeurope2/net_area_matching/tree/main/config) les fichiers suivants :
 
 - epg_parameters.ini : regroupe des paramètres de base issus de la bibliothèque libepg qui constitue le socle de développement l'outil. Ce fichier est aussi le fichier chapeau qui pointe vers les autres fichiers de configurations.
 - db_conf.ini : informations de connexion à la base de données.
@@ -89,18 +89,18 @@ L'outil **epg::step::StepSuite** donne la possibilité de ne lancer que certaine
 
 Exemple de lancement du traitement complet sur les pays France (code pays 'fr') et Belgique (code pays 'be') :
 ```
-area_matching --c path/to/config/epg_parameters.ini --cc be#fr
+net_area_matching --c path/to/config/epg_parameters.ini --cc be#fr
 ```
 A noter que l'on renseigne pour le paramètre --cc le code de la frontière séparant les deux pays à traiter. Le code pays est toujours composé de la même manière, c'est à dire en concaténant les codes <u>par ordre alphabétique</u>.
 
 Exemple du lancement d'une seule étape :
 ```
-area_matching --c path/to/config/epg_parameters.ini --cc be#fr --sp 340
+net_area_matching --c path/to/config/epg_parameters.ini --cc be#fr --sp 340
 ```
 
 Exemple de lancement d'une plage d'étapes :
 ```
-area_matching --c path/to/config/epg_parameters.ini --cc be#fr --sp 340-370
+net_area_matching --c path/to/config/epg_parameters.ini --cc be#fr --sp 340-370
 ```
 Ici toutes les étapes de 340 à 370 (incluses) sont jouées.
 
