@@ -1,4 +1,4 @@
-PROJECT_NAME=area_matching
+PROJECT_NAME=net_area_matching
 
 if [ $# -eq 0 ]
     #Si il n'y a pas d'argument
