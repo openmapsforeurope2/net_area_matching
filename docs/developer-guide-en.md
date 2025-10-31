@@ -194,7 +194,7 @@ Parameters used:
 
 Areas outside their country and further than a certain threshold are removed.
 
-![320_2_with_key](images/320_2_with_key.png)
+<img width="643" height="600" alt="image" src="https://github.com/user-attachments/assets/5627e3a4-daaa-430f-87d1-a1b79557266c" />
 
 For optimization, a working area corresponding to the border zone of the country is precomputed as the intersection of a buffer and the national landmask.
 
