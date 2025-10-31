@@ -14,7 +14,7 @@ Installing the application requires compiling internal and external libraries, i
 
 Here is the dependency graph:
 
-<img src="images/dependencies.png" width="500" height="auto">
+<img width="596" height="593" alt="image" src="https://github.com/user-attachments/assets/fa02cce1-75c0-4546-9b14-88ac96516e04" />
 
 ### IGN Socle 
 
@@ -98,7 +98,8 @@ Here, all steps from 340 to 370 (inclusive) will be executed.
 
 'Standing water' objects from both countries' working tables are copied into the 'watercourse areas' working table. The copied objects are removed from the 'standing water' table.
 
-![301_with_key](images/301_with_key.png)
+<img width="809" height="600" alt="image" src="https://github.com/user-attachments/assets/8f5b2230-4183-45ef-84a0-31d97c0e7fd5" />
+
 
 #### Working Data:
 
