@@ -147,7 +147,7 @@ CUTL_TABLE is dropped and recreated if it exists. Structure:
 #### Processing Description:
 Processing is done country by country. The principle is to build a planar graph from all polygon contours of a country, then identify arcs shared by two surfaces.
 
-![310_with_key](images/310_with_key.png)
+<img width="775" height="600" alt="image" src="https://github.com/user-attachments/assets/a01fd3e2-fa6a-4879-80aa-bee13b62deac" />
 
 ### 320: CleanByLandmask
 
@@ -178,7 +178,8 @@ Parameters used:
 
 Areas extending beyond their country are cut along lines corresponding to the international borders, offset by a certain distance outside the country.
 
-![320_with_key](images/320_with_key.png)
+<img width="647" height="600" alt="image" src="https://github.com/user-attachments/assets/a353158f-3c46-4cbf-ab52-58ecb2ff294a" />
+
 
 To optimize calculations, the cutting geometry contouring the country is indexed in the quadtree of the **epg::tools::geometry::SegmentIndexedGeometryCollection** class.
 
