@@ -10,12 +10,16 @@
 
 
 
-	enum HY_PARAMETERS{
+	enum TH_PARAMETERS{
 		DB_CONF_FILE,
 		WORKING_SCHEMA,
 		AREA_TABLE_INIT,
 		AREA_TABLE_INIT_CLEANED,
 		AREA_TABLE_INIT_STANDING_WATER,
+		LANDMASK_TABLE,
+		LAND_COVER_TYPE_NAME,
+		TYPE_LAND_AREA,
+		TYPE_INLAND_WATER,
 		NATIONAL_IDENTIFIER_NAME,
 		COUNTRY_CODE_W,
 		W_TAG_NAME,
@@ -24,11 +28,8 @@
 		INTERSECTION_AREA_TABLE_SUFFIX,
 		INTERSECTION_AREA_TABLE,
 
-		LANDMASK_TABLE,
-		LAND_COVER_TYPE_NAME,
-		TYPE_LAND_AREA,
-		TYPE_INLAND_WATER,
 		PC_LANDMASK_BUFFER,
+
 		CUTP_TABLE_SUFFIX,
 		CUTP_SECTION_GEOM,
 		CUTL_TABLE_SUFFIX,
@@ -48,9 +49,9 @@
 namespace app{
 namespace params{
 
-	class ThemeParameters : public epg::params::ParametersT< HY_PARAMETERS >
+	class ThemeParameters : public epg::params::ParametersT< TH_PARAMETERS >
 	{
-		typedef  epg::params::ParametersT< HY_PARAMETERS > Base;
+		typedef  epg::params::ParametersT< TH_PARAMETERS > Base;
 
 		public:
 

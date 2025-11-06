@@ -9,9 +9,9 @@ L'élaboration de la chaîne de production a nécessité le développement d'un 
 
 ## Description
 
-Le présent outil est dédié à la mise en cohérence des surfaces de deux pays autour de leur(s) frontière(s) commune(s).
+Le présent outil est dédié à la mise en cohérence les réseaux de surfaces de deux pays autour de leur(s) frontière(s) commune(s).
 
-Lorsqu'elle est lancée l'application traite un couple de pays frontaliers. Pour raccorder l'ensemble du réseau d'un pays le programme doit être lancé successivement sur ses différentes frontières (en considérant l'ensemble de ses pays limitrophes).
+Lorsqu'elle est lancée l'application traite un couple de pays frontaliers. Pour raccorder l'ensemble du réseau de surface d'un pays le programme doit être lancé successivement sur ses différentes frontières (en considérant l'ensemble de ses pays limitrophes).
 
 
 ## Fonctionnement
@@ -70,17 +70,17 @@ L'outil s'utilise en ligne de commande.
 
 Paramètres:
 * c [obligatoire] : chemin vers le fichier de configuration
-* cc [obligatoire] : code pays double (exemple : be#fr)
+* cc [obligatoire] : code frontière (exemple : be#fr)
 * sp [obligatoire] : étape(s) à executer (exemples: 320 ; 320,340 ; 310-399)
 
 <br>
 
 Exemple d'appel pour lancer successivement l'ensemble des étapes sur la frontière franco-belge :
 ~~~
-bin/net_area_matching --c path/to/config/epg_parmaters.ini --cc be#fr
+bin/net_area_matching --c path/to/config/epg_parameters.ini --cc be#fr
 ~~~
 
 Exemple d'appel pour ne lancer qu'une seule étape :
 ~~~
-bin/net_area_matching --c path/to/config/epg_parmaters.ini --cc be#fr --sp 350
+bin/net_area_matching --c path/to/config/epg_parameters.ini --cc be#fr --sp 350
 ~~~

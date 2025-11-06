@@ -246,16 +246,16 @@ namespace geometry{
 				}
 			case ign::geometry::Geometry::GeometryTypeGeometryCollection :
 				{
-					ign::geometry::GeometryCollection const& gc = geom.asGeometryCollection();
-					for( size_t i = 0 ; i < gc.numGeometries() ; ++i )
-					{
-						if( gc.geometryN(i).isPolygon() )
-							vPolygons.push_back( gc.geometryN(i).asPolygon() );
-						if( gc.geometryN(i).isMultiPolygon() )
-						{
-							ign::geometry::MultiPolygon const& mp = gc.geometryN(i).asMultiPolygon();
-							for( size_t k = 0 ; k < mp.numGeometries() ; ++k )
-								vPolygons.push_back( mp.polygonN(k) );
+					ign::geometry::GeometryCollection const& collection = resultPtr->asGeometryCollection();
+					for( size_t i = 0 ; i < collection.numGeometries() ; ++i ) {
+						if( collection.geometryN(i).isPolygon() ) {
+							ign::geometry::Polygon const& p = collection.geometryN(i).asPolygon();
+							if ( !p.isEmpty() ) mpResult.addGeometry(p);
+						}
+						if( collection.geometryN(i).isMultiPolygon() ) {
+							ign::geometry::MultiPolygon const& mp = collection.geometryN(i).asMultiPolygon();
+							for( size_t i = 0 ; i < mp.numGeometries() ; ++i )
+								if ( !mp.polygonN(i).isEmpty() ) mpResult.addGeometry(mp.polygonN(i));
 						}
 					}
 					break;
