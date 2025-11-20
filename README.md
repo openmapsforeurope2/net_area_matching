@@ -70,17 +70,18 @@ L'outil s'utilise en ligne de commande.
 
 Paramètres:
 * c [obligatoire] : chemin vers le fichier de configuration
-* cc [obligatoire] : code frontière (exemple : be#fr)
+* s [obligatoire] : suffix de la table de travail
 * sp [obligatoire] : étape(s) à executer (exemples: 320 ; 320,340 ; 310-399)
+* arguments libres [obligatoire] : codes des deux pays frontaliers
 
 <br>
 
 Exemple d'appel pour lancer successivement l'ensemble des étapes sur la frontière franco-belge :
 ~~~
-bin/net_area_matching --c path/to/config/epg_parameters.ini --cc be#fr
+bin/net_area_matching --c path/to/config/epg_parameters.ini --s 20251113 fr be
 ~~~
 
 Exemple d'appel pour ne lancer qu'une seule étape :
 ~~~
-bin/net_area_matching --c path/to/config/epg_parameters.ini --cc be#fr --sp 350
+bin/net_area_matching --c path/to/config/epg_parameters.ini --s 20251113 --sp 350 fr be
 ~~~

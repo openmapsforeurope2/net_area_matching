@@ -8,7 +8,7 @@
         "request": "launch",
         "program": "/usr/local/src/net_area_matching/bin/area_matchingd",
         "cwd": "/usr/local/src/net_area_matching",
-        "args": ["--c", "/usr/local/src/net_area_matching/config/epg_parameters.ini", "--cc", "es#fr", "--sp", "301-399"],
+        "args": ["--c", "/usr/local/src/net_area_matching/config/epg_parameters.ini", "--s", "20251113", "--sp", "301-399", "es", "fr"],
         "stopAtEntry": true,
         "environment": [{ "name": "config", "value": "Debug" }],
         "externalConsole": true,
@@ -23,7 +23,7 @@
         "pipeTransport": {
             "debuggerPath": "/usr/bin/gdb",
             "pipeProgram": "docker",
-            "pipeArgs": ["exec", "-i", "area_matching_container", "sh", "-c"],
+            "pipeArgs": ["exec", "-i", "area_matching_base_container", "sh", "-c"],
             "pipeCwd": "${workspaceRoot}"
         },
         "MIMode": "gdb",

@@ -246,16 +246,16 @@ namespace geometry{
 				}
 			case ign::geometry::Geometry::GeometryTypeGeometryCollection :
 				{
-					ign::geometry::GeometryCollection const& collection = resultPtr->asGeometryCollection();
+					ign::geometry::GeometryCollection const& collection = geom.asGeometryCollection();
 					for( size_t i = 0 ; i < collection.numGeometries() ; ++i ) {
 						if( collection.geometryN(i).isPolygon() ) {
 							ign::geometry::Polygon const& p = collection.geometryN(i).asPolygon();
-							if ( !p.isEmpty() ) mpResult.addGeometry(p);
+							if ( !p.isEmpty() ) vPolygons.push_back(p);
 						}
 						if( collection.geometryN(i).isMultiPolygon() ) {
 							ign::geometry::MultiPolygon const& mp = collection.geometryN(i).asMultiPolygon();
 							for( size_t i = 0 ; i < mp.numGeometries() ; ++i )
-								if ( !mp.polygonN(i).isEmpty() ) mpResult.addGeometry(mp.polygonN(i));
+								if ( !mp.polygonN(i).isEmpty() ) vPolygons.push_back(mp.polygonN(i));
 						}
 					}
 					break;
