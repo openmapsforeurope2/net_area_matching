@@ -1,4 +1,4 @@
-PROJECT_NAME=net_area_matching
+DOCKER_NAME=net_area_matching_dev
 
 if [ $# -eq 0 ]
     #Si il n'y a pas d'argument
