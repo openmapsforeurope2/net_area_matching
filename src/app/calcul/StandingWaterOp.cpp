@@ -120,7 +120,7 @@ namespace app
 			ign::feature::FeatureFilter filterCountries("(" + countryCodeName + " = '" + _vCountriesCodeName[0] + "' or " + countryCodeName + " = '" + _vCountriesCodeName[1] + "')");
 
 			int numFeaturesStandingWater = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsAreaStandingWater, filterCountries);
-			boost::progress_display display(numFeaturesStandingWater, std::cout, "[ IMPORT STANDING WATER ]\n");
+			boost::progress_display display(numFeaturesStandingWater, std::cout, "[ importing standing waters % complete ]\n");
 
 			std::set<std::string> sIdStandingArea2delete;
 
@@ -169,7 +169,7 @@ namespace app
 			ign::feature::FeatureFilter filterStandingArea(attrIsStandingWaterName + " = '" + _attrValueStandingWater + "'");
 
 			int numFeaturesStandingWater = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterStandingArea);
-			boost::progress_display display(numFeaturesStandingWater, std::cout, "[ EXPORT STANDING WATER ]\n");
+			boost::progress_display display(numFeaturesStandingWater, std::cout, "[ exporting standing waters % complete ]\n");
 
 			std::set<std::string> sIdStandingArea2delete;
 

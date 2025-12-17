@@ -123,11 +123,6 @@ int main(int argc, char *argv[])
         if( context->getConfigParameters().parameterHasNullValue(DATABASE) ) 
             context->getConfigParameters().setParameter(DATABASE, ign::data::String(ome2::utils::getEnvStr("DATABASE")));
 
-		//definition AREA_TABLE_INIT_CLEANED
-		std::string areaTableNameInitCleaned = "_" + ign::data::Integer(app::step::CleanByLandmask().getCode()).toString() + "_";
-		areaTableNameInitCleaned += themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString();
-		themeParameters->setParameter(AREA_TABLE_INIT_CLEANED, ign::data::String(areaTableNameInitCleaned));
-
         //epg logger
         epg::log::EpgLogger* logger = epg::log::EpgLoggerS::getInstance();
         // logger->setProdOfstream( logDirectory+"/au_merging.log" );
@@ -143,6 +138,11 @@ int main(int argc, char *argv[])
             std::string standingWaterTableName = standingWaterTableBaseName + "_" + countries.front() + "_" + countries.back() + "_" + suffix;
             themeParameters->setParameter(AREA_TABLE_INIT_STANDING_WATER, ign::data::String(standingWaterTableName));
         }
+
+        //definition de AREA_TABLE_INIT_CLEANED
+		std::string areaTableNameInitCleaned = "_" + ign::data::Integer(app::step::CleanByLandmask().getCode()).toString() + "_";
+		areaTableNameInitCleaned += themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString();
+		themeParameters->setParameter(AREA_TABLE_INIT_CLEANED, ign::data::String(areaTableNameInitCleaned));
 
         //set BDD search path
         context->getDataBaseManager().setSearchPath(themeParameters->getValue(WORKING_SCHEMA).toString());

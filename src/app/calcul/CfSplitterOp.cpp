@@ -164,7 +164,7 @@ namespace app
 
             ign::feature::FeatureFilter filterArea(countryCodeName + " LIKE '%#%'");
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
-            boost::progress_display display(numFeatures, std::cout, "[ cp splitter  % complete ]\n");
+            boost::progress_display display(numFeatures, std::cout, "[ splitting areas with cp (section) % complete ]\n");
 
             //--
             std::set<std::string> sArea2Delete;
@@ -174,7 +174,7 @@ namespace app
             {
                 ++display;
                 
-                ign::feature::Feature const& fArea = itArea->next();
+                ign::feature::Feature fArea = itArea->next();
                 ign::geometry::MultiPolygon mp = fArea.getGeometry().asMultiPolygon();
                 std::string idOrigin = fArea.getId();
 
@@ -389,7 +389,7 @@ namespace app
                     ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCl, filterCl);
                     while (itCl->hasNext())
                     {
-                        ign::feature::Feature const& fCl = itCl->next();
+                        ign::feature::Feature fCl = itCl->next();
                         ign::geometry::LineString clGeom = _getClgeometry(fCl, mModifiedCl);
 
                         //DEBUG
@@ -513,7 +513,7 @@ namespace app
             ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCl,filterCl);
             while (itCl->hasNext())
             {
-                ign::feature::Feature const& fCl = itCl->next();
+                ign::feature::Feature fCl = itCl->next();
                 ign::geometry::LineString const& clGeom = fCl.getGeometry().asLineString();
 
                 size_t id = 0;
@@ -562,7 +562,7 @@ namespace app
             std::set<std::string> sMergedCp;
             while (itCp->hasNext())
             {
-                ign::feature::Feature const& fCp = itCp->next();
+                ign::feature::Feature fCp = itCp->next();
                 ign::geometry::Point const& cpGeom = fCp.getGeometry().asPoint();
                 std::string const& country = fCp.getAttribute(countryName).toString();
                 std::string cpId = fCp.getId();
@@ -666,7 +666,7 @@ namespace app
             ign::feature::FeatureFilter filterCl("ST_DISTANCE(" + geomName + ", ST_GeomFromText('" + clGeom.toString() + "')) < 0.1");
             ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCl, filterCl);
             while (itCl->hasNext()) {
-                ign::feature::Feature const& fOtherCl = itCl->next();
+                ign::feature::Feature fOtherCl = itCl->next();
                 ign::geometry::LineString otherClGeom = fOtherCl.getGeometry().asLineString();
 
                 if ( clId == fOtherCl.getId() ) continue;

@@ -103,7 +103,7 @@ namespace app
 				ign::feature::FeatureIteratorPtr itLandmask = ome2::feature::sql::NotDestroyedTools::GetFeatures(*fsLandmask,ign::feature::FeatureFilter("(" + landCoverTypeName + " = '" + landAreaValue + "' OR " + landCoverTypeName + " = '" + inlandwaterValue + "') AND " + countryCodeName + " = '" + vCountry[i] + "'"));
 				while (itLandmask->hasNext())
                 {
-                    ign::feature::Feature const& fLandmask = itLandmask->next();
+                    ign::feature::Feature fLandmask = itLandmask->next();
                     ign::geometry::MultiPolygon const& mp = fLandmask.getGeometry().asMultiPolygon();
 
                     ign::geometry::GeometryPtr bufferGeom(mp.buffer(borderOffset));
@@ -183,14 +183,14 @@ namespace app
 
             ign::feature::FeatureFilter filterArea;
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
-            boost::progress_display display(numFeatures, std::cout, "[ polygon splitter  % complete ]\n");
+            boost::progress_display display(numFeatures, std::cout, "[ splitting polygons % complete ]\n");
 
             ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterArea);
             while (itArea->hasNext())
             {
                 ++display;
                 
-                ign::feature::Feature const& fArea = itArea->next();
+                ign::feature::Feature fArea = itArea->next();
                 ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string idOrigin = fArea.getId();
                 std::string countryCode = fArea.getAttribute(countryCodeName).toString();

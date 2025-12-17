@@ -172,10 +172,10 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutp(
 
 	ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filter);
 	size_t numArea2load = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filter);
-	boost::progress_display display(numArea2load, std::cout, "[ GENERATE CUTTING POINTS ]\n");
+	boost::progress_display display(numArea2load, std::cout, "[ generating cutting points % complete ]\n");
 	while (itArea->hasNext()) {
 		++display;
-		ign::feature::Feature const& fArea = itArea->next();
+		ign::feature::Feature fArea = itArea->next();
 		ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
 		std::string const idOrigin = fArea.getId();
 		std::string const linkedNatId = fArea.getAttribute(natIdIdName).toString();

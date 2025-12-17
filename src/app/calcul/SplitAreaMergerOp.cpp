@@ -148,13 +148,13 @@ namespace app
             ign::feature::FeatureFilter filterArea(wTagName + " IS NOT NULL");
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
 
-            boost::progress_display display1(numFeatures, std::cout, "[ SAM [1/3] searching small areas % complete ]\n");
+            boost::progress_display display1(numFeatures, std::cout, "[ Split Area Merger [1/3] searching small areas % complete ]\n");
             ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
             while (itArea->hasNext())
             {
                 ++display1;
 
-                ign::feature::Feature const& fArea = itArea->next();
+                ign::feature::Feature fArea = itArea->next();
                 ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string areaId = fArea.getId();
                 std::string const& countryCode = fArea.getAttribute(countryCodeName).toString();
@@ -209,13 +209,13 @@ namespace app
 
             if (mergeByNatId) {
 
-                boost::progress_display display2(numFeatures, std::cout, "[ SAM [2/3] gathering areas to merge % complete ]\n");
+                boost::progress_display display2(numFeatures, std::cout, "[ Split Area Merger [2/3] gathering areas to merge % complete ]\n");
                 ign::feature::FeatureIteratorPtr itArea2 = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
                 while (itArea2->hasNext())
                 {
                     ++display2;
 
-                    ign::feature::Feature const& fArea = itArea2->next();
+                    ign::feature::Feature fArea = itArea2->next();
                     ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                     std::string areaId = fArea.getId();
                     std::string identifier = fArea.getAttribute(nationalIdName).toString();
@@ -240,7 +240,7 @@ namespace app
 
             _mergeGroups(vmAreas);
 
-            boost::progress_display display3(vmAreas.size(), std::cout, "[ SAM [3/3] merging areas % complete ]\n");
+            boost::progress_display display3(vmAreas.size(), std::cout, "[ Split Area Merger [3/3] merging areas % complete ]\n");
             for (std::vector<std::map<std::string, ign::feature::Feature>>::iterator vit = vmAreas.begin() ; vit != vmAreas.end() ; ++vit) {
                 ++display3;
 
@@ -339,7 +339,7 @@ namespace app
             
             while (itArea->hasNext())
             {
-                ign::feature::Feature const& fNeighbour = itArea->next();
+                ign::feature::Feature fNeighbour = itArea->next();
                 std::string idNeighbour = fNeighbour.getId();
 
                 if(idNeighbour == areaId) continue;
@@ -379,7 +379,7 @@ namespace app
             
             while (itArea->hasNext())
             {
-                ign::feature::Feature const& fNeighbour = itArea->next();
+                ign::feature::Feature fNeighbour = itArea->next();
                 if(fNeighbour.getId() == areaId) continue;
 
                 vNeighbours.push_back(fNeighbour);

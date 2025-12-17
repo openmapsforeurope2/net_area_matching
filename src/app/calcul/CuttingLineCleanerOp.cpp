@@ -103,7 +103,7 @@ namespace app
             ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCl,filterCl);
             while (itCl->hasNext())
             {
-                ign::feature::Feature const& fCl = itCl->next();
+                ign::feature::Feature fCl = itCl->next();
                 std::string clId = fCl.getId();
                 std::string linkedFeatId = fCl.getAttribute(linkedFeatIdName).toString();
 

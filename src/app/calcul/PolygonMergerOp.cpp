@@ -100,7 +100,7 @@ namespace app
 
             std::list<std::string> lNatIds = _getAllIdentifiers(areaTableName);
 
-            boost::progress_display display(lNatIds.size(), std::cout, "[ polygon merger  % complete ]\n");
+            boost::progress_display display(lNatIds.size(), std::cout, "[ merging polygons % complete ]\n");
             
             for( std::list<std::string>::const_iterator lit = lNatIds.begin(); lit != lNatIds.end() ; ++lit ) {
                 ++display;
@@ -113,7 +113,7 @@ namespace app
                 bool isFirst = true;
                 while (itArea->hasNext())
                 {
-                    ign::feature::Feature const& fArea = itArea->next();
+                    ign::feature::Feature fArea = itArea->next();
                     ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                     std::string idOrigin = fArea.getId();
 

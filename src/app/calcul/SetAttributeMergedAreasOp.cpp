@@ -107,7 +107,7 @@ namespace app
             ign::feature::FeatureFilter filterArea(countryCodeName+" like '%#%'");
 
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
-            boost::progress_display display(numFeatures, std::cout, "[ set attribute merged areas % complete ]\n");
+            boost::progress_display display(numFeatures, std::cout, "[ setting merged areas attributes % complete ]\n");
 
             ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
             while (itArea->hasNext())
@@ -173,7 +173,7 @@ namespace app
 			while (itAreaInit->hasNext())
 			{
 
-				ign::feature::Feature const& fAreaInit = itAreaInit->next();
+				ign::feature::Feature fAreaInit = itAreaInit->next();
 				ign::geometry::MultiPolygon geomAreaInit = fAreaInit.getGeometry().asMultiPolygon();
 				std::string idOriginInit = fAreaInit.getId();
 

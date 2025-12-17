@@ -128,7 +128,7 @@ namespace app
             {
                 ++display;
 
-                ign::feature::Feature const& fArea1 = itArea1->next();
+                ign::feature::Feature fArea1 = itArea1->next();
                 ign::geometry::MultiPolygon const& areaGeom1 = fArea1.getGeometry().asMultiPolygon();
 				std::string const natId1 = fArea1.getAttribute(natIdIdName).toString();
 
@@ -139,7 +139,7 @@ namespace app
 
 				while (itArea2->hasNext())
 				{
-					ign::feature::Feature const& fArea2 = itArea2->next();
+					ign::feature::Feature fArea2 = itArea2->next();
 					ign::geometry::MultiPolygon const& areaGeom2 = fArea2.getGeometry().asMultiPolygon();
 					std::string const natId2 = fArea2.getAttribute(natIdIdName).toString();
 
@@ -174,7 +174,7 @@ namespace app
 
 			while (itArea->hasNext())
 			{
-				ign::feature::Feature const& fArea = itArea->next();
+				ign::feature::Feature fArea = itArea->next();
 				ign::geometry::MultiPolygon const& areaGeom = fArea.getGeometry().asMultiPolygon();
 
 				areaUnionPtr.reset(areaUnionPtr->Union(areaGeom));

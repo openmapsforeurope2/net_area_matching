@@ -145,10 +145,10 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 	ign::feature::FeatureFilter filterCountry(countryCodeName + " = '" + countryCode + "'");
     ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterCountry);
 	size_t numArea2load = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterCountry);
-	boost::progress_display displayGrapLoad(numArea2load, std::cout, "[ LOADING GRAPH AREA "+ countryCode +" ]\n");
+	boost::progress_display displayGrapLoad(numArea2load, std::cout, "[ loading areas graph "+ countryCode +" % complete ]\n");
     while (itArea->hasNext()){
 		++displayGrapLoad;
-        ign::feature::Feature const& fArea = itArea->next();
+        ign::feature::Feature fArea = itArea->next();
         ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
         std::string idOrigin = fArea.getId();
 		for (size_t i = 0; i < mp.numGeometries(); ++i) {
@@ -161,7 +161,7 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 	//--
 	GraphType::edge_iterator eit, eitEnd;
 	graphArea.edges(eit, eitEnd);
-	boost::progress_display displayGenerateCL(graphArea.numEdges(), std::cout, "[ GENERATE CUTTING LINES " + countryCode + " ]\n");
+	boost::progress_display displayGenerateCL(graphArea.numEdges(), std::cout, "[ generating cutting lines " + countryCode + " % complete ]\n");
 	while (eit != eitEnd) {
 		++displayGenerateCL;
 

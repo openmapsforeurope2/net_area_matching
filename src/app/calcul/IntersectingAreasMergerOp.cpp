@@ -101,7 +101,7 @@ namespace app
             ign::feature::FeatureFilter filterArea(countryCodeName+"='"+_vCountry[idCountryRef]+"'");
 
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
-            boost::progress_display display(numFeatures, std::cout, "[ intersecting areas merger (1/2) % complete ]\n");
+            boost::progress_display display(numFeatures, std::cout, "[ merging intersecting areas (1/2) % complete ]\n");
 
             ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
 
@@ -111,7 +111,7 @@ namespace app
             {
                 ++display;
 
-                ign::feature::Feature const& fArea = itArea->next();
+                ign::feature::Feature fArea = itArea->next();
                 ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                 std::string idOrigin = fArea.getId();
 
@@ -128,7 +128,7 @@ namespace app
                     lsAreas2Merge.push_back(sAreas2Merge);
             }
 
-            boost::progress_display display2(lsAreas2Merge.size(), std::cout, "[ intersecting areas merger (2/2) % complete ]\n");
+            boost::progress_display display2(lsAreas2Merge.size(), std::cout, "[ merging intersecting areas (2/2) % complete ]\n");
 
             for (std::list<std::set<std::string>>::const_iterator lit = lsAreas2Merge.begin() ; lit != lsAreas2Merge.end() ; ++lit) {
                 ign::feature::FeatureFilter filterArea(idName + " IN " +_toSqlList(*lit));
@@ -137,7 +137,7 @@ namespace app
                 ign::geometry::GeometryPtr mergedGeomPtr(new ign::geometry::MultiPolygon());
                 while (itArea->hasNext())
                 {
-                    ign::feature::Feature const& fArea = itArea->next();
+                    ign::feature::Feature fArea = itArea->next();
                     ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
 
                     mergedGeomPtr.reset(mergedGeomPtr->Union(mp));
@@ -187,7 +187,7 @@ namespace app
 
                 while (itArea->hasNext())
                 {
-                    ign::feature::Feature const& fArea = itArea->next();
+                    ign::feature::Feature fArea = itArea->next();
                     ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
                     std::string idOrigin = fArea.getId();
 
