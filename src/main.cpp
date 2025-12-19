@@ -113,68 +113,68 @@ int main(int argc, char *argv[])
         //info de connection db
         context->loadEpgParameters( themeParameters->getValue(DB_CONF_FILE).toString() );
         //pour IGN-MUT
-        if( context->getConfigParameters().parameterHasNullValue(HOST) ) 
-            context->getConfigParameters().setParameter(HOST, ign::data::String(ome2::utils::getEnvStr("PGHOST")));
-        if( context->getConfigParameters().parameterHasNullValue(PORT) ) 
-            context->getConfigParameters().setParameter(PORT, ign::data::String(ome2::utils::getEnvStr("PGPORT")));
-        if( context->getConfigParameters().parameterHasNullValue(USER) ) 
-            context->getConfigParameters().setParameter(USER, ign::data::String(ome2::utils::getEnvStr("PGUSER")));
-        if( context->getConfigParameters().parameterHasNullValue(PASSWORD) ) 
-            context->getConfigParameters().setParameter(PASSWORD, ign::data::String(ome2::utils::getEnvStr("PGPASSWORD")));
-        if( context->getConfigParameters().parameterHasNullValue(DATABASE) ) 
-            context->getConfigParameters().setParameter(DATABASE, ign::data::String(ome2::utils::getEnvStr("PGDATABASE")));
+        // if( context->getConfigParameters().parameterHasNullValue(HOST) ) 
+        //     context->getConfigParameters().setParameter(HOST, ign::data::String(ome2::utils::getEnvStr("PGHOST")));
+        // if( context->getConfigParameters().parameterHasNullValue(PORT) ) 
+        //     context->getConfigParameters().setParameter(PORT, ign::data::String(ome2::utils::getEnvStr("PGPORT")));
+        // if( context->getConfigParameters().parameterHasNullValue(USER) ) 
+        //     context->getConfigParameters().setParameter(USER, ign::data::String(ome2::utils::getEnvStr("PGUSER")));
+        // if( context->getConfigParameters().parameterHasNullValue(PASSWORD) ) 
+        //     context->getConfigParameters().setParameter(PASSWORD, ign::data::String(ome2::utils::getEnvStr("PGPASSWORD")));
+        // if( context->getConfigParameters().parameterHasNullValue(DATABASE) ) 
+        //     context->getConfigParameters().setParameter(DATABASE, ign::data::String(ome2::utils::getEnvStr("PGDATABASE")));
 
-        std::cout << context->getConfigParameters().getValue(HOST).toString() << std::endl;
-        std::cout << context->getConfigParameters().getValue(PORT).toString() << std::endl;
-        std::cout << context->getConfigParameters().getValue(USER).toString() << std::endl;
-        std::cout << context->getConfigParameters().getValue(PASSWORD).toString() << std::endl;
-        std::cout << context->getConfigParameters().getValue(DATABASE).toString() << std::endl;
+        // std::cout << context->getConfigParameters().getValue(HOST).toString() << std::endl;
+        // std::cout << context->getConfigParameters().getValue(PORT).toString() << std::endl;
+        // std::cout << context->getConfigParameters().getValue(USER).toString() << std::endl;
+        // std::cout << context->getConfigParameters().getValue(PASSWORD).toString() << std::endl;
+        // std::cout << context->getConfigParameters().getValue(DATABASE).toString() << std::endl;
 
-        std::cout << std::getenv("PGDATABASE") << std::endl;
-        std::cout << std::getenv("PGPASSWORD") << std::endl;
+        // std::cout << std::getenv("PGDATABASE") << std::endl;
+        // std::cout << std::getenv("PGPASSWORD") << std::endl;
 
-        try {
-            PGconn* conn1 = PQconnectdb( "" );
-            bool isOpen1 = (PQstatus(conn1) == CONNECTION_OK);
-            if ( isOpen1 ) {
-                std::cout << "CONNEXION1 OK !!!" << std::endl;
-            }
-            PGresult* res1 = PQexec(conn1, "SET CLIENT_ENCODING TO 'UTF-8'");
-            std::cout << "REQUETE1 OK !!!" << std::endl;
-        } catch( ign::Exception &e )
-        {
-            std::cerr<< e.diagnostic() << std::endl;
-        }
-        catch( std::exception &e )
-        {
-            std::cerr << e.what() << std::endl;
-        }
+        // try {
+        //     PGconn* conn1 = PQconnectdb( "" );
+        //     bool isOpen1 = (PQstatus(conn1) == CONNECTION_OK);
+        //     if ( isOpen1 ) {
+        //         std::cout << "CONNEXION1 OK !!!" << std::endl;
+        //     }
+        //     PGresult* res1 = PQexec(conn1, "SET CLIENT_ENCODING TO 'UTF-8'");
+        //     std::cout << "REQUETE1 OK !!!" << std::endl;
+        // } catch( ign::Exception &e )
+        // {
+        //     std::cerr<< e.diagnostic() << std::endl;
+        // }
+        // catch( std::exception &e )
+        // {
+        //     std::cerr << e.what() << std::endl;
+        // }
         
-        try {
-            std::ostringstream oss;
-            oss << " host = '" << std::getenv("PGHOST") << "'"
-                << " port = '" << std::getenv("PGPORT") << "'"
-                << " dbname = '" << std::getenv("PGDATABASE") << "'"
-                << " user = '" << std::getenv("PGUSER") << "'"
-                << " password = '" << std::getenv("PGPASSWORD") << "'"
-                << " connect_timeout = '5' "
-                << " sslmode = 'disable' ";
+        // try {
+        //     std::ostringstream oss;
+        //     oss << " host = '" << std::getenv("PGHOST") << "'"
+        //         << " port = '" << std::getenv("PGPORT") << "'"
+        //         << " dbname = '" << std::getenv("PGDATABASE") << "'"
+        //         << " user = '" << std::getenv("PGUSER") << "'"
+        //         << " password = '" << std::getenv("PGPASSWORD") << "'"
+        //         << " connect_timeout = '5' "
+        //         << " sslmode = 'disable' ";
 
-            PGconn* conn = PQconnectdb( oss.str().c_str() );
-            bool isOpen = (PQstatus(conn) == CONNECTION_OK);
-            if ( isOpen ) {
-                std::cout << "CONNEXION2 OK !!!" << std::endl;
-            }
-            PGresult* res = PQexec(conn, "SET CLIENT_ENCODING TO 'UTF-8'");
-            std::cout << "REQUETE2 OK !!!" << std::endl;
-        } catch( ign::Exception &e )
-        {
-            std::cerr<< e.diagnostic() << std::endl;
-        }
-        catch( std::exception &e )
-        {
-            std::cerr << e.what() << std::endl;
-        }
+        //     PGconn* conn = PQconnectdb( oss.str().c_str() );
+        //     bool isOpen = (PQstatus(conn) == CONNECTION_OK);
+        //     if ( isOpen ) {
+        //         std::cout << "CONNEXION2 OK !!!" << std::endl;
+        //     }
+        //     PGresult* res = PQexec(conn, "SET CLIENT_ENCODING TO 'UTF-8'");
+        //     std::cout << "REQUETE2 OK !!!" << std::endl;
+        // } catch( ign::Exception &e )
+        // {
+        //     std::cerr<< e.diagnostic() << std::endl;
+        // }
+        // catch( std::exception &e )
+        // {
+        //     std::cerr << e.what() << std::endl;
+        // }
 
         //epg logger
         epg::log::EpgLogger* logger = epg::log::EpgLoggerS::getInstance();
