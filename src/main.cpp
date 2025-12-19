@@ -17,9 +17,10 @@
 #include <app/params/ThemeParameters.h>
 #include <app/step/tools/initSteps.h>
 
+//DEBUG
+#include <libpq-fe.h>
 
 namespace po = boost::program_options;
-
 
 int main(int argc, char *argv[])
 {
@@ -122,6 +123,32 @@ int main(int argc, char *argv[])
             context->getConfigParameters().setParameter(PASSWORD, ign::data::String(ome2::utils::getEnvStr("PGPASSWORD")));
         if( context->getConfigParameters().parameterHasNullValue(DATABASE) ) 
             context->getConfigParameters().setParameter(DATABASE, ign::data::String(ome2::utils::getEnvStr("PGDATABASE")));
+
+        std::cout << context->getConfigParameters().getValue(HOST).toString() << std::endl;
+        std::cout << context->getConfigParameters().getValue(PORT).toString() << std::endl;
+        std::cout << context->getConfigParameters().getValue(USER).toString() << std::endl;
+        std::cout << context->getConfigParameters().getValue(PASSWORD).toString() << std::endl;
+        std::cout << context->getConfigParameters().getValue(DATABASE).toString() << std::endl;
+
+        std::cout << std::getenv("PGDATABASE") << std::endl;
+        std::cout << std::getenv("PGPASSWORD") << std::endl;
+
+        std::ostringstream oss;
+        oss << " host = '" << std::getenv("PGHOST") << "'"
+            << " port = '" << std::getenv("PGPORT") << "'"
+            << " dbname = '" << std::getenv("PGDATABASE") << "'"
+            << " user = '" << std::getenv("PGUSER") << "'"
+            << " password = '" << std::getenv("PGPASSWORD") << "'"
+            << " connect_timeout = '5' "
+            << " sslmode = 'disable' ";
+
+        PGconn* conn = PQconnectdb( oss.str().c_str() );
+        bool isOpen = (PQstatus(conn) == CONNECTION_OK);
+        if ( isOpen ) {
+            std::cout << "CONNEXION OK !!!" << std::endl;
+        }
+        PGresult* res = PQexec(conn, "SET CLIENT_ENCODING TO 'UTF-8'");
+        std::cout << "REQUETE OK !!!" << std::endl;
 
         //epg logger
         epg::log::EpgLogger* logger = epg::log::EpgLoggerS::getInstance();
