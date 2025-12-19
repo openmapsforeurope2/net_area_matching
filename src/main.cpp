@@ -133,6 +133,14 @@ int main(int argc, char *argv[])
         std::cout << std::getenv("PGDATABASE") << std::endl;
         std::cout << std::getenv("PGPASSWORD") << std::endl;
 
+        PGconn* conn1 = PQconnectdb( "" );
+        bool isOpen1 = (PQstatus(conn1) == CONNECTION_OK);
+        if ( isOpen1 ) {
+            std::cout << "CONNEXION OK !!!" << std::endl;
+        }
+        PGresult* res1 = PQexec(conn1, "SET CLIENT_ENCODING TO 'UTF-8'");
+        std::cout << "REQUETE OK !!!" << std::endl;
+
         std::ostringstream oss;
         oss << " host = '" << std::getenv("PGHOST") << "'"
             << " port = '" << std::getenv("PGPORT") << "'"
