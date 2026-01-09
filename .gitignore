@@ -7,3 +7,4 @@ core
 config/db_conf*
 !config/db_conf.ini.template
 package/*
+config_tmp

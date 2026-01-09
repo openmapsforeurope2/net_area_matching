@@ -134,23 +134,6 @@ int main(int argc, char *argv[])
         // std::cout << std::getenv("PGPASSWORD") << std::endl;
 
         // try {
-        //     PGconn* conn1 = PQconnectdb( "" );
-        //     bool isOpen1 = (PQstatus(conn1) == CONNECTION_OK);
-        //     if ( isOpen1 ) {
-        //         std::cout << "CONNEXION1 OK !!!" << std::endl;
-        //     }
-        //     PGresult* res1 = PQexec(conn1, "SET CLIENT_ENCODING TO 'UTF-8'");
-        //     std::cout << "REQUETE1 OK !!!" << std::endl;
-        // } catch( ign::Exception &e )
-        // {
-        //     std::cerr<< e.diagnostic() << std::endl;
-        // }
-        // catch( std::exception &e )
-        // {
-        //     std::cerr << e.what() << std::endl;
-        // }
-        
-        // try {
         //     std::ostringstream oss;
         //     oss << " host = '" << std::getenv("PGHOST") << "'"
         //         << " port = '" << std::getenv("PGPORT") << "'"
@@ -161,12 +144,61 @@ int main(int argc, char *argv[])
         //         << " sslmode = 'disable' ";
 
         //     PGconn* conn = PQconnectdb( oss.str().c_str() );
-        //     bool isOpen = (PQstatus(conn) == CONNECTION_OK);
-        //     if ( isOpen ) {
-        //         std::cout << "CONNEXION2 OK !!!" << std::endl;
+        //     switch (PQstatus(conn))
+        //     {
+        //         case CONNECTION_OK:
+        //         {
+        //             std::cout<<"CONNECTION_OK"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_BAD:
+        //         {
+        //             std::cout<<"CONNECTION_BAD"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_STARTED:
+        //         {
+        //             std::cout<<"CONNECTION_STARTED"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_MADE:
+        //         {
+        //             std::cout<<"CONNECTION_MADE"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_AWAITING_RESPONSE:
+        //         {
+        //             std::cout<<"CONNECTION_AWAITING_RESPONSE"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_AUTH_OK:
+        //         {
+        //             std::cout<<"CONNECTION_AUTH_OK"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_SETENV:
+        //         {
+        //             std::cout<<"CONNECTION_SETENV"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_SSL_STARTUP:
+        //         {
+        //             std::cout<<"CONNECTION_SSL_STARTUP"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_NEEDED:
+        //         {
+        //             std::cout<<"CONNECTION_NEEDED"<<std::endl;
+        //             break;
+        //         }
         //     }
+
+        //     if (PQstatus(conn) != CONNECTION_OK) {
+        //         std::cout << PQerrorMessage(conn) << std::endl;
+        //     }
+
         //     PGresult* res = PQexec(conn, "SET CLIENT_ENCODING TO 'UTF-8'");
-        //     std::cout << "REQUETE2 OK !!!" << std::endl;
+        //     std::cout << "REQUETE1 OK !!!" << std::endl;
         // } catch( ign::Exception &e )
         // {
         //     std::cerr<< e.diagnostic() << std::endl;
@@ -176,6 +208,71 @@ int main(int argc, char *argv[])
         //     std::cerr << e.what() << std::endl;
         // }
 
+        // try {
+        //     PGconn* conn1 = PQconnectdb( "" );
+        //     switch (PQstatus(conn1))
+        //     {
+        //         case CONNECTION_OK:
+        //         {
+        //             std::cout<<"CONNECTION_OK"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_BAD:
+        //         {
+        //             std::cout<<"CONNECTION_BAD"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_STARTED:
+        //         {
+        //             std::cout<<"CONNECTION_STARTED"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_MADE:
+        //         {
+        //             std::cout<<"CONNECTION_MADE"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_AWAITING_RESPONSE:
+        //         {
+        //             std::cout<<"CONNECTION_AWAITING_RESPONSE"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_AUTH_OK:
+        //         {
+        //             std::cout<<"CONNECTION_AUTH_OK"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_SETENV:
+        //         {
+        //             std::cout<<"CONNECTION_SETENV"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_SSL_STARTUP:
+        //         {
+        //             std::cout<<"CONNECTION_SSL_STARTUP"<<std::endl;
+        //             break;
+        //         }
+        //         case CONNECTION_NEEDED:
+        //         {
+        //             std::cout<<"CONNECTION_NEEDED"<<std::endl;
+        //             break;
+        //         }
+        //     }
+        //     if (PQstatus(conn1) != CONNECTION_OK) {
+        //         std::cout << PQerrorMessage(conn1) << std::endl;
+        //     }
+
+        //     PGresult* res1 = PQexec(conn1, "SET CLIENT_ENCODING TO 'UTF-8'");
+        //     std::cout << "REQUETE2 OK !!!" << std::endl;
+        // } catch( ign::Exception &e )
+        // {
+        //     std::cerr<< e.diagnostic() << std::endl;
+        // }
+        // catch( std::exception &e )
+        // {
+        //     std::cerr << e.what() << std::endl;
+        // }
+        
         //epg logger
         epg::log::EpgLogger* logger = epg::log::EpgLoggerS::getInstance();
         // logger->setProdOfstream( logDirectory+"/au_merging.log" );
