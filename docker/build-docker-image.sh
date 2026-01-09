@@ -1,3 +1,4 @@
+#!/bin/sh
 DOCKER_NAME=net_area_matching
 
 GIT_BRANCH=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')

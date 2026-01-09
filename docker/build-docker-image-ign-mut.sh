@@ -1,4 +1,5 @@
 
+#!/bin/sh
 if [ -d "../config_tmp" ]; then
     echo "WARNING : folder config_tmp deletion"
     mv ../config_tmp/db_conf* ../config

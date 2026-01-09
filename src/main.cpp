@@ -295,7 +295,9 @@ int main(int argc, char *argv[])
 		themeParameters->setParameter(AREA_TABLE_INIT_CLEANED, ign::data::String(areaTableNameInitCleaned));
 
         //set BDD search path
+        context->setVerboseDataBaseManager(true);
         context->getDataBaseManager().setSearchPath(themeParameters->getValue(WORKING_SCHEMA).toString());
+        context->setVerboseDataBaseManager(false);
         ome2::utils::setTableName<app::params::ThemeParametersS>(LANDMASK_TABLE);
         ome2::utils::setTableName<epg::params::EpgParametersS>(TARGET_BOUNDARY_TABLE);
 
