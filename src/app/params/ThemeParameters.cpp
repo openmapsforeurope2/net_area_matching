@@ -35,6 +35,7 @@ namespace params{
 		_initParameter( INTERSECTION_AREA_TABLE, "INTERSECTION_AREA_TABLE" );
 
 		_initParameter( PC_LANDMASK_BUFFER, "PC_LANDMASK_BUFFER" );
+		_initParameter( PC_COUNTRY_BUFFER, "PC_COUNTRY_BUFFER" );
 		
 		_initParameter( CUTP_TABLE_SUFFIX, "CUTP_TABLE_SUFFIX" );
 		_initParameter( CUTL_TABLE_SUFFIX, "CUTL_TABLE_SUFFIX" );

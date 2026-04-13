@@ -83,6 +83,7 @@ namespace app
             std::string const landCoverTypeName = themeParameters->getValue(LAND_COVER_TYPE_NAME).toString();
 			std::string const landAreaValue = themeParameters->getValue(TYPE_LAND_AREA).toString();
 			std::string const inlandwaterValue = themeParameters->getValue(TYPE_INLAND_WATER).toString();
+			double const countryBufferRadius = themeParameters->getValue(PC_COUNTRY_BUFFER).toDouble();
 
             // on recupere un buffer autour de la frontiere
             ign::geometry::GeometryPtr boundBuffPtr(new ign::geometry::Polygon());
@@ -95,7 +96,7 @@ namespace app
                 ign::feature::Feature fBoundary = itBoundary->next();
                 ign::geometry::LineString const& ls = fBoundary.getGeometry().asLineString();
 
-                ign::geometry::GeometryPtr tmpBuffPtr(ls.buffer(1000));
+                ign::geometry::GeometryPtr tmpBuffPtr(ls.buffer(countryBufferRadius));
 
                 boundBuffPtr.reset(boundBuffPtr->Union(*tmpBuffPtr));
             }

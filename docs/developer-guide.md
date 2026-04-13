@@ -206,15 +206,16 @@ Paramètres utilisés:
 | LAND_COVER_TYPE_NAME   | nom du champ désignant le type de couverture du sol   |
 | LAND_COVER_TYPE_VALUE  | valeur pour le type de couverture de sol              |
 | PC_DISTANCE_THRESHOLD  | seuil d'éloigenement minimum des surfaces à supprimer |
+| PC_COUNTRY_BUFFER      | rayon du buffer de travail simplifiant l'emprise nationale servant à déterminer si un polygone est dans son pays |
 
 
 L'objectif est ici de supprimer les surfaces hors de leur pays qui s'éloignent de plus d'une certaine distance de ce dernier. Afin de calculer si une surface dépasse un seuil d'éloignement on calcul la demi-distance de Hausdorff entre la surface et la frontière.
 
 ![320_2_with_key](images/320_2_with_key.png)
 
-Dans un soucis d'optimisation, à l'initialisation de l'opérateur est calculée une surface de travail qui correspond à la zone frontalière du pays traité. Cette zone est calculée par intersection entre la surface du pays et un buffer autour de la frontière. Deplus, afin d'accélérer la calcul de la distance de Hausdorff entre les surfaces et la frontière cette dernière est encapsulé dans la classe de calcul **epg::tools::MultiLineStringTool** qui réalise une indexation spatiale et qui permet de couper l'effort de calcul en cas de dépassant d'un seuil d'éloignement.
+Dans un soucis d'optimisation, à l'initialisation de l'opérateur est calculée une surface de travail qui correspond à la zone frontalière du pays traité. Cette zone est calculée par intersection entre la surface du pays et un buffer autour de la frontière. De plus, afin d'accélérer la calcul de la distance de Hausdorff entre les surfaces et la frontière cette dernière est encapsulé dans la classe de calcul **epg::tools::MultiLineStringTool** qui réalise une indexation spatiale et qui permet de couper l'effort de calcul en cas de dépassant d'un seuil d'éloignement.
 
-_Attention : il faut veiller à ce que le rayon du buffer (la profondeur de la zone de travail) soit égal ou supérieur à la distance d'extraction (paramètre de la fonction data-tools::border_extract), afin de ne pas supprimer des objets qui seraient situés à l'intérieur du pays._
+_Attention : il faut veiller à ce que le rayon _PC_COUNTRY_BUFFER_ du buffer national (i.e. la profondeur de l'emprise nationale simplifiée) soit suffisamment grand pour ne pas supprimer des objets qui seraient situés à l'intérieur de leur pays (cette distance doit être au moins également à la distance d'extraction - paramètre de la fonction data-tools::border_extract - voir supérieure dans certain cas particuliers)._
 
 
 ##### 3) Fusion des surfaces découpées

@@ -133,19 +133,19 @@ namespace geometry{
 			sTreatedFaces.insert(*fit);
 
 			//DEBUG
-			ign::geometry::Polygon faceG = _graph.getGeometry( *fit );
-			if (faceG.intersects(ign::geometry::Point(4017319.3,3084558.2))) {
-				bool test = true;
-			}
-			if (faceG.intersects(ign::geometry::Point(4017264.2803,3084799.8512))) {
-				bool test = true;
-			}
-			if (faceG.intersects(ign::geometry::Point(4017264.13,3084790.79))) {
-				bool test = true;
-			}
-			if (faceG.intersects(ign::geometry::Point(4017259.3258,3084743.6678))) {
-				bool test = true;
-			}
+			// ign::geometry::Polygon faceG = _graph.getGeometry( *fit );
+			// if (faceG.intersects(ign::geometry::Point(4017319.3,3084558.2))) {
+			// 	bool test = true;
+			// }
+			// if (faceG.intersects(ign::geometry::Point(4017264.2803,3084799.8512))) {
+			// 	bool test = true;
+			// }
+			// if (faceG.intersects(ign::geometry::Point(4017264.13,3084790.79))) {
+			// 	bool test = true;
+			// }
+			// if (faceG.intersects(ign::geometry::Point(4017259.3258,3084743.6678))) {
+			// 	bool test = true;
+			// }
 
 			oriented_edge_descriptor startEdge = _graph.getIncidentEdge( *fit );
 			oriented_edge_descriptor nextEdge = startEdge;

@@ -17,9 +17,6 @@
 #include <app/params/ThemeParameters.h>
 #include <app/step/tools/initSteps.h>
 
-//DEBUG
-#include <libpq-fe.h>
-
 namespace po = boost::program_options;
 
 int main(int argc, char *argv[])
@@ -112,167 +109,7 @@ int main(int argc, char *argv[])
 
         //info de connection db
         context->loadEpgParameters( themeParameters->getValue(DB_CONF_FILE).toString() );
-        //pour IGN-MUT
-        // if( context->getConfigParameters().parameterHasNullValue(HOST) ) 
-        //     context->getConfigParameters().setParameter(HOST, ign::data::String(ome2::utils::getEnvStr("PGHOST")));
-        // if( context->getConfigParameters().parameterHasNullValue(PORT) ) 
-        //     context->getConfigParameters().setParameter(PORT, ign::data::String(ome2::utils::getEnvStr("PGPORT")));
-        // if( context->getConfigParameters().parameterHasNullValue(USER) ) 
-        //     context->getConfigParameters().setParameter(USER, ign::data::String(ome2::utils::getEnvStr("PGUSER")));
-        // if( context->getConfigParameters().parameterHasNullValue(PASSWORD) ) 
-        //     context->getConfigParameters().setParameter(PASSWORD, ign::data::String(ome2::utils::getEnvStr("PGPASSWORD")));
-        // if( context->getConfigParameters().parameterHasNullValue(DATABASE) ) 
-        //     context->getConfigParameters().setParameter(DATABASE, ign::data::String(ome2::utils::getEnvStr("PGDATABASE")));
-
-        // std::cout << context->getConfigParameters().getValue(HOST).toString() << std::endl;
-        // std::cout << context->getConfigParameters().getValue(PORT).toString() << std::endl;
-        // std::cout << context->getConfigParameters().getValue(USER).toString() << std::endl;
-        // std::cout << context->getConfigParameters().getValue(PASSWORD).toString() << std::endl;
-        // std::cout << context->getConfigParameters().getValue(DATABASE).toString() << std::endl;
-
-        // std::cout << std::getenv("PGDATABASE") << std::endl;
-        // std::cout << std::getenv("PGPASSWORD") << std::endl;
-
-        // try {
-        //     std::ostringstream oss;
-        //     oss << " host = '" << std::getenv("PGHOST") << "'"
-        //         << " port = '" << std::getenv("PGPORT") << "'"
-        //         << " dbname = '" << std::getenv("PGDATABASE") << "'"
-        //         << " user = '" << std::getenv("PGUSER") << "'"
-        //         << " password = '" << std::getenv("PGPASSWORD") << "'"
-        //         << " connect_timeout = '5' "
-        //         << " sslmode = 'disable' ";
-
-        //     PGconn* conn = PQconnectdb( oss.str().c_str() );
-        //     switch (PQstatus(conn))
-        //     {
-        //         case CONNECTION_OK:
-        //         {
-        //             std::cout<<"CONNECTION_OK"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_BAD:
-        //         {
-        //             std::cout<<"CONNECTION_BAD"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_STARTED:
-        //         {
-        //             std::cout<<"CONNECTION_STARTED"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_MADE:
-        //         {
-        //             std::cout<<"CONNECTION_MADE"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_AWAITING_RESPONSE:
-        //         {
-        //             std::cout<<"CONNECTION_AWAITING_RESPONSE"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_AUTH_OK:
-        //         {
-        //             std::cout<<"CONNECTION_AUTH_OK"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_SETENV:
-        //         {
-        //             std::cout<<"CONNECTION_SETENV"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_SSL_STARTUP:
-        //         {
-        //             std::cout<<"CONNECTION_SSL_STARTUP"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_NEEDED:
-        //         {
-        //             std::cout<<"CONNECTION_NEEDED"<<std::endl;
-        //             break;
-        //         }
-        //     }
-
-        //     if (PQstatus(conn) != CONNECTION_OK) {
-        //         std::cout << PQerrorMessage(conn) << std::endl;
-        //     }
-
-        //     PGresult* res = PQexec(conn, "SET CLIENT_ENCODING TO 'UTF-8'");
-        //     std::cout << "REQUETE1 OK !!!" << std::endl;
-        // } catch( ign::Exception &e )
-        // {
-        //     std::cerr<< e.diagnostic() << std::endl;
-        // }
-        // catch( std::exception &e )
-        // {
-        //     std::cerr << e.what() << std::endl;
-        // }
-
-        // try {
-        //     PGconn* conn1 = PQconnectdb( "" );
-        //     switch (PQstatus(conn1))
-        //     {
-        //         case CONNECTION_OK:
-        //         {
-        //             std::cout<<"CONNECTION_OK"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_BAD:
-        //         {
-        //             std::cout<<"CONNECTION_BAD"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_STARTED:
-        //         {
-        //             std::cout<<"CONNECTION_STARTED"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_MADE:
-        //         {
-        //             std::cout<<"CONNECTION_MADE"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_AWAITING_RESPONSE:
-        //         {
-        //             std::cout<<"CONNECTION_AWAITING_RESPONSE"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_AUTH_OK:
-        //         {
-        //             std::cout<<"CONNECTION_AUTH_OK"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_SETENV:
-        //         {
-        //             std::cout<<"CONNECTION_SETENV"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_SSL_STARTUP:
-        //         {
-        //             std::cout<<"CONNECTION_SSL_STARTUP"<<std::endl;
-        //             break;
-        //         }
-        //         case CONNECTION_NEEDED:
-        //         {
-        //             std::cout<<"CONNECTION_NEEDED"<<std::endl;
-        //             break;
-        //         }
-        //     }
-        //     if (PQstatus(conn1) != CONNECTION_OK) {
-        //         std::cout << PQerrorMessage(conn1) << std::endl;
-        //     }
-
-        //     PGresult* res1 = PQexec(conn1, "SET CLIENT_ENCODING TO 'UTF-8'");
-        //     std::cout << "REQUETE2 OK !!!" << std::endl;
-        // } catch( ign::Exception &e )
-        // {
-        //     std::cerr<< e.diagnostic() << std::endl;
-        // }
-        // catch( std::exception &e )
-        // {
-        //     std::cerr << e.what() << std::endl;
-        // }
-        
+       
         //epg logger
         epg::log::EpgLogger* logger = epg::log::EpgLoggerS::getInstance();
         // logger->setProdOfstream( logDirectory+"/au_merging.log" );
@@ -295,12 +132,9 @@ int main(int argc, char *argv[])
 		themeParameters->setParameter(AREA_TABLE_INIT_CLEANED, ign::data::String(areaTableNameInitCleaned));
 
         //set BDD search path
-        context->setVerboseDataBaseManager(true);
         context->getDataBaseManager().setSearchPath(themeParameters->getValue(WORKING_SCHEMA).toString());
-        context->setVerboseDataBaseManager(false);
         ome2::utils::setTableName<app::params::ThemeParametersS>(LANDMASK_TABLE);
         ome2::utils::setTableName<epg::params::EpgParametersS>(TARGET_BOUNDARY_TABLE);
-
         
 		logger->log(epg::log::INFO, "[START HY MATCHING PROCESS ] " + epg::tools::TimeTools::getTime());
         
@@ -311,7 +145,7 @@ int main(int argc, char *argv[])
     }
     catch( ign::Exception &e )
     {
-        std::cerr<< e.diagnostic() << std::endl;
+        std::cerr << e.diagnostic() << std::endl;
         epg::log::EpgLoggerS::getInstance()->log( epg::log::ERROR, std::string(e.diagnostic()));
         logFile << e.diagnostic() << std::endl;
         returnValue = 1;
@@ -325,9 +159,11 @@ int main(int argc, char *argv[])
     }
     
     logFile << "[END] " << epg::tools::TimeTools::getTime() << std::endl;
+    
     epg::ContextS::kill();
     epg::log::EpgLoggerS::kill();
     epg::log::ShapeLoggerS::kill();
+    epg::params::EpgParametersS::kill();
     app::params::ThemeParametersS::kill();
 
     logFile.close();
