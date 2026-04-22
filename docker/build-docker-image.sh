@@ -23,3 +23,4 @@ fi
 echo $NB_PROC
 
 DOCKER_BUILDKIT=1 docker build --no-cache --build-arg GIT_BRANCH=$GIT_BRANCH --build-arg NB_PROC=$NB_PROC -t $DOCKER_NAME:$DOCKER_TAG -f Dockerfile ./..
+

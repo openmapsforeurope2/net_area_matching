@@ -12,7 +12,11 @@ RUN apt-get update -y \
                        pax-utils \
  && rm -rf /var/lib/apt/lists/*
 
-ENV APP_DIR_SRC=/usr/local/src/net_area_matching/                                              
+ENV APP_DIR_SRC=/usr/local/src/net_area_matching/
+
+WORKDIR $APP_DIR_SRC
+
+COPY . .
 
 ENV CONFIG=Release
 RUN ./build-unix.sh

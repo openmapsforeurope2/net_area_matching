@@ -39,6 +39,8 @@ namespace app
         {
             _shapeLogger->closeShape("pc_deleted_area");
             _shapeLogger->closeShape("pc_country");
+
+            delete _boundaryTool;
         }
 
         ///
