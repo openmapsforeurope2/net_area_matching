@@ -1,6 +1,6 @@
 # Introduction
 
-La présente documentation, à destination des développeurs, a pour objectif de présenter le détail du fonctionnement du processus de mise en cohérences des surfaciques aux frontières ainsi que les principaux outils mis en oeuvre.
+La présente documentation, à destination des développeurs, a pour objectif de présenter le détail du fonctionnement du processus de mise en cohérences des données de type réseau surfacique aux frontières ainsi que les principaux outils mis en oeuvre.
 
 # Installation
 
@@ -29,18 +29,7 @@ Cette bibliothèque, développée à l'IGN et s'appuyant essentiellement sur le 
 Elle comporte essentiellement des fonctions de généralisations, des fonctions utiles au management du processus tels que des utilitaires de log, d'orchestration, de gestion du contexte).
 On y trouve également des opérateurs permettant d'encapsuler des objets géométriques complexes afin d'en optimiser la manipulation (par l'utilisation de graphes, d'indexes...) et ainsi d'accroitre les performances globales des processus.
 
-Le code source de la bibliothèque libepg ce trouve sur le dépôt [libepg](http://gitlab.dockerforge.ign.fr/europe/libepg.git)
-
-
-# Configuration
-
-L'outil s'appuie sur de nombreux paramètres de configuration permettant d'adapter le comportement des algorithmes en fonctions des spécificités nationales (sémantique, précision, échelle, conventions de modélisation...).
-
-On trouve dans le [dossier de configuration](https://github.com/openmapsforeurope2/net_area_matching/tree/main/config) les fichiers suivants :
-
-- epg_parameters.ini : regroupe des paramètres de base issus de la bibliothèque libepg qui constitue le socle de développement l'outil. Ce fichier est aussi le fichier chapeau qui pointe vers les autres fichiers de configurations.
-- db_conf.ini : informations de connexion à la base de données.
-- theme_parameters.ini : configuration des paramètres spécifiques à l'application.
+Le code source de la bibliothèque libepg ce trouve sur le dépôt [libepg](https://github.com/IGNF/libepg.git)
 
 
 # Fonctionnement du processus
@@ -84,6 +73,16 @@ Les étapes qui composent le traitement de mise en cohérence sont les suivantes
 **399** - export des surfaces de type 'standing water'
 
 L'outil **epg::step::StepSuite** donne la possibilité de ne lancer que certaines étapes ou une plage de plusieurs étapes.
+
+## Configuration
+
+L'outil s'appuie sur de nombreux paramètres de configuration permettant d'adapter le comportement des algorithmes en fonctions des spécificités nationales (sémantique, précision, échelle, conventions de modélisation...).
+
+On trouve dans le [dossier de configuration](https://github.com/openmapsforeurope2/net_area_matching/tree/main/config) les fichiers suivants :
+
+- epg_parameters.ini : regroupe des paramètres de base issus de la bibliothèque libepg qui constitue le socle de développement l'outil. Ce fichier est aussi le fichier chapeau qui pointe vers les autres fichiers de configurations.
+- db_conf.ini : informations de connexion à la base de données.
+- theme_parameters.ini : configuration des paramètres spécifiques à l'application.
 
 ## Lancement du traitement
 
