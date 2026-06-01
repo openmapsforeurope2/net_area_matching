@@ -191,6 +191,7 @@ Parameters used:
 | LAND_COVER_TYPE_NAME   | name of the land cover type field                     |
 | LAND_COVER_TYPE_VALUE  | value for the land cover type                         |
 | PC_DISTANCE_THRESHOLD  | minimum distance threshold for removing areas         |
+| PC_COUNTRY_BUFFER      | Radius of the work buffer used to simplify the national extent used to determine if a polygon is inside its country |
 
 Areas outside their country and further than a certain threshold are removed.
 
@@ -198,7 +199,7 @@ Areas outside their country and further than a certain threshold are removed.
 
 For optimization, a working area corresponding to the border zone of the country is precomputed as the intersection of a buffer and the national landmask.
 
-_Note: the buffer radius (work zone depth) must be greater than or equal to the extraction distance (data-tools::border_extract parameter)._
+_Note: the buffer radius _PC_COUNTRY_BUFFER_ (work zone depth) must be greater than or equal to the extraction distance (data-tools::border_extract parameter)._
 
 ##### 3) Merging Split Areas
 
