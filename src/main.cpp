@@ -11,7 +11,6 @@
 
 //OME2
 #include <ome2/utils/setTableName.h>
-#include <ome2/utils/getEnvStr.h>
 
 //APP
 #include <app/params/ThemeParameters.h>

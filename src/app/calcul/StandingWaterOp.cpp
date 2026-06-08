@@ -117,14 +117,14 @@ namespace app
 			context->getDataBaseManager().refreshFeatureStore(_fsArea->getTableName(),idName, geomName);
 
 			//--
-			ign::feature::FeatureFilter filterCountries("(" + countryCodeName + " = '" + _vCountriesCodeName[0] + "' or " + countryCodeName + " = '" + _vCountriesCodeName[1] + "')");
+			ign::feature::FeatureFilter filterCountries("(" + countryCodeName + " LIKE '%" + _vCountriesCodeName[0] + "%' or " + countryCodeName + " LIKE '%" + _vCountriesCodeName[1] + "%')");
 
 			int numFeaturesStandingWater = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsAreaStandingWater, filterCountries);
 			boost::progress_display display(numFeaturesStandingWater, std::cout, "[ importing standing waters % complete ]\n");
 
 			std::set<std::string> sIdStandingArea2delete;
 
-			ign::feature::FeatureIteratorPtr itStandingArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsAreaStandingWater,filterCountries);
+			ign::feature::FeatureIteratorPtr itStandingArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsAreaStandingWater, filterCountries);
 			while (itStandingArea->hasNext()) {
 				++display;
 				ign::feature::Feature fStandingArea = itStandingArea->next();
