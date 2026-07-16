@@ -24,8 +24,7 @@ namespace calcul{
         /// @param verbose Mode verbeux
 		GenerateCuttingPointsOp(
             std::string const& borderCode,
-            bool verbose,
-			bool resetCpTable = true
+            bool verbose
         );
 
         /// @brief Destructeur
@@ -37,21 +36,17 @@ namespace calcul{
 		/// proximité d'une de ces extrémités, le cutting point n'est pas créé.
 		/// @param borderCode Code frontière (code double)
 		/// @param verbose Mode verbeux
-		/// @param resetCpTable Booléen indiquant si la table des cutting points doit être préalablement supprimée avant d'être re-créée
 		static void ComputeByCountry(
 			std::string const& borderCode,
-            bool verbose,
-			bool resetCpTable = true
+            bool verbose
 		);
 
 		/// @brief Génération des cutting points pays par pays. Les cuttings points correspondent
 		/// aux extrémités des axes médians des surfaces. Si une cutting line existe déjà à 
 		/// proximité d'une de ces extrémités, le cutting point n'est pas créé.
 		/// @param verbose Mode verbeux
-		/// @param resetCpTable Booléen indiquant si la table des cutting points doit être préalablement supprimée avant d'être re-créée
 		static void Compute(
-            bool verbose,
-			bool resetCpTable = true
+            bool verbose
 		);
 
 
@@ -74,7 +69,7 @@ namespace calcul{
 	private:
 
 		//--
-		void _init(bool resetCpTable);
+		void _init();
 
 		//--
 		void _computeByCountry() const;

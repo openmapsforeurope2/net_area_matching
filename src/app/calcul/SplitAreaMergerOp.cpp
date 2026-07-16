@@ -137,7 +137,7 @@ namespace app
             double const areaThreshold = themeParameters->getValue(SAM_SMALL_AREA_THRESHOLD).toDouble();
             double const lengthThreshold = themeParameters->getValue(SAM_SMALL_AREA_LENGTH_THRESHOLD).toDouble();
             std::string const nationalIdName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
-			std::string const wTagName = themeParameters->getParameter(W_TAG_NAME).getValue().toString();
+			std::string const wTagName = themeParameters->getValue(W_TAG_NAME).toString();
 
             // paquets de areas a merger
             std::vector<std::map<std::string, ign::feature::Feature>> vmAreas;
@@ -149,7 +149,7 @@ namespace app
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
 
             boost::progress_display display1(numFeatures, std::cout, "[ Split Area Merger [1/3] searching small areas % complete ]\n");
-            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterArea);
             while (itArea->hasNext())
             {
                 ++display1;
@@ -165,7 +165,7 @@ namespace app
 
                 double length = _getLength(mp);
 
-                if( length > lengthThreshold && countryCode.find("#") == std::string::npos ) continue;
+                if( length > lengthThreshold && countryCode != "#" ) continue;
 
                 mSortedSmallAreas.insert(std::make_pair(area, fArea));
                 sSmallAreas.insert(fArea.getId());
@@ -178,11 +178,11 @@ namespace app
                 
                 std::map<double, ign::feature::Feature> mNeighbours = _getNeighboursWithArea(rmit->second, filterArea); // TODO confirmer qu'on cherche les voisins "w_tag IS NOT NULL" et non country LIKE%#%
 
-                if ( rmit->second.getAttribute(countryCodeName).toString().find("#") != std::string::npos ) {
+                if ( rmit->second.getAttribute(countryCodeName).toString() == "#" ) {
                     //petite surface #, on elimine les candidats qui ne sont pas #
                     std::map<double, ign::feature::Feature>::const_iterator mit = mNeighbours.begin();
                     while ( mit != mNeighbours.end() ) {
-                        if ( mit->second.getAttribute(countryCodeName).toString().find("#") == std::string::npos ) {
+                        if ( mit->second.getAttribute(countryCodeName).toString() != "#" ) {
                             mit = mNeighbours.erase(mit);
                         } else {
                             ++mit;
@@ -210,7 +210,7 @@ namespace app
             if (mergeByNatId) {
 
                 boost::progress_display display2(numFeatures, std::cout, "[ Split Area Merger [2/3] gathering areas to merge % complete ]\n");
-                ign::feature::FeatureIteratorPtr itArea2 = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
+                ign::feature::FeatureIteratorPtr itArea2 = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterArea);
                 while (itArea2->hasNext())
                 {
                     ++display2;

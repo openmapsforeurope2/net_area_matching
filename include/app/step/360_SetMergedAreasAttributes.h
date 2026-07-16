@@ -1,5 +1,5 @@
-#ifndef _APP_STEP_GETATTRIBUTESMERGEDAREAS_H_
-#define _APP_STEP_GETATTRIBUTESMERGEDAREAS_H_
+#ifndef _APP_STEP_SETMERGEDAREASATTRIBUTES_H_
+#define _APP_STEP_SETMERGEDAREASATTRIBUTES_H_
 
 #include <epg/step/StepBase.h>
 #include <app/params/ThemeParameters.h>
@@ -7,7 +7,7 @@
 namespace app{
 namespace step{
 
-	class MergedAttributesAreas : public epg::step::StepBase< app::params::ThemeParametersS > {
+	class SetMergedAreasAttributes : public epg::step::StepBase< app::params::ThemeParametersS > {
 
 	public:
 
@@ -15,7 +15,7 @@ namespace step{
 		int getCode() { return 360; };
 
 		/// \brief
-		std::string getName() { return "MergedAttributesAreas"; };
+		std::string getName() { return "SetMergedAreasAttributes"; };
 
 		/// \brief
 		void onCompute( bool );

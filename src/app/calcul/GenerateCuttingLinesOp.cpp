@@ -92,24 +92,7 @@ void app::calcul::GenerateCuttingLinesOp::_init()
             
     // app parameters
     params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
-
 	std::string cutlTableName = themeParameters->getValue(CUTL_TABLE).toString();
-	if (cutlTableName == "") {
-		std::string const cutlTableSuffix = themeParameters->getValue(CUTL_TABLE_SUFFIX).toString();
-		cutlTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + cutlTableSuffix;
-	}
-	{
-		std::ostringstream ss;
-		ss << "DROP TABLE IF EXISTS " << cutlTableName << " ;";
-		ss << "CREATE TABLE " << cutlTableName <<"("
-			<< idName << " uuid DEFAULT gen_random_uuid(),"
-			<< geomName << " geometry(LineStringZ),"
-			<< countryCodeName << " character varying(8),"
-			<< linkedFeatIdName << " character varying(255) "
-			<< ");";
-		//ajout d'index?
-		context->getDataBaseManager().getConnection()->update(ss.str());
-	}
 
     //--
 	_fsArea = context->getDataBaseManager().getFeatureStore(areaTableName, idName, geomName);
@@ -142,8 +125,8 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 
 	std::map<std::string, std::string> mIdNatId;
 
-	ign::feature::FeatureFilter filterCountry(countryCodeName + " = '" + countryCode + "'");
-    ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterCountry);
+	ign::feature::FeatureFilter filterCountry(countryCodeName + " LIKE '%" + countryCode + "%'");
+    ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterCountry);
 	size_t numArea2load = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterCountry);
 	boost::progress_display displayGrapLoad(numArea2load, std::cout, "[ loading areas graph "+ countryCode +" % complete ]\n");
     while (itArea->hasNext()){

@@ -14,7 +14,7 @@
 #include <app/step/335_GenerateCuttingPoints.h>
 #include <app/step/340_MergeAreas.h>
 #include <app/step/350_SplitMergedAreasWithCF.h>
-#include <app/step/360_MergedAttributesAreas.h>
+#include <app/step/360_SetMergedAreasAttributes.h>
 #include <app/step/370_MergeSplitAreas.h>
 #include <app/step/399_SortingStandingWater.h>
 
@@ -33,7 +33,7 @@ namespace tools{
 		stepSuite.addStep( epg::step::factoryNew< GenerateCuttingPoints >() );
 		stepSuite.addStep( epg::step::factoryNew< MergeAreas >() );
 		stepSuite.addStep( epg::step::factoryNew< SplitMergedAreasWithCF >() );
-		stepSuite.addStep( epg::step::factoryNew< MergedAttributesAreas >() );
+		stepSuite.addStep( epg::step::factoryNew< SetMergedAreasAttributes >() );
 		stepSuite.addStep( epg::step::factoryNew< MergeSplitAreas >() );
 		stepSuite.addStep( epg::step::factoryNew< SortingStandingWater >() );
 	}

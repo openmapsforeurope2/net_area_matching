@@ -30,9 +30,9 @@ namespace calcul{
         ~SplitAreaMergerOp();
 
 		/// @brief Lance la fusion. Les surfaces traitées sont celles dont l'attribut w_tag 
-		/// n'est pas NULL. Ce champs a été renseigné par l'opérateur SetAttributeMergedAreasOp
+		/// n'est pas NULL. Ce champs a été renseigné par l'opérateur SetMergedAreasAttributesOp
 		/// pour tracer les surfaces issues de la découpe réalisée par l'opérateur CfSplitterOp
-		/// (car suite à l'affectation des attributs par SetAttributeMergedAreasOp le code pays 
+		/// (car suite à l'affectation des attributs par SetMergedAreasAttributesOp le code pays 
 		/// des surfaces issues de la découpe n'est pas forcément en '#').
 		/// Les petites surfaces (surfaces dont l'aire est inférieur à un seuil) 
 		/// sont fusionnés à la surface voisine de même identifiant national ayant

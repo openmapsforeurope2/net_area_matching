@@ -72,7 +72,7 @@ namespace app
             std::string clTableName = themeParameters->getValue(CUTL_TABLE).toString();
             if (clTableName == "") {
                 std::string const clTableSuffix = themeParameters->getValue(CUTL_TABLE_SUFFIX).toString();
-                clTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + clTableSuffix;
+                clTableName = themeParameters->getValue(AREA_TABLE_INIT).toString() + clTableSuffix;
             }
 
             //--
@@ -100,21 +100,21 @@ namespace app
             std::set<std::string> sCl2Delete;
 
             ign::feature::FeatureFilter filterCl;
-            ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCl,filterCl);
+            ign::feature::FeatureIteratorPtr itCl = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCl, filterCl);
             while (itCl->hasNext())
             {
                 ign::feature::Feature fCl = itCl->next();
                 std::string clId = fCl.getId();
                 std::string linkedFeatId = fCl.getAttribute(linkedFeatIdName).toString();
 
-                std::vector<std::string> vIds;
-                epg::tools::StringTools::Split(linkedFeatId, "#", vIds);
+                std::set<std::string> sIds;
+                epg::tools::StringTools::Split(linkedFeatId, "#", sIds);
 
                 bool bDelete = true;
-                for (size_t i = 0 ; i < vIds.size() ; ++i) {
+                for (std::set<std::string>::const_iterator sit = sIds.begin() ; sit != sIds.end() ; ++sit) {
                     ign::feature::Feature fArea;
-					ign::feature::FeatureFilter filterAreaLinked(natIdIdName +" = '" + vIds[i] + "'");
-                    ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterAreaLinked);
+					ign::feature::FeatureFilter filterAreaLinked(natIdIdName +" LIKE '%" + *sit + "%'");
+                    ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterAreaLinked);
 	
                     while(itArea->hasNext()) {
 						ign::feature::Feature fArea = itArea->next();

@@ -15,6 +15,7 @@
 //APP
 #include <app/params/ThemeParameters.h>
 #include <app/step/tools/initSteps.h>
+#include <app/utils/createAllTables.h>
 
 namespace po = boost::program_options;
 
@@ -124,6 +125,12 @@ int main(int argc, char *argv[])
             std::string standingWaterTableName = standingWaterTableBaseName + "_" + countries.front() + "_" + countries.back() + "_" + suffix;
             themeParameters->setParameter(AREA_TABLE_INIT_STANDING_WATER, ign::data::String(standingWaterTableName));
         }
+        if ( themeParameters->getValue(CUTL_TABLE).toString() == "" )
+            themeParameters->setParameter(CUTL_TABLE, ign::data::String(themeParameters->getValue(AREA_TABLE_INIT).toString() + themeParameters->getValue(CUTL_TABLE_SUFFIX).toString()));
+        if ( themeParameters->getValue(INTERSECTION_AREA_TABLE).toString() == "" )
+            themeParameters->setParameter(INTERSECTION_AREA_TABLE, ign::data::String(themeParameters->getValue(AREA_TABLE_INIT).toString() + themeParameters->getValue(INTERSECTION_AREA_TABLE_SUFFIX).toString()));
+        if ( themeParameters->getValue(CUTP_TABLE).toString() == "" )
+            themeParameters->setParameter(CUTP_TABLE, ign::data::String(themeParameters->getValue(AREA_TABLE_INIT).toString() + themeParameters->getValue(CUTP_TABLE_SUFFIX).toString()));
 
         //definition de AREA_TABLE_INIT_CLEANED
 		std::string areaTableNameInitCleaned = "_" + ign::data::Integer(app::step::CleanByLandmask().getCode()).toString() + "_";
@@ -134,6 +141,9 @@ int main(int argc, char *argv[])
         context->getDataBaseManager().setSearchPath(themeParameters->getValue(WORKING_SCHEMA).toString());
         ome2::utils::setTableName<app::params::ThemeParametersS>(LANDMASK_TABLE);
         ome2::utils::setTableName<epg::params::EpgParametersS>(TARGET_BOUNDARY_TABLE);
+
+        //créer la table CL vide si elles n'existe pas
+        app::utils::createClTable();
         
 		logger->log(epg::log::INFO, "[START HY MATCHING PROCESS ] " + epg::tools::TimeTools::getTime());
         

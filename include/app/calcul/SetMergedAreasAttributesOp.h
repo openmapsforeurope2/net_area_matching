@@ -17,7 +17,7 @@ namespace app{
 namespace calcul{
 
 	/// @brief Classe utilisée pour l'affectation des attributs des surfaces fusionnées
-	class SetAttributeMergedAreasOp {
+	class SetMergedAreasAttributesOp {
 
 	public:
 
@@ -25,13 +25,13 @@ namespace calcul{
         /// @brief Constructeur
         /// @param borderCode Code frontière (code double)
         /// @param verbose Mode verbeux
-		SetAttributeMergedAreasOp(
+		SetMergedAreasAttributesOp(
 			std::string borderCode,
             bool verbose
         );
 
         /// @brief Destructeur
-        ~SetAttributeMergedAreasOp();
+        ~SetMergedAreasAttributesOp();
 
 
 		/// @brief Lance l'affection des attributs des surfaces fusionnées.
@@ -66,7 +66,7 @@ namespace calcul{
 		//--
 		bool                                                     _verbose;
 		//--
-		ome2::calcul::utils::AttributeMerger                     _attrMergerOnBorder;
+		ome2::calcul::utils::AttributeMerger*                    _attrMerger;
 		//--
 		double													 _thresholdAreaAttr;
 

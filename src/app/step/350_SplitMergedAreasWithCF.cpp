@@ -30,8 +30,9 @@ namespace step {
 		_epgParams.setParameter(AREA_TABLE, ign::data::String(getCurrentWorkingTableName(AREA_TABLE_INIT)));
 		ome2::utils::CopyTableUtils::copyAreaTable(getLastWorkingTableName(AREA_TABLE_INIT), "", false, true, true);
 
-		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
+		//--
+		_themeParams.setParameter(CUTP_TABLE, ign::data::String(getLastWorkingTableName(CUTP_TABLE)));
+		_themeParams.setParameter(CUTL_TABLE, ign::data::String(getLastWorkingTableName(CUTL_TABLE)));
 
 		//--
 		app::calcul::CfSplitterOp::Compute(verbose);

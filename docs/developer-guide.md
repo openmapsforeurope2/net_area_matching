@@ -140,7 +140,7 @@ Le but est de générer les _'cutting lines'_. Une _'cutting line'_ est une port
 | table           | entrée | sortie | entitée de travail | description                  |
 |-----------------|--------|--------|--------------------|------------------------------|
 | AREA_TABLE_INIT | X      | X      | X                  | table des surfaces à traiter |
-| CUTL_TABLE      |        | X      |                    | table des 'cutting lines'    |
+| CUTL_TABLE      |        | X      | x                  | table des 'cutting lines'    |
 
 Note : la table en sortie _CUTL_TABLE_ n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
 
@@ -244,7 +244,7 @@ Cette étape permet de supprimer les 'cutting lines' qui, suite au nettoyage ré
 | table           | entrée | sortie | entitée de travail | description                  |
 |-----------------|--------|--------|--------------------|------------------------------|
 | AREA_TABLE_INIT | X      |        |                    | table des surfaces à traiter |
-| CUTL_TABLE      | X      | X      |                    | table des 'cutting lines'    |
+| CUTL_TABLE      | X      | X      | x                  | table des 'cutting lines'    |
 
 
 #### Principaux opérateurs de calcul utilisés :
@@ -270,9 +270,7 @@ Etape consistant à générer les surfaces représentant les zones de chevauchem
 | table                   | entrée | sortie | entitée de travail | description                         |
 |-------------------------|--------|--------|--------------------|-------------------------------------|
 | AREA_TABLE_INIT         | X      |        |                    | table des surfaces à traiter        |
-| INTERSECTION_AREA_TABLE |        | X      |                    | table des surfaces de chevauchement |
-
-Note : la table en sortie _INTERSECTION_AREA_TABLE_ n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
+| INTERSECTION_AREA_TABLE |        | X      | x                  | table des surfaces de chevauchement |
 
 La table _INTERSECTION_AREA_TABLE_ dans laquelle sont enregistrées les surfaces de chevauchement est effacée si elle existe déjà puis créée.
 Sa structure est la suivante:
@@ -312,9 +310,7 @@ Cette étape traite de la génération des _'cutting points'_. Ces points seront
 | AREA_TABLE_INIT         | X      |        |                    | table des surfaces à traiter       |
 | INTERSECTION_AREA_TABLE | X      |        |                    | table des surface de chevauchement |
 | CUTL_TABLE              | X      |        |                    | table des 'cutting lines'          |
-| CUTP_TABLE              |        | X      |                    | table des 'cutting points'         |
-
-Note : la table en sortie _CUTP_TABLE_ n'est pas préfixée du numéro d'étape (elle sert de référence pour l'ensemble du processus)
+| CUTP_TABLE              |        | X      | x                  | table des 'cutting points'         |
 
 La table _CUTP_TABLE_ dans laquelle sont enregistrées les surfaces de chevauchement est effacée si elle existe déjà puis créée.
 Sa structure est la suivante:
@@ -341,7 +337,7 @@ Paramètre utilisés:
 | CUTP_SECTION_GEOM        | nom du champ pour stocker la section de coupure                                                    |
 
 
-Le calcul des _'cutting points'_ consiste à parcourir les surfaces de la table _AREA_TABLE_INIT_ en traitant successivement chacun des deux pays frontaliers. Pour chacune des surfaces on détermine quels en sont les 'vecteurs extrèmes' (_'ending vectors'_). On considère que chaque surface possède deux 'extrémités' qui sont choisis parmis les points de leur contour extérieur. C'est point correspondent aux extrémités de l'axe médian de la surface. On définit les 'vecteurs extrémes' comme étant les deux vecteurs ayant pour origines les 'extrémités' et tangeant à l'axe médian. Les points 'extrèmités' sont enregistrés dans la table _CUTP_TABLE_, on leur associe en plus de leur géométrie ponctuelle une géométrie linéaire (section) qui est un segment de droite centré sur le ponctuel et orthogonal au vecteur extrème. Si un point 'extrèmité' est situé à moins de la distance _DIST_SNAP_MERGE_CF_ d'une 'cutting line' issue de la même surface, il n'est pas engistré (ce qui revient à fusionner ce point à la 'cutting line').
+Le calcul des _'cutting points'_ consiste à parcourir les surfaces de la table _AREA_TABLE_INIT_ en traitant successivement chacun des deux pays frontaliers. Pour chacune des surfaces on détermine quels en sont les 'vecteurs extrèmes' (_'ending vectors'_). On considère que chaque surface possède deux 'extrémités' qui sont choisis parmis les points de leur contour extérieur. Ces points correspondent aux extrémités de l'axe médian de la surface. On définit les 'vecteurs extrémes' comme étant les deux vecteurs ayant pour origines les 'extrémités' et tangeant à l'axe médian. Les points 'extrèmités' sont enregistrés dans la table _CUTP_TABLE_, on leur associe en plus de leur géométrie ponctuelle une géométrie linéaire (section) qui est un segment de droite centré sur le ponctuel et orthogonal au vecteur extrème. Si un point 'extrèmité' est situé à moins de la distance _DIST_SNAP_MERGE_CF_ d'une 'cutting line' issue de la même surface, il n'est pas engistré (ce qui revient à fusionner ce point à la 'cutting line').
 
 Le même calcul est effectué en parcourant la table _INTERSECTION_AREA_TABLE_.
 
@@ -370,7 +366,7 @@ Le processus de fusion des surfaces se déroule en deux étapes :
 
 ![340_1_with_key](images/340_1_with_key.png)
 
-2. pour chaque groupe, on fusionne les polygones qui le constitue. Un seul polygone doit résulter de la fusion d'un groupe puisque les polygones qui le composent représente un ensemble continue surfaces se chevauchant de proche en proche.
+2. pour chaque groupe, on fusionne les polygones qui le constitue. Un seul polygone doit résulter de la fusion d'un groupe puisque les polygones qui le composent représente un ensemble continu surfaces se chevauchant de proche en proche.
 
 ![340_2_with_key](images/340_2_with_key.png)
 
@@ -439,7 +435,7 @@ Suite à la fusion des surfaces des deux pays frontaliers, puis à la découpe d
 | AREA_TABLE_INIT_CLEANED | X      |        |                    | table des surfaces de référence issue de l'étape **app::step::CleanByLandmask** |
 
 #### Principaux opérateurs de calcul utilisés :
-- app::calcul::SetAttributeMergedAreasOp
+- app::calcul::SetMergedAreasAttributesOp
 
 #### Description du traitement :
 

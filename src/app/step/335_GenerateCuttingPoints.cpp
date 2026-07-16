@@ -3,6 +3,7 @@
 //EPG
 #include <epg/Context.h>
 #include <epg/log/ScopeLogger.h>
+#include <ome2/utils/CopyTableUtils.h>
 
 //APP
 #include <app/params/ThemeParameters.h>
@@ -17,7 +18,7 @@ namespace step {
 	///
 	void GenerateCuttingPoints::init()
 	{
-
+		addWorkingEntity(CUTP_TABLE);
 	}
 
 	///
@@ -26,26 +27,30 @@ namespace step {
 	void GenerateCuttingPoints::onCompute( bool verbose = false )
 	{
 		//--
-		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
+		std::string cutpRefTableName = _themeParams.getValue(CUTP_TABLE).toString();
+		std::string countryCodeW = _themeParams.getValue(COUNTRY_CODE_W).toString();
+
+		//--
+		ome2::utils::CopyTableUtils::copyPointTable(
+			getLastWorkingTableName(CUTP_TABLE),
+			getCurrentWorkingTableName(CUTP_TABLE),
+			"", false, true
+		);
+
+		//--
+		_themeParams.setParameter(CUTP_TABLE, ign::data::String(getCurrentWorkingTableName(CUTP_TABLE)));
 
 		//--
 		_epgParams.setParameter(AREA_TABLE, ign::data::String(getLastWorkingTableName(AREA_TABLE_INIT)));
-		
-		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
-
 		app::calcul::GenerateCuttingPointsOp::ComputeByCountry(countryCodeW, verbose);
 
 
 		//--
-		std::string intAreaTableName = themeParameters->getValue(INTERSECTION_AREA_TABLE).toString();
-		if (intAreaTableName == "") {
-			std::string const intAreaSuffix = themeParameters->getValue(INTERSECTION_AREA_TABLE_SUFFIX).toString();
-			intAreaTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + intAreaSuffix;
-		}
+		_epgParams.setParameter(AREA_TABLE, ign::data::String(getLastWorkingTableName(INTERSECTION_AREA_TABLE)));
+		app::calcul::GenerateCuttingPointsOp::Compute(verbose);
 
-		_epgParams.setParameter(AREA_TABLE, ign::data::String(intAreaTableName));
-
-		app::calcul::GenerateCuttingPointsOp::Compute(verbose, false);
+		//--
+		_themeParams.setParameter(CUTP_TABLE, ign::data::String(cutpRefTableName));
 	}
 
 }

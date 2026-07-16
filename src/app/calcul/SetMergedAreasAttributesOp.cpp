@@ -1,5 +1,5 @@
 // APP
-#include <app/calcul/SetAttributeMergedAreasOp.h>
+#include <app/calcul/SetMergedAreasAttributesOp.h>
 #include <app/params/ThemeParameters.h>
 #include <app/tools/zTools.h>
 
@@ -24,12 +24,13 @@ namespace app
         ///
         ///
         ///
-        SetAttributeMergedAreasOp::SetAttributeMergedAreasOp(
+        SetMergedAreasAttributesOp::SetMergedAreasAttributesOp(
             std::string borderCode,
             bool verbose
         ) : 
             _verbose(verbose),
-            _borderCode(borderCode)
+            _borderCode(borderCode),
+			_attrMerger(0)
         {
             _init();
         }
@@ -37,25 +38,27 @@ namespace app
         ///
         ///
         ///
-        SetAttributeMergedAreasOp::~SetAttributeMergedAreasOp()
+        SetMergedAreasAttributesOp::~SetMergedAreasAttributesOp()
         {
+			if (_attrMerger)
+				delete _attrMerger;
         }
 
         ///
         ///
         ///
-        void SetAttributeMergedAreasOp::Compute(
+        void SetMergedAreasAttributesOp::Compute(
             std::string borderCode,
 			bool verbose
 		) {
-            SetAttributeMergedAreasOp setAttributeMergedAreasOp(borderCode, verbose);
-			setAttributeMergedAreasOp._compute();
+            SetMergedAreasAttributesOp setMergedAreasAttributesOp(borderCode, verbose);
+			setMergedAreasAttributesOp._compute();
         }
 
         ///
         ///
         ///
-        void SetAttributeMergedAreasOp::_init()
+        void SetMergedAreasAttributesOp::_init()
         {
             //--
             _logger = epg::log::EpgLoggerS::getInstance();
@@ -64,36 +67,47 @@ namespace app
             //--
             epg::Context *context = epg::ContextS::getInstance();
 
-            // epg parameters
+            //--
             epg::params::EpgParameters const& epgParams = context->getEpgParameters();
             std::string const areaTableName = epgParams.getValue(AREA_TABLE).toString();
             std::string const idName = epgParams.getValue(ID).toString();
             std::string const geomName = epgParams.getValue(GEOM).toString();
+            std::string const countryName = epgParams.getValue(COUNTRY_CODE).toString();
+
+			//--
+			app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
+			std::string const areaTableNameInitCleaned = themeParameters->getValue(AREA_TABLE_INIT_CLEANED).toString();
+			std::string const listAttrSeparator = themeParameters->getValue(AM_LIST_ATTR_SEPARATOR).toString();
+			std::string const listAttrJsonName = themeParameters->getValue(AM_LIST_ATTR_JSON).toString();
+			std::string listAttrWName = themeParameters->getValue(AM_LIST_ATTR_W).toString();
+			listAttrWName += listAttrSeparator + themeParameters->getValue(IS_STANDING_WATER_NAME).toString();
+
+			//--
+		    epg::tools::StringTools::Split(_borderCode, "#", _vCountry);
 
             //--
             _fsArea = context->getDataBaseManager().getFeatureStore(areaTableName, idName, geomName);
 
 			//--
-			app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-			std::string areaTableNameInitCleaned = themeParameters->getParameter(AREA_TABLE_INIT_CLEANED).getValue().toString();
 			_fsAreaInitCleaned = context->getDataBaseManager().getFeatureStore(areaTableNameInitCleaned, idName, geomName);
-
 
             //--
             _logger->log(epg::log::INFO, "[END] initialization: " + epg::tools::TimeTools::getTime());
 
-            //--
-		    epg::tools::StringTools::Split(_borderCode, "#", _vCountry);
-
-			std::string listAttrWName = themeParameters->getValue(AM_LIST_ATTR_W).toString();
-			std::string listAttrJsonName = themeParameters->getValue(AM_LIST_ATTR_JSON).toString();
-			_attrMergerOnBorder.setLists(listAttrWName, listAttrJsonName, "/");
+			//--
+			_attrMerger = new ome2::calcul::utils::AttributeMerger(
+				listAttrWName,
+				listAttrJsonName,
+				countryName,
+				listAttrSeparator,
+				"#"
+			);
         }
 
         ///
         ///
         ///
-        void SetAttributeMergedAreasOp::_compute() const {
+        void SetMergedAreasAttributesOp::_compute() const {
 
             // epg parameters
             epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
@@ -101,15 +115,15 @@ namespace app
             std::string const idName = epgParams.getValue(ID).toString();
 			//--
 			app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-			std::string const wTagName = themeParameters->getParameter(W_TAG_NAME).getValue().toString();
-			std::string separator = "#";
+			std::string const wTagName = themeParameters->getValue(W_TAG_NAME).toString();
+			std::string const isStandingWaterName = themeParameters->getValue(IS_STANDING_WATER_NAME).toString();
 
-            ign::feature::FeatureFilter filterArea(countryCodeName+" like '%#%'");
+            ign::feature::FeatureFilter filterArea(countryCodeName+" = '#'");
 
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ setting merged areas attributes % complete ]\n");
 
-            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterArea);
             while (itArea->hasNext())
             {
                 ++display;
@@ -121,12 +135,12 @@ namespace app
 
 				ign::feature::Feature featCountry1, featCountry2;
 
-				ign::feature::FeatureFilter filterArroundAreaFromCountry1(countryCodeName + "='" + _vCountry[0] + "'");
+				ign::feature::FeatureFilter filterArroundAreaFromCountry1(countryCodeName + " LIKE '%" + _vCountry[0] + "%'");
 				filterArroundAreaFromCountry1.setExtent(geomArea.getEnvelope());
 
 				double area1 = _getAreaMergedByCountry(geomArea, filterArroundAreaFromCountry1, featCountry1);
 
-				ign::feature::FeatureFilter filterArroundAreaFromCountry2(countryCodeName + "='"+ _vCountry[1] +"'");
+				ign::feature::FeatureFilter filterArroundAreaFromCountry2(countryCodeName + " LIKE '%"+ _vCountry[1] +"%'");
 				filterArroundAreaFromCountry2.setExtent(geomArea.getEnvelope());
 
 				double area2 = _getAreaMergedByCountry(geomArea, filterArroundAreaFromCountry2, featCountry2);
@@ -144,8 +158,13 @@ namespace app
 					fArea = featCountry2;
 				}
 				else {
-					fArea = featCountry1;
-					_attrMergerOnBorder.mergeFeatAttribute(fArea,featCountry2, separator);
+					ign::data::Variant isStanding1 = featCountry1.getAttribute(isStandingWaterName);
+					ign::data::Variant isStanding2 = featCountry2.getAttribute(isStandingWaterName);
+
+					fArea = _attrMerger->merge(featCountry1, featCountry2);
+
+					if ( !isStanding1.isNull() && ! isStanding2.isNull() )
+						fArea.setAttribute(isStandingWaterName, isStanding1);
 				}
 				fArea.setId(idOrigin);
 				fArea.setGeometry(geomArea);
@@ -159,7 +178,7 @@ namespace app
 		///
         ///
         ///
-		double SetAttributeMergedAreasOp::_getAreaMergedByCountry(
+		double SetMergedAreasAttributesOp::_getAreaMergedByCountry(
 			ign::geometry::MultiPolygon& geomAreaMerged,
 			ign::feature::FeatureFilter& filterArroundAreaFromCountry,
 			ign::feature::Feature& fMergedInit
@@ -168,7 +187,7 @@ namespace app
 			std::map<double, ign::feature::Feature> mIntersectedArea;
 			//recup fs table source -> table init sans step
 			//filtre sur les feat de la table source
-			ign::feature::FeatureIteratorPtr itAreaInit = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsAreaInitCleaned,filterArroundAreaFromCountry);
+			ign::feature::FeatureIteratorPtr itAreaInit = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsAreaInitCleaned, filterArroundAreaFromCountry);
 
 			while (itAreaInit->hasNext())
 			{

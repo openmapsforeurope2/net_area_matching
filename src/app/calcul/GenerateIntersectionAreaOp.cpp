@@ -69,24 +69,7 @@ namespace app
 
 			//--
 			app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-			std::string intAreaTableName = themeParameters->getValue(INTERSECTION_AREA_TABLE).toString();
-			if (intAreaTableName == "") {
-				std::string const intAreaSuffix = themeParameters->getValue(INTERSECTION_AREA_TABLE_SUFFIX).toString();
-				intAreaTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + intAreaSuffix;
-			}
-			
-			{
-				std::ostringstream ss;
-				ss << "DROP TABLE IF EXISTS " << intAreaTableName << " ;";
-				ss << "CREATE TABLE " << intAreaTableName << "("
-					<< idName << " uuid DEFAULT gen_random_uuid(),"
-					<< geomName << " geometry(MULTIPOLYGONZ),"
-					<< countryCodeName << " character varying(8),"
-					<< linkedFeatIdName << " character varying(255) "
-					<< ");";
-
-				context->getDataBaseManager().getConnection()->update(ss.str());
-			}
+			std::string const intAreaTableName = themeParameters->getValue(INTERSECTION_AREA_TABLE).toString();
 
 			//--
 			_fsArea = context->getDataBaseManager().getFeatureStore(areaTableName, idName, geomName);
@@ -117,12 +100,12 @@ namespace app
             std::string country1 = _vCountry.front();
 			std::string country2 = _vCountry.back();
 
-            ign::feature::FeatureFilter filterArea1(countryCodeName+"='"+country1+"'");
+            ign::feature::FeatureFilter filterArea1(countryCodeName+" LIKE '%"+country1+"%'");
 
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea1);
             boost::progress_display display(numFeatures, std::cout, "[ computing area intersections % complete ]\n");
 
-            ign::feature::FeatureIteratorPtr itArea1 = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea1);
+            ign::feature::FeatureIteratorPtr itArea1 = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterArea1);
 
             while (itArea1->hasNext())
             {
@@ -132,7 +115,7 @@ namespace app
                 ign::geometry::MultiPolygon const& areaGeom1 = fArea1.getGeometry().asMultiPolygon();
 				std::string const natId1 = fArea1.getAttribute(natIdIdName).toString();
 
-				ign::feature::FeatureFilter filterArea2(countryCodeName+"='"+country2+"'");
+				ign::feature::FeatureFilter filterArea2(countryCodeName+" LIKE '%"+country2+"%'");
 				epg::tools::FilterTools::addAndConditions(filterArea2, "ST_INTERSECTS(" + geomName + ", ST_SetSRID(ST_GeomFromText('" + areaGeom1.toString() + "'),3035))");
 
 				ign::feature::FeatureIteratorPtr itArea2 = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea2);
@@ -147,7 +130,7 @@ namespace app
 
 					if( geomPtr->isEmpty() ) continue;
 
-					_persistGeom(*geomPtr, _borderCode, natId1+"#"+natId2);
+					_persistGeom(*geomPtr, "#", natId1+"#"+natId2);
 				}
             }
 		}

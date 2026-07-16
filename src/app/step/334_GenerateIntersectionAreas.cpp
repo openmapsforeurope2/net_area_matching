@@ -3,6 +3,7 @@
 //EPG
 #include <epg/Context.h>
 #include <epg/log/ScopeLogger.h>
+#include <ome2/utils/CopyTableUtils.h>
 
 //APP
 #include <app/params/ThemeParameters.h>
@@ -17,7 +18,7 @@ namespace step {
 	///
 	void GenerateIntersectionAreas::init()
 	{
-
+		addWorkingEntity(INTERSECTION_AREA_TABLE);
 	}
 
 	///
@@ -26,13 +27,29 @@ namespace step {
 	void GenerateIntersectionAreas::onCompute( bool verbose = false )
 	{
 		//--
+		std::string intAreaRefTableName = _themeParams.getValue(INTERSECTION_AREA_TABLE).toString();
+		std::string countryCodeW = _themeParams.getValue(COUNTRY_CODE_W).toString();
+
+		//--
+		ome2::utils::CopyTableUtils::copyPolygonTable(
+			getLastWorkingTableName(INTERSECTION_AREA_TABLE),
+			getCurrentWorkingTableName(INTERSECTION_AREA_TABLE),
+			"", false, true, true
+		);
+
+		//--
+		_themeParams.setParameter(INTERSECTION_AREA_TABLE, ign::data::String(getCurrentWorkingTableName(INTERSECTION_AREA_TABLE)));
 		_epgParams.setParameter(AREA_TABLE, ign::data::String(getLastWorkingTableName(AREA_TABLE_INIT)));
 		
-		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-		std::string countryCodeW = themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString();
-
+		//--
 		app::calcul::GenerateIntersectionAreaOp::Compute(countryCodeW, verbose);
+
+		//--
+		_themeParams.setParameter(INTERSECTION_AREA_TABLE, ign::data::String(intAreaRefTableName));
 	}
 
 }
 }
+
+
+		

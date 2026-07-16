@@ -24,13 +24,12 @@
 ///
 app::calcul::GenerateCuttingPointsOp::GenerateCuttingPointsOp(
     std::string const& borderCode,
-    bool verbose,
-	bool resetCpTable
+    bool verbose
 ) : 
 	_borderCode(borderCode),
     _verbose(verbose)
 {
-    _init(resetCpTable);
+    _init();
 }
 
 ///
@@ -50,10 +49,9 @@ app::calcul::GenerateCuttingPointsOp::~GenerateCuttingPointsOp()
 ///
 void app::calcul::GenerateCuttingPointsOp::ComputeByCountry(
 	std::string const& borderCode, 
-	bool verbose,
-	bool resetCpTable
+	bool verbose
 ) {
-	GenerateCuttingPointsOp op(borderCode, verbose, resetCpTable);
+	GenerateCuttingPointsOp op(borderCode, verbose);
 	op._computeByCountry();
 }
 
@@ -61,10 +59,9 @@ void app::calcul::GenerateCuttingPointsOp::ComputeByCountry(
 ///
 ///
 void app::calcul::GenerateCuttingPointsOp::Compute(
-	bool verbose,
-	bool resetCpTable
+	bool verbose
 ) {
-	GenerateCuttingPointsOp op("", verbose, resetCpTable);
+	GenerateCuttingPointsOp op("", verbose);
 	op._generateCutp();
 }
 
@@ -80,7 +77,7 @@ void app::calcul::GenerateCuttingPointsOp::_computeByCountry() const
 	epg::tools::StringTools::Split(_borderCode, "#", vCountry);
 
 	for (size_t i = 0; i < vCountry.size(); ++i) {
-		ign::feature::FeatureFilter filter(countryCodeName + " = '" + vCountry[i] + "'");
+		ign::feature::FeatureFilter filter(countryCodeName + " LIKE '%" + vCountry[i] + "%'");
 		_generateCutp(filter);
 	}	
 }
@@ -88,7 +85,7 @@ void app::calcul::GenerateCuttingPointsOp::_computeByCountry() const
 ///
 ///
 ///
-void app::calcul::GenerateCuttingPointsOp::_init(bool resetCpTable)
+void app::calcul::GenerateCuttingPointsOp::_init()
 {
 	epg::Context* context = epg::ContextS::getInstance();
 
@@ -111,32 +108,8 @@ void app::calcul::GenerateCuttingPointsOp::_init(bool resetCpTable)
 
 	//--
 	app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-	std::string const sectionGeomName = themeParameters->getParameter(CUTP_SECTION_GEOM).getValue().toString();
-	std::string cutpTableName = themeParameters->getValue(CUTP_TABLE).toString();
-	if (cutpTableName == "") {
-		std::string const cpTableSuffix = themeParameters->getValue(CUTP_TABLE_SUFFIX).toString();
-		cutpTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + cpTableSuffix;
-	}
-	std::string cutlTableName = themeParameters->getValue(CUTL_TABLE).toString();
-	if (cutlTableName == "") {
-		std::string const cutlTableSuffix = themeParameters->getValue(CUTL_TABLE_SUFFIX).toString();
-		cutlTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + cutlTableSuffix;
-	}
-	
-	if (resetCpTable || !context->getDataBaseManager().tableExists(cutpTableName)) {
-		std::ostringstream ss;
-		ss << "DROP TABLE IF EXISTS " << cutpTableName << " ;";
-		ss << "CREATE TABLE " << cutpTableName << "("
-			<< idName << " uuid DEFAULT gen_random_uuid(),"
-			<< geomName << " geometry(PointZ),"
-			<< sectionGeomName << " geometry(LineString),"
-			<< countryCodeName << " character varying(8),"
-			<< linkedFeatIdName << " character varying(255) "
-			<< ");";
-		//ajout d'index?
-
-		context->getDataBaseManager().getConnection()->update(ss.str());
-	}
+	std::string const cutlTableName = themeParameters->getValue(CUTL_TABLE).toString();
+	std::string const cutpTableName = themeParameters->getValue(CUTP_TABLE).toString();
 
 	//--
 	_fsArea = context->getDataBaseManager().getFeatureStore(areaTableName, idName, geomName);
@@ -170,7 +143,7 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutp(
 	//--
 	double sectionWidth = 100;
 
-	ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filter);
+	ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filter);
 	size_t numArea2load = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filter);
 	boost::progress_display display(numArea2load, std::cout, "[ generating cutting points % complete ]\n");
 	while (itArea->hasNext()) {
@@ -187,8 +160,10 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutp(
 		//--
 		std::vector<std::string> vLkid;
 		epg::tools::StringTools::Split(linkedNatId, "#", vLkid);
+		//TODO
+		//faire une boucle au cas ou vLkid.size() > 2 ?
 		std::string sqlFilter = linkedFeatIdName + " LIKE '%" + vLkid.front() + "%'";
-		if(vLkid.size() > 1) sqlFilter += " || "+ linkedFeatIdName + " LIKE '%" + vLkid.back() + "%'";
+		if(vLkid.size() > 1) sqlFilter += " OR "+ linkedFeatIdName + " LIKE '%" + vLkid.back() + "%'";
 
 		for (size_t i = 0; i < mp.numGeometries(); ++i) {
 			ign::geometry::Polygon const& poly = mp.polygonN(i);
@@ -355,7 +330,7 @@ bool app::calcul::GenerateCuttingPointsOp::_hasCutLArroundEndingPt(
 	app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 	double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
 
-	ign::feature::FeatureIteratorPtr itCutLArroundEndPt = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCutL,filterArroundEndPt);
+	ign::feature::FeatureIteratorPtr itCutLArroundEndPt = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCutL, filterArroundEndPt);
 	bool hasCutLArround = false;
 	while (itCutLArroundEndPt->hasNext()) {
 		ign::feature::Feature fCutLArroundEndPt = itCutLArroundEndPt->next();

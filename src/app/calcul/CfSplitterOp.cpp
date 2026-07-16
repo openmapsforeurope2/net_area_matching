@@ -105,26 +105,18 @@ namespace app
             std::string const geomName = epgParams.getValue(GEOM).toString();
 
             // app parameters
-            params::ThemeParameters * themeParameters = params::ThemeParametersS::getInstance();
-            std::string cpTableName = themeParameters->getValue(CUTP_TABLE).toString();
-            if (cpTableName == "") {
-                std::string const cpTableSuffix = themeParameters->getValue(CUTP_TABLE_SUFFIX).toString();
-                cpTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + cpTableSuffix;
-            }
-            std::string clTableName = themeParameters->getValue(CUTL_TABLE).toString();
-            if (clTableName == "") {
-                std::string const clTableSuffix = themeParameters->getValue(CUTL_TABLE_SUFFIX).toString();
-                clTableName = themeParameters->getParameter(AREA_TABLE_INIT).getValue().toString() + clTableSuffix;
-            }
+            app::params::ThemeParameters * themeParameters = params::ThemeParametersS::getInstance();
+            std::string const cutlTableName = themeParameters->getValue(CUTL_TABLE).toString();
+            std::string const cutpTableName = themeParameters->getValue(CUTP_TABLE).toString();
 
             //--
             _fsArea = context->getDataBaseManager().getFeatureStore(areaTableName, idName, geomName);
 
             //--
-            _fsCp = context->getDataBaseManager().getFeatureStore(cpTableName, idName, geomName);
+            _fsCp = context->getDataBaseManager().getFeatureStore(cutpTableName, idName, geomName);
 
             //--
-            _fsCl = context->getDataBaseManager().getFeatureStore(clTableName, idName, geomName);
+            _fsCl = context->getDataBaseManager().getFeatureStore(cutlTableName, idName, geomName);
 
             //--
             _logger->log(epg::log::INFO, "[END] initialization: " + epg::tools::TimeTools::getTime());
@@ -162,14 +154,14 @@ namespace app
             app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
             double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
 
-            ign::feature::FeatureFilter filterArea(countryCodeName + " LIKE '%#%'");
+            ign::feature::FeatureFilter filterArea(countryCodeName + " = '#'");
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ splitting areas with cp (section) % complete ]\n");
 
             //--
             std::set<std::string> sArea2Delete;
 
-            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterArea);
             while (itArea->hasNext())
             {
                 ++display;
@@ -567,7 +559,7 @@ namespace app
                 std::string const& country = fCp.getAttribute(countryName).toString();
                 std::string cpId = fCp.getId();
 
-                if ( country.find("#") != std::string::npos )
+                if ( country == "#" )
                     sIntersectionCp.insert(cpId);
 
                 if ( sMergedCp.find(cpId) != sMergedCp.end() ) continue;

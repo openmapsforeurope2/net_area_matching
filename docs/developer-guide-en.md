@@ -423,7 +423,7 @@ After merging the areas of the two neighbouring countries, and then splitting th
 | AREA_TABLE_INIT_CLEANED | X     |        |                     | Reference table from the **app::step::CleanByLandmask** step                     |
 
 #### Main Calculation Operators Used:
-- app::calcul::SetAttributeMergedAreasOp
+- app::calcul::SetMergedAreasAttributesOp
 
 #### Process description:
 

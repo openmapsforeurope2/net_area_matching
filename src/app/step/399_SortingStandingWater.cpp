@@ -28,7 +28,7 @@ namespace app {
 			ome2::utils::CopyTableUtils::copyAreaTable(getLastWorkingTableName(AREA_TABLE_INIT_STANDING_WATER), "", false, true, true);
 
 			//affectation temporaire pour AREA_TABLE_INIT_STANDING_WATER
-			std::string areaTableNameStandingInit = _themeParams.getParameter(AREA_TABLE_INIT_STANDING_WATER).getValue().toString();
+			std::string areaTableNameStandingInit = _themeParams.getValue(AREA_TABLE_INIT_STANDING_WATER).toString();
 			_themeParams.setParameter(AREA_TABLE_INIT_STANDING_WATER, ign::data::String(getCurrentWorkingTableName(AREA_TABLE_INIT_STANDING_WATER)));
 
 			//--
@@ -36,7 +36,7 @@ namespace app {
 			ome2::utils::CopyTableUtils::copyAreaTable(getLastWorkingTableName(AREA_TABLE_INIT), "", false, true, true);
 			
 			//--
-			std::string countryCodeW = _themeParams.getParameter(COUNTRY_CODE_W).getValue().toString();
+			std::string countryCodeW = _themeParams.getValue(COUNTRY_CODE_W).toString();
 			
 			app::calcul::StandingWaterOp::SortingStandingWater(countryCodeW, verbose);
 
