@@ -76,9 +76,10 @@ void app::calcul::GenerateCuttingPointsOp::_computeByCountry() const
 	std::vector<std::string> vCountry;
 	epg::tools::StringTools::Split(_borderCode, "#", vCountry);
 
-	for (size_t i = 0; i < vCountry.size(); ++i) {
+	for (size_t i = 0; i < vCountry.size(); ++i)
+	{
 		ign::feature::FeatureFilter filter(countryCodeName + " LIKE '%" + vCountry[i] + "%'");
-		_generateCutp(filter);
+		_generateCutp(filter, true);
 	}	
 }
 
@@ -126,7 +127,8 @@ void app::calcul::GenerateCuttingPointsOp::_init()
 ///
 ///
 void app::calcul::GenerateCuttingPointsOp::_generateCutp(
-	ign::feature::FeatureFilter filter
+	ign::feature::FeatureFilter filter,
+	bool hasNatId
 ) const {
 	//--
 	epg::Context *context = epg::ContextS::getInstance();
@@ -146,39 +148,50 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutp(
 	ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filter);
 	size_t numArea2load = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filter);
 	boost::progress_display display(numArea2load, std::cout, "[ generating cutting points % complete ]\n");
-	while (itArea->hasNext()) {
+	while (itArea->hasNext())
+	{
 		++display;
 		ign::feature::Feature fArea = itArea->next();
 		ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
 		std::string const idOrigin = fArea.getId();
-		std::string const linkedNatId = fArea.getAttribute(natIdIdName).toString();
+		std::string const areaNatId = hasNatId ? fArea.getAttribute(natIdIdName).toString() : "";
 		std::string const countryCode = fArea.getAttribute(countryCodeName).toString();
 
 		//DEBUG
 		_logger->log(epg::log::DEBUG, idOrigin);
 
 		//--
-		std::vector<std::string> vLkid;
-		epg::tools::StringTools::Split(linkedNatId, "#", vLkid);
-		//TODO
-		//faire une boucle au cas ou vLkid.size() > 2 ?
-		std::string sqlFilter = linkedFeatIdName + " LIKE '%" + vLkid.front() + "%'";
-		if(vLkid.size() > 1) sqlFilter += " OR "+ linkedFeatIdName + " LIKE '%" + vLkid.back() + "%'";
+		std::string sqlFilter = "";
+		if( hasNatId ) {
+			std::vector<std::string> vLkid;
+			epg::tools::StringTools::Split(areaNatId, "#", vLkid);
+			for( size_t i = 0 ; i < vLkid.size() ; ++i )
+				sqlFilter += (sqlFilter != "" ? " OR " : "") + linkedFeatIdName + " LIKE '%" + vLkid[i] + "%'";
+		}
 
-		for (size_t i = 0; i < mp.numGeometries(); ++i) {
+		for (size_t i = 0; i < mp.numGeometries(); ++i)
+		{
 			ign::geometry::Polygon const& poly = mp.polygonN(i);
+
+			//DEBUG
+			// if( poly.distance(ign::geometry::Point(4057797.2, 2935185.8)) < 1 ) {
+			// 	bool test = true;
+			// }
 
 			std::vector<std::pair<ign::geometry::Point, ign::math::Vec2d>> vpEndingPtVector = _getEndingVectors(poly);
 
-			for(size_t i = 0 ; i < vpEndingPtVector.size() ; ++i ) {
-
-				ign::feature::FeatureFilter filterArroundEndPt(sqlFilter);
-				ign::geometry::Envelope bboxPt(vpEndingPtVector[i].first.getEnvelope());
-				bboxPt.expandBy(distSnapMergeCf);
-				filterArroundEndPt.setExtent(bboxPt);
-				if (_hasCutLArroundEndingPt(filterArroundEndPt, vpEndingPtVector[i].first, poly))
-					continue;
-						
+			for(size_t i = 0 ; i < vpEndingPtVector.size() ; ++i )
+			{
+				if( hasNatId )
+				{
+					ign::feature::FeatureFilter filterArroundEndPt(sqlFilter);
+					ign::geometry::Envelope bboxPt(vpEndingPtVector[i].first.getEnvelope());
+					bboxPt.expandBy(distSnapMergeCf);
+					filterArroundEndPt.setExtent(bboxPt);
+					if (_hasCutLArroundEndingPt(filterArroundEndPt, vpEndingPtVector[i].first, poly))
+						continue;
+				}
+				
 				ign::math::Vec2d vOrtho(-vpEndingPtVector[i].second.y(), vpEndingPtVector[i].second.x());
 
 				ign::geometry::Point sectionPt1( vpEndingPtVector[i].first.x() + (sectionWidth/2)*vOrtho.x(), vpEndingPtVector[i].first.y() + (sectionWidth/2)*vOrtho.y());
@@ -195,7 +208,7 @@ void app::calcul::GenerateCuttingPointsOp::_generateCutp(
 				// sectionGeom.setFillZ(0);
 				featCutP.setGeometry(vpEndingPtVector[i].first);
 				featCutP.setAttribute(countryCodeName, ign::data::String(countryCode));
-				featCutP.setAttribute(linkedFeatIdName, ign::data::String(linkedNatId));
+				if(hasNatId) featCutP.setAttribute(linkedFeatIdName, ign::data::String(areaNatId));
 				featCutP.setAttribute(sectionGeomName, sectionGeom);
 				_fsCutP->createFeature(featCutP);
 			}

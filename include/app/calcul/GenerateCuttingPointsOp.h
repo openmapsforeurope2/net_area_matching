@@ -76,7 +76,8 @@ namespace calcul{
 
 		//--
 		void _generateCutp(
-			ign::feature::FeatureFilter filter = ign::feature::FeatureFilter()
+			ign::feature::FeatureFilter filter = ign::feature::FeatureFilter(),
+			bool hasNatId = false
 		) const;
 
 		//--

@@ -153,8 +153,9 @@ namespace app
             //--
             app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
             double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
+            std::string const mergedAreaCode = themeParameters->getValue(MERGED_AREA_CODE).toString();
 
-            ign::feature::FeatureFilter filterArea(countryCodeName + " = '#'");
+            ign::feature::FeatureFilter filterArea(countryCodeName + " = '"+mergedAreaCode+"'");
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ splitting areas with cp (section) % complete ]\n");
 
@@ -173,9 +174,15 @@ namespace app
                 //DEBUG
                 _logger->log(epg::log::DEBUG, "Area id : "+idOrigin);
 
+                //DEBUG
+                // if( mp.distance(ign::geometry::Point(4057843, 2933858)) < 1 ) {
+                //     bool test = true;
+                // }
+
                 std::vector< ign::geometry::Polygon > vPolygons;
 
-                for (size_t i = 0 ; i < mp.numGeometries() ; ++i ) {
+                for (size_t i = 0 ; i < mp.numGeometries() ; ++i )
+                {
                     ign::geometry::Polygon & poly = mp.polygonN(i);
 
                     _clean(poly);
@@ -197,7 +204,8 @@ namespace app
                     std::set<std::string> sIntersectionCp;
                     std::map<std::string, ign::geometry::Point> mCp = _getAllCp(polyWithoutHoles, sIntersectionCp); //TODO supprimer doublons sur le contour
                     std::vector<ign::geometry::Point> vCpCl;
-                    for( std::map<std::string, ign::geometry::Point>::const_iterator mit = mCp.begin() ; mit != mCp.end() ; ++mit ) {
+                    for( std::map<std::string, ign::geometry::Point>::const_iterator mit = mCp.begin() ; mit != mCp.end() ; ++mit )
+                    {
                         if (sIntersectionCp.find(mit->first) != sIntersectionCp.end() ) continue; //on ne crée pas de coupure au niveau des cp issues des surfaces intersections
                         vCpCl.push_back(mit->second);
                     }
@@ -218,7 +226,8 @@ namespace app
 
                     // Outil
                     std::vector<epg::tools::geometry::SegmentIndexedGeometryInterface*> vIndexedSubLs;
-                    for(size_t i = 0 ; i < vSubLs.size() ; ++i) {
+                    for(size_t i = 0 ; i < vSubLs.size() ; ++i)
+                    {
                         vIndexedSubLs.push_back(new epg::tools::geometry::SegmentIndexedGeometry(&vSubLs[i]));
 
                         //--
@@ -233,11 +242,16 @@ namespace app
 
                     // on boucle sur les CP
                     std::set<std::string> sMergedCp;
-                    for( std::map<std::string, ign::geometry::Point>::const_iterator mit_ = mCp.begin() ; mit_ != mCp.end() ; ++mit_ ) {
-
+                    for( std::map<std::string, ign::geometry::Point>::const_iterator mit_ = mCp.begin() ; mit_ != mCp.end() ; ++mit_ )
+                    {
                         if ( sMergedCp.find(mit_->first) != sMergedCp.end() ) continue;
                         
                         ign::geometry::Point const& cpGeom = mit_->second;
+
+                        //DEBUG
+                        // if( cpGeom.distance(ign::geometry::Point(4057864.7920601, 2935241.4767348)) < 1) {
+                        //     bool test = true;
+                        // }
 
                         // on merge les autres CP proches
                         // TODO : faut-il privilégier les CP sur le contour ou ceux à l'intérieur du poly ?
@@ -245,7 +259,8 @@ namespace app
                         ign::geometry::Envelope bboxPt(cpGeom.getEnvelope());
                         bboxPt.expandBy(distSnapMergeCf);
                         _fsCp->getFeaturesByExtent(bboxPt, fCollection);
-                        for (ign::feature::FeatureCollection::iterator fcit = fCollection.begin() ; fcit != fCollection.end() ; ++fcit) {
+                        for (ign::feature::FeatureCollection::iterator fcit = fCollection.begin() ; fcit != fCollection.end() ; ++fcit)
+                        {
                             if ( fcit->getId() == mit_->first ) continue;
                             if ( cpGeom.distance(fcit->getGeometry() ) < distSnapMergeCf)
                                 sMergedCp.insert(fcit->getId());
@@ -256,17 +271,21 @@ namespace app
                         // normalement si doublon il n'est pas ajouté dans la map (même distance mDistProj.first)
                         // voir s'il faut ajouter une tolérance pour supprimer des doublons avec des distance légèrement différentes
                         // On calcule les projections sur les subLs
-                        for ( size_t j = 0 ; j < vIndexedSubLs.size() ; ++j ) {
+                        for ( size_t j = 0 ; j < vIndexedSubLs.size() ; ++j )
+                        {
                             std::pair<double, ign::geometry::Point> distProj = vIndexedSubLs[j]->distanceWithProj(cpGeom, projDistThreshold);
-                            if (distProj.first >= 0 && distProj.first < 1e-7) cpIsOnRing = true;
-                            else if (distProj.first > 1e-7) mDistSubLsProj.insert(std::make_pair(distProj.first, std::make_pair(j, distProj.second)));
+                            if (distProj.first >= 0 && distProj.first < 1e-7) 
+                                cpIsOnRing = true;
+                            else if (distProj.first > 1e-7) 
+                                mDistSubLsProj.insert(std::make_pair(distProj.first, std::make_pair(j, distProj.second)));
                         }
 
                         ign::geometry::GeometryPtr sectionGeomPtr;
                         std::vector<ign::geometry::Point> vInOutProj;
                         std::set<size_t> sHittenSubLs;
                         std::map<double, std::pair<int, ign::geometry::Point>>::const_iterator mit;
-                        for ( mit = mDistSubLsProj.begin() ; mit != mDistSubLsProj.end() ; ++mit ) {
+                        for ( mit = mDistSubLsProj.begin() ; mit != mDistSubLsProj.end() ; ++mit )
+                        {
                             ign::geometry::LineString ls(cpGeom, mit->second.second);
                             double ratio = _getRatio(polyWithoutHoles, ls);
 
@@ -279,7 +298,8 @@ namespace app
 
                             if (ratio < precision) continue; //TODO elargir le seuil à ~10% ?
 
-                            if ( !cpIsOnRing && std::abs(1-ratio) < precision ) {
+                            if ( !cpIsOnRing && std::abs(1-ratio) < precision )
+                            {
                                 if ( _touchAlreadyHittenSubLs( vIndexedSubLs, sHittenSubLs, mit->second.second ) ) continue;
                                 sHittenSubLs.insert(mit->second.first);
 
@@ -292,7 +312,8 @@ namespace app
                             vInOutProj.push_back(mit->second.second);
                         }
 
-                        if ( sectionGeomPtr && sectionGeomPtr->isMultiLineString() ) {
+                        if ( sectionGeomPtr && sectionGeomPtr->isMultiLineString() )
+                        {
                             //simplification de la geometrie de la section
                             if ( sectionGeomPtr->asMultiLineString().numGeometries() == 2 ) {
                                 sectionGeomPtr.reset(new ign::geometry::LineString(
@@ -304,7 +325,8 @@ namespace app
                             }
                         }
 
-                        if (!sectionGeomPtr) {
+                        if (!sectionGeomPtr)
+                        {
                             for (size_t i = 0 ; i < vInOutProj.size() ; ++i) {
                                 //calcul intersections entre [cpGeom vInOutProj[i]] et poly.exteriorRing()
                                 // si nb points = 3 : calcul du chemin entre cpGeom et vInOutProj[i]
@@ -314,14 +336,17 @@ namespace app
                                 std::vector< ign::geometry::Point > vPtIntersect = epg::tools::geometry::LineIntersector::compute(cpGeom, vInOutProj[i], polyWithoutHoles.exteriorRing());
                                 std::vector< ign::geometry::Point > vIntersectInter;
                                 ign::math::Line2d line(cpGeom.toVec2d(), vInOutProj[i].toVec2d());
-                                for (std::vector< ign::geometry::Point >::iterator vit = vPtIntersect.begin(); vit != vPtIntersect.end(); ++vit) {
+                                for (std::vector< ign::geometry::Point >::iterator vit = vPtIntersect.begin(); vit != vPtIntersect.end(); ++vit)
+                                {
                                     double abs = line.project(vit->toVec2d());
                                     if (abs < 1e-7 || abs > 1.-1e-7) continue;
                                     vIntersectInter.push_back(*vit);
                                 }
 
-                                if (cpIsOnRing) {
-                                    if( vIntersectInter.size() == 1) {
+                                if (cpIsOnRing)
+                                {
+                                    if( vIntersectInter.size() == 1)
+                                    {
                                         if( !mslToolPtr ) mslToolPtr = new epg::tools::MultiLineStringTool(polyWithoutHoles);
                                         std::pair< bool, ign::geometry::LineString > foundPath = mslToolPtr->getPath(cpGeom, vIntersectInter.front());
 
@@ -329,7 +354,8 @@ namespace app
 
                                         double length = foundPath.second.length();
 
-                                        if( length < pathLengthThreshold) {
+                                        if( length < pathLengthThreshold)
+                                        {
                                             if( !sectionGeomPtr ) sectionGeomPtr.reset(new ign::geometry::MultiLineString());
                                             sectionGeomPtr->asMultiLineString().addGeometry( ign::geometry::LineString(cpGeom, vInOutProj[i]) );
 
@@ -349,14 +375,14 @@ namespace app
                                         sectionGeomPtr->asMultiLineString().addGeometry( ign::geometry::LineString(cpGeom, vInOutProj[i]) );
                                     }
                                     else {
-                                        _logger->log(epg::log::ERROR, "More than one intermediate intersection on section : "+ign::geometry::LineString(cpGeom, vInOutProj[i]).toString());
+                                        _logger->log(epg::log::WARN, "More than one intermediate intersection on section : "+ign::geometry::LineString(cpGeom, vInOutProj[i]).toString());
                                     }
                                 }
                             }
                         }
 
                         if (!sectionGeomPtr) {
-                            _logger->log(epg::log::ERROR, "Unable to define section geometry from cutting point  : "+cpGeom.toString());
+                            _logger->log(epg::log::WARN, "Unable to define section geometry from cutting point  : "+cpGeom.toString());
                             continue;
                         }
 
@@ -547,6 +573,7 @@ namespace app
             //--
             app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
             double const distSnapMergeCf = themeParameters->getValue(DIST_SNAP_MERGE_CF).toDouble();
+            std::string const interAreaCode = themeParameters->getValue(INTERSECTION_AREA_CODE).toString();
 
             ign::feature::FeatureFilter filterCp("ST_INTERSECTS(" + geomName + ", ST_GeomFromText('" + poly.toString() + "'))");
             ign::feature::FeatureIteratorPtr itCp = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsCp, filterCp);
@@ -559,7 +586,7 @@ namespace app
                 std::string const& country = fCp.getAttribute(countryName).toString();
                 std::string cpId = fCp.getId();
 
-                if ( country == "#" )
+                if ( country == interAreaCode )
                     sIntersectionCp.insert(cpId);
 
                 if ( sMergedCp.find(cpId) != sMergedCp.end() ) continue;

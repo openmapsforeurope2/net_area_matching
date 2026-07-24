@@ -133,6 +133,12 @@ namespace app
 				//boucler sur les mp ?
 				ign::geometry::MultiPolygon geomArea = fArea.getGeometry().asMultiPolygon();
 
+
+				//DEBUG
+				// if( geomArea.distance(ign::geometry::Point(4057801.86, 2934164.46)) < 1 ) {
+				// 	bool test = true;
+				// }
+
 				ign::feature::Feature featCountry1, featCountry2;
 
 				ign::feature::FeatureFilter filterArroundAreaFromCountry1(countryCodeName + " LIKE '%" + _vCountry[0] + "%'");

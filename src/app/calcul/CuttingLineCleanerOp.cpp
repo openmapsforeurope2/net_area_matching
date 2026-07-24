@@ -111,7 +111,8 @@ namespace app
                 epg::tools::StringTools::Split(linkedFeatId, "#", sIds);
 
                 bool bDelete = true;
-                for (std::set<std::string>::const_iterator sit = sIds.begin() ; sit != sIds.end() ; ++sit) {
+                for (std::set<std::string>::const_iterator sit = sIds.begin() ; sit != sIds.end() ; ++sit)
+                {
                     ign::feature::Feature fArea;
 					ign::feature::FeatureFilter filterAreaLinked(natIdIdName +" LIKE '%" + *sit + "%'");
                     ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterAreaLinked);

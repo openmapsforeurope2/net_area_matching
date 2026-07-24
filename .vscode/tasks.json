@@ -58,7 +58,7 @@
         {
             "label": "run the code",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/net_area_matching net_area_matching_dev ./bin/net_area_matching --c config/epg_parameters.ini --s 20260605 fr lu",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/net_area_matching net_area_matching_dev ./bin/net_area_matching --sp 399 --c config/epg_parameters.ini --s 20260605 fr lu",
             "group": "build",
             "problemMatcher": []
         },

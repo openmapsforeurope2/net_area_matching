@@ -13,6 +13,7 @@
 #include <app/step/334_GenerateIntersectionAreas.h>
 #include <app/step/335_GenerateCuttingPoints.h>
 #include <app/step/340_MergeAreas.h>
+#include <app/step/345_GenerateCuttingPoints2.h>
 #include <app/step/350_SplitMergedAreasWithCF.h>
 #include <app/step/360_SetMergedAreasAttributes.h>
 #include <app/step/370_MergeSplitAreas.h>
@@ -32,6 +33,7 @@ namespace tools{
 		stepSuite.addStep( epg::step::factoryNew< GenerateIntersectionAreas >() );
 		stepSuite.addStep( epg::step::factoryNew< GenerateCuttingPoints >() );
 		stepSuite.addStep( epg::step::factoryNew< MergeAreas >() );
+		stepSuite.addStep( epg::step::factoryNew< GenerateCuttingPoints2 >() );
 		stepSuite.addStep( epg::step::factoryNew< SplitMergedAreasWithCF >() );
 		stepSuite.addStep( epg::step::factoryNew< SetMergedAreasAttributes >() );
 		stepSuite.addStep( epg::step::factoryNew< MergeSplitAreas >() );

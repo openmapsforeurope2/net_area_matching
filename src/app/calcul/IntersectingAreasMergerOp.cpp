@@ -96,6 +96,10 @@ namespace app
             std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
             std::string const idName = epgParams.getValue(ID).toString();
 
+            //--
+			app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
+			std::string const mergedAreaCode = themeParameters->getValue(MERGED_AREA_CODE).toString();
+
             size_t idCountryRef = 0;
 
             ign::feature::FeatureFilter filterArea(countryCodeName+" LIKE '%"+_vCountry[idCountryRef]+"%'");
@@ -130,7 +134,8 @@ namespace app
 
             boost::progress_display display2(lsAreas2Merge.size(), std::cout, "[ merging intersecting areas (2/2) % complete ]\n");
 
-            for (std::list<std::set<std::string>>::const_iterator lit = lsAreas2Merge.begin() ; lit != lsAreas2Merge.end() ; ++lit, ++display2) {
+            for (std::list<std::set<std::string>>::const_iterator lit = lsAreas2Merge.begin() ; lit != lsAreas2Merge.end() ; ++lit, ++display2)
+            {
                 ign::feature::FeatureFilter filterArea(idName + " IN " +_toSqlList(*lit));
                 ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterArea);
 
@@ -144,8 +149,9 @@ namespace app
                 }
 
                 ign::feature::Feature mergedFeat = _fsArea->newFeature();
-                mergedFeat.setAttribute(countryCodeName, ign::data::String("#"));
-                if (mergedGeomPtr->isMultiPolygon()) {
+                mergedFeat.setAttribute(countryCodeName, ign::data::String(mergedAreaCode));
+                if (mergedGeomPtr->isMultiPolygon())
+                {
                     ign::geometry::MultiPolygon const& mpResult = mergedGeomPtr->asMultiPolygon();
 
                     for ( size_t i = 0 ; i < mpResult.numGeometries() ; ++i) {

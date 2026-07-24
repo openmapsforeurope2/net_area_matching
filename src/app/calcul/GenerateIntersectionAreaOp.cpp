@@ -96,6 +96,7 @@ namespace app
 			//--
 			app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 			std::string const natIdIdName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
+			std::string const interAreaCode = themeParameters->getValue(INTERSECTION_AREA_CODE).toString();
 
             std::string country1 = _vCountry.front();
 			std::string country2 = _vCountry.back();
@@ -130,7 +131,7 @@ namespace app
 
 					if( geomPtr->isEmpty() ) continue;
 
-					_persistGeom(*geomPtr, "#", natId1+"#"+natId2);
+					_persistGeom(*geomPtr, interAreaCode, natId1+"#"+natId2);
 				}
             }
 		}
