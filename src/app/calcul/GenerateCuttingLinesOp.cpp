@@ -117,7 +117,8 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 
 	// theme paramaters
 	params::ThemeParameters * themeParameters = params::ThemeParametersS::getInstance();
-	std::string const natIdIdName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
+	std::string const natIdName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
+	std::string const linkedFeatSeparator = themeParameters->getValue(CUT_LINKED_FEATURE_SEPARATOR).toString();
 
 	//--
 	GraphType graphArea;
@@ -129,7 +130,8 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
     ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterCountry);
 	size_t numArea2load = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterCountry);
 	boost::progress_display displayGrapLoad(numArea2load, std::cout, "[ loading areas graph "+ countryCode +" % complete ]\n");
-    while (itArea->hasNext()){
+    while (itArea->hasNext())
+	{
 		++displayGrapLoad;
         ign::feature::Feature fArea = itArea->next();
         ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
@@ -137,7 +139,7 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 		for (size_t i = 0; i < mp.numGeometries(); ++i) {
 			planarizerGraphArea.addEdge(mp.polygonN(i).exteriorRing(), idOrigin);
 		}
-		mIdNatId[idOrigin] = fArea.getAttribute(natIdIdName).toString();
+		mIdNatId[idOrigin] = fArea.getAttribute(natIdName).toString();
     }
 	planarizerGraphArea.planarize();
 
@@ -145,7 +147,8 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 	GraphType::edge_iterator eit, eitEnd;
 	graphArea.edges(eit, eitEnd);
 	boost::progress_display displayGenerateCL(graphArea.numEdges(), std::cout, "[ generating cutting lines " + countryCode + " % complete ]\n");
-	while (eit != eitEnd) {
+	while (eit != eitEnd)
+	{
 		++displayGenerateCL;
 
 		std::vector<std::string> vCutlOrigins = graphArea.origins(*eit);
@@ -165,17 +168,16 @@ void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
 		featCutL.setGeometry(lsCutl);
 
 		std::string idLinkedValue;
-		for (std::set<std::string>::iterator sit = sCutlOrigins.begin(); sit != sCutlOrigins.end(); ++sit) {
+		for (std::set<std::string>::iterator sit = sCutlOrigins.begin(); sit != sCutlOrigins.end(); ++sit)
+		{
 			if (sit != sCutlOrigins.begin())
-				idLinkedValue+="#";
+				idLinkedValue += linkedFeatSeparator;
 			if(mIdNatId.find(*sit) != mIdNatId.end())
 				idLinkedValue += mIdNatId.find(*sit)->second;
 		}
 
 		featCutL.setAttribute(linkedFeatIdName, ign::data::String(idLinkedValue));
-
 		featCutL.setAttribute(countryCodeName, ign::data::String(countryCode));
-
 		_fsCutL->createFeature(featCutL);
 
 		++eit;

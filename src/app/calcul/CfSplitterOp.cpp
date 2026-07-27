@@ -249,9 +249,12 @@ namespace app
                         ign::geometry::Point const& cpGeom = mit_->second;
 
                         //DEBUG
-                        // if( cpGeom.distance(ign::geometry::Point(4057864.7920601, 2935241.4767348)) < 1) {
-                        //     bool test = true;
-                        // }
+                        if( cpGeom.distance(ign::geometry::Point(4017849.989, 2945356.294)) < 1) {
+                            bool test = true;
+                        }
+                        if( cpGeom.distance(ign::geometry::Point(4017852.980, 2945347.177)) < 1) {
+                            bool test = true;
+                        }
 
                         // on merge les autres CP proches
                         // TODO : faut-il privilégier les CP sur le contour ou ceux à l'intérieur du poly ?
@@ -386,13 +389,13 @@ namespace app
                             continue;
                         }
 
+                        _cleanSection(vIndexedSubLs, *sectionGeomPtr);
 
                         polySplitter.addCuttingGeometry(*sectionGeomPtr);
 
                         ign::feature::Feature feat;
                         feat.setGeometry(*sectionGeomPtr);
                         _shapeLogger->writeFeature("cfs_cutting_features", feat);
-
                     }
 
                     //--
@@ -445,6 +448,78 @@ namespace app
             for( std::set<std::string>::const_iterator sit = sArea2Delete.begin() ; sit!= sArea2Delete.end() ; ++sit )
                 _fsArea->deleteFeature(*sit);
         };
+
+        ///
+        ///
+        ///
+        void CfSplitterOp::_cleanSection(
+            std::vector<epg::tools::geometry::SegmentIndexedGeometryInterface*> const& vIndexedSubLs,
+            ign::geometry::Geometry & sectionGeom
+        ) const {
+            if( sectionGeom.isMultiLineString() ) {
+                ign::geometry::MultiLineString & mls = sectionGeom.asMultiLineString();
+                for ( size_t i = 0 ; i < mls.numGeometries() ; ++i ) {
+                    _changeEndingPoint(vIndexedSubLs, mls.lineStringN(i), START);
+                    _changeEndingPoint(vIndexedSubLs, mls.lineStringN(i), END);
+                }
+            } else if( sectionGeom.isLineString() ) {
+                ign::geometry::LineString & ls = sectionGeom.asLineString();
+                _changeEndingPoint(vIndexedSubLs, ls, START);
+                _changeEndingPoint(vIndexedSubLs, ls, END);
+            }
+        }
+
+        ///
+        ///
+        ///
+        void CfSplitterOp::_changeEndingPoint(
+            std::vector<epg::tools::geometry::SegmentIndexedGeometryInterface*> const& vIndexedSubLs,
+            ign::geometry::LineString & ls,
+            ENDING ending
+        ) const {
+
+            std::pair<bool, ign::geometry::Point> foundNextEnding = _getNextPoint(vIndexedSubLs, ending == START ? ls.startPoint() : ls.endPoint() );
+            if( foundNextEnding.first ) {
+                ign::geometry::LineString nextLs = ls;
+                if (ending == START) nextLs.startPoint() = foundNextEnding.second;
+                else nextLs.endPoint() = foundNextEnding.second;
+                if (foundNextEnding.second.distance(ls) < 0.5 && nextLs.length() < ls.length() && nextLs.length() > 1e-5) {
+                    ls = nextLs;
+                    _changeEndingPoint(vIndexedSubLs, ls, ending);
+                }
+            }
+            
+            std::pair<bool, ign::geometry::Point> foundPrevEnding = _getNextPoint(vIndexedSubLs, ending == START ? ls.startPoint() : ls.endPoint(), true );
+            if( foundPrevEnding.first ) {
+                ign::geometry::LineString prevLs = ls;
+                if (ending == START) prevLs.startPoint() = foundPrevEnding.second;
+                else prevLs.endPoint() = foundPrevEnding.second;
+                if (foundPrevEnding.second.distance(ls) < 0.5 && prevLs.length() < ls.length() && prevLs.length() > 1e-5) {
+                    ls = prevLs;
+                    _changeEndingPoint(vIndexedSubLs, ls, ending);
+                }
+            }
+        }
+
+        ///
+        ///
+        ///
+        std::pair<bool, ign::geometry::Point> CfSplitterOp::_getNextPoint(
+            std::vector<epg::tools::geometry::SegmentIndexedGeometryInterface*> const& vIndexedSubLs,
+            ign::geometry::Point & pt,
+            bool reverse
+        ) const {
+            std::vector<ign::geometry::LineString> vLs;
+            for ( size_t i = 0 ; i < vIndexedSubLs.size() ; ++i ) {
+               vIndexedSubLs[i]->getSegments( pt.getEnvelope().expandBy(1e-5), vLs );
+            }
+            for ( size_t i = 0 ; i < vLs.size() ; ++i ) {
+                ign::geometry::Point const& targetPoint = reverse ? vLs[i].startPoint() : vLs[i].endPoint();
+                if( pt.distance(targetPoint) > 1e-5 )
+                    return std::make_pair(true, targetPoint);
+            }
+            return std::make_pair(false, ign::geometry::Point());
+        }
 
         ///
         ///

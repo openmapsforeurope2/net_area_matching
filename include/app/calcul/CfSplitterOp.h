@@ -17,9 +17,14 @@ namespace calcul{
 
 	/// @brief Classe utilisée pour découper les surfaces avec les cutting features (cuttin points et cutting lines)
 	class CfSplitterOp {
+    private:
+        //--
+		enum ENDING{
+			START,
+			END
+		};
 
 	public:
-
 	
 		/// @brief Constructeur
 		/// @param verbose Mode verbeux
@@ -61,6 +66,26 @@ namespace calcul{
 
         //--
 		void _compute() const;
+
+        //--
+        void _cleanSection(
+            std::vector<epg::tools::geometry::SegmentIndexedGeometryInterface*> const& vIndexedSubLs,
+            ign::geometry::Geometry & sectionGeom
+        ) const;
+
+        //--
+        void _changeEndingPoint(
+            std::vector<epg::tools::geometry::SegmentIndexedGeometryInterface*> const& vIndexedSubLs,
+            ign::geometry::LineString & ls,
+            ENDING ending
+        ) const;
+
+        //--
+        std::pair<bool, ign::geometry::Point> _getNextPoint(
+            std::vector<epg::tools::geometry::SegmentIndexedGeometryInterface*> const& vIndexedSubLs,
+            ign::geometry::Point & pt,
+            bool reverse = false
+        ) const;
 
         //--
         bool _touchAlreadyHittenSubLs( 

@@ -93,8 +93,11 @@ namespace app
             epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
 			std::string const linkedFeatIdName = epgParams.getValue(LINKED_FEATURE_ID).toString();
             std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
+
+            //--
 			params::ThemeParameters * themeParameters = params::ThemeParametersS::getInstance();
 			std::string const natIdIdName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
+            std::string const linkedFeatSeparator = themeParameters->getValue(CUT_LINKED_FEATURE_SEPARATOR).toString();
 
             //--
             std::set<std::string> sCl2Delete;
@@ -108,7 +111,7 @@ namespace app
                 std::string linkedFeatId = fCl.getAttribute(linkedFeatIdName).toString();
 
                 std::set<std::string> sIds;
-                epg::tools::StringTools::Split(linkedFeatId, "#", sIds);
+                epg::tools::StringTools::Split(linkedFeatId, linkedFeatSeparator, sIds);
 
                 bool bDelete = true;
                 for (std::set<std::string>::const_iterator sit = sIds.begin() ; sit != sIds.end() ; ++sit)
@@ -117,7 +120,8 @@ namespace app
 					ign::feature::FeatureFilter filterAreaLinked(natIdIdName +" LIKE '%" + *sit + "%'");
                     ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterAreaLinked);
 	
-                    while(itArea->hasNext()) {
+                    while(itArea->hasNext())
+                    {
 						ign::feature::Feature fArea = itArea->next();
 						if (fArea.getGeometry().intersects(fCl.getGeometry())) {
 							bDelete = false;
