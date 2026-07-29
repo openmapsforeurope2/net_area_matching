@@ -21,168 +21,185 @@
 //OME2
 #include <ome2/calcul/detail/ClMerger.h>
 
-///
-///
-///
-app::calcul::GenerateCuttingLinesOp::GenerateCuttingLinesOp(
-    std::string borderCode,
-    bool verbose
-) : 
-	_borderCode(borderCode),
-    _verbose(verbose)
-{
-    _init();
-}
+namespace app {
+	namespace calcul
+    {
 
-///
-///
-///
-app::calcul::GenerateCuttingLinesOp::~GenerateCuttingLinesOp()
-{
-}
-
-///
-///
-///
-void app::calcul::GenerateCuttingLinesOp::Compute(
-	std::string borderCode, 
-	bool verbose
-) {
-	GenerateCuttingLinesOp op(borderCode, verbose);
-	op._compute();
-}
-
-///
-///
-///
-void app::calcul::GenerateCuttingLinesOp::_compute() const
-{
-	std::vector<std::string> vCountry;
-	epg::tools::StringTools::Split(_borderCode, "#", vCountry);
-
-	for (size_t i = 0; i < vCountry.size(); ++i) 
-		_generateCutlByCountry(vCountry[i]);
-	
-}
-
-///
-///
-///
-void app::calcul::GenerateCuttingLinesOp::_init()
-{
-    //--
-    _logger = epg::log::EpgLoggerS::getInstance();
-    _logger->log(epg::log::INFO, "[START] initialization: " + epg::tools::TimeTools::getTime());
-
-    //--
-    _shapeLogger = epg::log::ShapeLoggerS::getInstance();
-	//_shapeLogger->addShape("", epg::log::ShapeLogger::POLYGON);
-
-    //--
-    epg::Context *context = epg::ContextS::getInstance();
-
-    // epg parameters
-    epg::params::EpgParameters const& epgParams = context->getEpgParameters();
-    std::string const boundaryTableName = epgParams.getValue(TARGET_BOUNDARY_TABLE).toString();
-    std::string const areaTableName = epgParams.getValue(AREA_TABLE).toString();
-    std::string const idName = epgParams.getValue(ID).toString();
-    std::string const geomName = epgParams.getValue(GEOM).toString();
-    std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
-	std::string const linkedFeatIdName = context->getEpgParameters().getValue(LINKED_FEATURE_ID).toString();
-            
-    // app parameters
-    params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
-	std::string cutlTableName = themeParameters->getValue(CUTL_TABLE).toString();
-
-    //--
-	_fsArea = context->getDataBaseManager().getFeatureStore(areaTableName, idName, geomName);
-	_fsCutL = context->getDataBaseManager().getFeatureStore(cutlTableName, idName, geomName);
-
-    //--
-    _logger->log(epg::log::INFO, "[END] initialization: " + epg::tools::TimeTools::getTime());
-};
-
-///
-///
-///
-void app::calcul::GenerateCuttingLinesOp::_generateCutlByCountry(
-	std::string countryCode
-) const {
-	epg::Context *context = epg::ContextS::getInstance();
-
-    // epg parameters
-    epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
-    std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
-	std::string const linkedFeatIdName = context->getEpgParameters().getValue(LINKED_FEATURE_ID).toString();
-
-	// theme paramaters
-	params::ThemeParameters * themeParameters = params::ThemeParametersS::getInstance();
-	std::string const natIdName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
-	std::string const linkedFeatSeparator = themeParameters->getValue(CUT_LINKED_FEATURE_SEPARATOR).toString();
-
-	//--
-	GraphType graphArea;
-	ign::geometry::graph::tools::SnapRoundPlanarizer< GraphType >  planarizerGraphArea(graphArea, 100);
-
-	std::map<std::string, std::string> mIdNatId;
-
-	ign::feature::FeatureFilter filterCountry(countryCodeName + " LIKE '%" + countryCode + "%'");
-    ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterCountry);
-	size_t numArea2load = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterCountry);
-	boost::progress_display displayGrapLoad(numArea2load, std::cout, "[ loading areas graph "+ countryCode +" % complete ]\n");
-    while (itArea->hasNext())
-	{
-		++displayGrapLoad;
-        ign::feature::Feature fArea = itArea->next();
-        ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
-        std::string idOrigin = fArea.getId();
-		for (size_t i = 0; i < mp.numGeometries(); ++i) {
-			planarizerGraphArea.addEdge(mp.polygonN(i).exteriorRing(), idOrigin);
-		}
-		mIdNatId[idOrigin] = fArea.getAttribute(natIdName).toString();
-    }
-	planarizerGraphArea.planarize();
-
-	//--
-	GraphType::edge_iterator eit, eitEnd;
-	graphArea.edges(eit, eitEnd);
-	boost::progress_display displayGenerateCL(graphArea.numEdges(), std::cout, "[ generating cutting lines " + countryCode + " % complete ]\n");
-	while (eit != eitEnd)
-	{
-		++displayGenerateCL;
-
-		std::vector<std::string> vCutlOrigins = graphArea.origins(*eit);
-		std::set<std::string> sCutlOrigins;
-		for (size_t i = 0; i < vCutlOrigins.size(); ++i)
-			sCutlOrigins.insert(vCutlOrigins[i]);
-
-		if (sCutlOrigins.size() == 1) {
-			++eit;
-			continue;
-		}
-
-		ign::feature::Feature featCutL = _fsCutL->newFeature();
-
-		ign::geometry::LineString lsCutl = graphArea.getGeometry(*eit);
-		lsCutl.setFillZ(0);//temp
-		featCutL.setGeometry(lsCutl);
-
-		std::string idLinkedValue;
-		for (std::set<std::string>::iterator sit = sCutlOrigins.begin(); sit != sCutlOrigins.end(); ++sit)
+		///
+		///
+		///
+		GenerateCuttingLinesOp::GenerateCuttingLinesOp(
+			std::string borderCode,
+			bool verbose
+		) : 
+			_borderCode(borderCode),
+			_verbose(verbose)
 		{
-			if (sit != sCutlOrigins.begin())
-				idLinkedValue += linkedFeatSeparator;
-			if(mIdNatId.find(*sit) != mIdNatId.end())
-				idLinkedValue += mIdNatId.find(*sit)->second;
+			_init();
 		}
 
-		featCutL.setAttribute(linkedFeatIdName, ign::data::String(idLinkedValue));
-		featCutL.setAttribute(countryCodeName, ign::data::String(countryCode));
-		_fsCutL->createFeature(featCutL);
+		///
+		///
+		///
+		GenerateCuttingLinesOp::~GenerateCuttingLinesOp()
+		{
+		}
 
-		++eit;
+		///
+		///
+		///
+		void GenerateCuttingLinesOp::Compute(
+			std::string borderCode, 
+			bool verbose
+		) {
+			GenerateCuttingLinesOp op(borderCode, verbose);
+			op._compute();
+		}
+
+		///
+		///
+		///
+		void GenerateCuttingLinesOp::_compute() const
+		{
+			for (size_t i = 0; i < _vCountry.size(); ++i) 
+				_generateCutlByCountry(_vCountry[i]);
+		}
+
+		///
+		///
+		///
+		void GenerateCuttingLinesOp::_init()
+		{
+			//--
+			_logger = epg::log::EpgLoggerS::getInstance();
+			_logger->log(epg::log::INFO, "[START] initialization: " + epg::tools::TimeTools::getTime());
+
+			//--
+			_shapeLogger = epg::log::ShapeLoggerS::getInstance();
+			//_shapeLogger->addShape("", epg::log::ShapeLogger::POLYGON);
+
+			//--
+			epg::Context *context = epg::ContextS::getInstance();
+
+			// epg parameters
+			epg::params::EpgParameters const& epgParams = context->getEpgParameters();
+			std::string const boundaryTableName = epgParams.getValue(TARGET_BOUNDARY_TABLE).toString();
+			std::string const areaTableName = epgParams.getValue(AREA_TABLE).toString();
+			std::string const idName = epgParams.getValue(ID).toString();
+			std::string const geomName = epgParams.getValue(GEOM).toString();
+			std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
+			std::string const linkedFeatIdName = context->getEpgParameters().getValue(LINKED_FEATURE_ID).toString();
+					
+			// app parameters
+			params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
+			std::string cutlTableName = themeParameters->getValue(CUTL_TABLE).toString();
+
+			//--
+			epg::tools::StringTools::Split(_borderCode, "#", _vCountry);
+
+			//--
+			_fsArea = context->getDataBaseManager().getFeatureStore(areaTableName, idName, geomName);
+			_fsCutL = context->getDataBaseManager().getFeatureStore(cutlTableName, idName, geomName);
+
+			//--
+			_logger->log(epg::log::INFO, "[END] initialization: " + epg::tools::TimeTools::getTime());
+		};
+
+		///
+		///
+		///
+		void GenerateCuttingLinesOp::_generateCutlByCountry(
+			std::string countryCode
+		) const {
+			epg::Context *context = epg::ContextS::getInstance();
+
+			// epg parameters
+			epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
+			std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
+			std::string const linkedFeatIdName = context->getEpgParameters().getValue(LINKED_FEATURE_ID).toString();
+
+			// theme paramaters
+			params::ThemeParameters * themeParameters = params::ThemeParametersS::getInstance();
+			std::string const natIdName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
+			std::string const linkedFeatSeparator = themeParameters->getValue(CUT_LINKED_FEATURE_SEPARATOR).toString();
+
+			//--
+			GraphType graphArea;
+			ign::geometry::graph::tools::SnapRoundPlanarizer< GraphType >  planarizerGraphArea(graphArea, 100);
+
+			//--
+			std::map<std::string, std::string> mIdNatId;
+
+			std::string otherCountry = _getOtherCountry(countryCode);
+			ign::feature::FeatureFilter filterCountry(countryCodeName + " LIKE '%" + countryCode + "%' AND " + countryCodeName + " NOT LIKE '%" + otherCountry + "%'");
+			ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterCountry);
+
+			size_t numArea2load = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterCountry);
+			boost::progress_display displayGrapLoad(numArea2load, std::cout, "[ loading areas graph "+ countryCode +" % complete ]\n");
+			while (itArea->hasNext())
+			{
+				++displayGrapLoad;
+				ign::feature::Feature fArea = itArea->next();
+				ign::geometry::MultiPolygon const& mp = fArea.getGeometry().asMultiPolygon();
+				std::string idOrigin = fArea.getId();
+				for (size_t i = 0; i < mp.numGeometries(); ++i) {
+					planarizerGraphArea.addEdge(mp.polygonN(i).exteriorRing(), idOrigin);
+				}
+				mIdNatId[idOrigin] = fArea.getAttribute(natIdName).toString();
+			}
+			planarizerGraphArea.planarize();
+
+			//--
+			GraphType::edge_iterator eit, eitEnd;
+			graphArea.edges(eit, eitEnd);
+			boost::progress_display displayGenerateCL(graphArea.numEdges(), std::cout, "[ generating cutting lines " + countryCode + " % complete ]\n");
+			while (eit != eitEnd)
+			{
+				++displayGenerateCL;
+
+				std::vector<std::string> vCutlOrigins = graphArea.origins(*eit);
+				std::set<std::string> sCutlOrigins;
+				for (size_t i = 0; i < vCutlOrigins.size(); ++i)
+					sCutlOrigins.insert(vCutlOrigins[i]);
+
+				if (sCutlOrigins.size() == 1) {
+					++eit;
+					continue;
+				}
+
+				ign::feature::Feature featCutL = _fsCutL->newFeature();
+
+				ign::geometry::LineString lsCutl = graphArea.getGeometry(*eit);
+				lsCutl.setFillZ(0);//temp
+				featCutL.setGeometry(lsCutl);
+
+				std::string idLinkedValue;
+				for (std::set<std::string>::iterator sit = sCutlOrigins.begin(); sit != sCutlOrigins.end(); ++sit)
+				{
+					if (sit != sCutlOrigins.begin())
+						idLinkedValue += linkedFeatSeparator;
+					if(mIdNatId.find(*sit) != mIdNatId.end())
+						idLinkedValue += mIdNatId.find(*sit)->second;
+				}
+
+				featCutL.setAttribute(linkedFeatIdName, ign::data::String(idLinkedValue));
+				featCutL.setAttribute(countryCodeName, ign::data::String(countryCode));
+				_fsCutL->createFeature(featCutL);
+
+				++eit;
+			}
+
+			//fusion des CutL avec les mêmes linkedFeatIdName et qui se touchent (ou presque)
+			ome2::calcul::detail::ClMerger::mergeAll(_fsCutL, ign::feature::FeatureFilter());
+		}
+
+		///
+		///
+		///
+		std::string GenerateCuttingLinesOp::_getOtherCountry(
+			std::string const& country
+		) const {
+			return _vCountry.front() == country ? _vCountry.back() : _vCountry.front();
+		}
 	}
-
-	//fusion des CutL avec les mêmes linkedFeatIdName et qui se touchent (ou presque)
-	ome2::calcul::detail::ClMerger::mergeAll(_fsCutL, ign::feature::FeatureFilter());
-} 
+}

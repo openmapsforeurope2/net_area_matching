@@ -28,8 +28,10 @@ namespace app
         ///
         ///
         PolygonMergerOp::PolygonMergerOp(
+            std::string const& borderCode,
             bool verbose
         ) : 
+            _borderCode(borderCode),
             _verbose(verbose)
         {
             _init();
@@ -47,9 +49,10 @@ namespace app
         ///
         ///
         void PolygonMergerOp::Compute(
+            std::string const& borderCode,
 			bool verbose
 		) {
-            PolygonMergerOp PolygonMergerOp(verbose);
+            PolygonMergerOp PolygonMergerOp(borderCode, verbose);
             PolygonMergerOp._compute();
         }
 
@@ -76,12 +79,14 @@ namespace app
             std::string const geomName = epgParams.getValue(GEOM).toString();
 
             //--
+			epg::tools::StringTools::Split(_borderCode, "#", _vCountry);
+
+            //--
             _fsArea = context->getDataBaseManager().getFeatureStore(areaTableName, idName, geomName);
 
             //--
             _logger->log(epg::log::INFO, "[END] initialization: " + epg::tools::TimeTools::getTime());
         };
-
 
         ///
         ///
@@ -102,7 +107,8 @@ namespace app
 
             boost::progress_display display(lNatIds.size(), std::cout, "[ merging polygons % complete ]\n");
             
-            for( std::list<std::string>::const_iterator lit = lNatIds.begin(); lit != lNatIds.end() ; ++lit ) {
+            for( std::list<std::string>::const_iterator lit = lNatIds.begin(); lit != lNatIds.end() ; ++lit )
+            {
                 ++display;
 
                 ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,ign::feature::FeatureFilter(natIdName+"='"+*lit+"'"));
@@ -155,7 +161,6 @@ namespace app
             }
         }
 
-
         ///
         ///
         ///
@@ -166,11 +171,16 @@ namespace app
             // context
             epg::Context* context = epg::ContextS::getInstance();
 
+            //--
+            epg::params::EpgParameters const& epgParams = context->getEpgParameters();
+            std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
+
             // app parameters
             params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
             std::string const fieldName = themeParameters->getValue(NATIONAL_IDENTIFIER_NAME).toString();
 
-            std::string sql = "SELECT "+fieldName+", count(*) FROM "+tableName + " GROUP BY "+fieldName;
+            std::string whereStatement = countryCodeName + " = '" + _vCountry.front() + "' OR " + countryCodeName + " = '" + _vCountry.back() + "'";
+            std::string sql = "SELECT "+fieldName+", count(*) FROM "+tableName + " WHERE " + whereStatement + " GROUP BY "+fieldName;
 
             ign::sql::SqlResultSetPtr	resultPtr = context->getDataBaseManager().getConnection()->query( sql );
 

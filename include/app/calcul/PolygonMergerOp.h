@@ -21,8 +21,10 @@ namespace calcul{
 
 	
         /// @brief Constructeur
+		/// @param borderCode Code frontère (code double)
         /// @param verbose Mode verbeux
         PolygonMergerOp(
+			std::string const& borderCode,
             bool verbose
         );
 
@@ -31,11 +33,12 @@ namespace calcul{
 
 
 		/// @brief Lance la fusion des surfaces possédant le même identifiant national
+		/// @param borderCode Code frontère (code double)
 		/// @param verbose 
 		static void Compute(
+			std::string const& borderCode,
 			bool verbose
 		);
-
 
 	private:
 		//--
@@ -44,6 +47,10 @@ namespace calcul{
 		epg::log::EpgLogger*                                     _logger;
 		//--
 		epg::log::ShapeLogger*                                   _shapeLogger;
+		//--
+		std::string                                              _borderCode;
+		//--
+		std::vector<std::string>                                 _vCountry;
 		//--
 		bool                                                     _verbose;
 

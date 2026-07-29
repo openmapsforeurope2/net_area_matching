@@ -64,6 +64,8 @@ namespace calcul{
 		//--
 		std::string                                              _borderCode;
 		//--
+		std::vector<std::string>                                 _vCountry;
+		//--
 		bool                                                     _verbose;
 
 	private:

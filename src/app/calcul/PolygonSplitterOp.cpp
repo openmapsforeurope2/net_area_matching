@@ -28,7 +28,7 @@ namespace app
             std::string borderCode,
             bool verbose
         ) : 
-            _countryCode(borderCode),
+            _borderCode(borderCode),
             _verbose(verbose)
         {
             _init();
@@ -93,14 +93,15 @@ namespace app
             double const borderOffset = themeParameters->getValue(PS_BORDER_OFFSET).toDouble();
 			std::string const inlandwaterValue = themeParameters->getValue(TYPE_INLAND_WATER).toString();
 
-            //on recupere la geometry des pays
-            std::vector<std::string> vCountry;
-		    epg::tools::StringTools::Split(_countryCode, "#", vCountry);
+            //--
+			epg::tools::StringTools::Split(_borderCode, "#", _vCountry);
 
-            for (size_t i = 0 ; i < 2 ; ++i) {
+            //on recupere la geometry des pays
+            for (size_t i = 0 ; i < 2 ; ++i)
+            {
                 ign::geometry::MultiLineString* cuttingMlsPtr = new ign::geometry::MultiLineString();
                 ign::feature::sql::FeatureStorePostgis* fsLandmask = context->getDataBaseManager().getFeatureStore(landmaskTableName, idName, geomName);
-				ign::feature::FeatureIteratorPtr itLandmask = ome2::feature::sql::NotDestroyedTools::GetFeatures(*fsLandmask,ign::feature::FeatureFilter("(" + landCoverTypeName + " = '" + landAreaValue + "' OR " + landCoverTypeName + " = '" + inlandwaterValue + "') AND " + countryCodeName + " = '" + vCountry[i] + "'"));
+				ign::feature::FeatureIteratorPtr itLandmask = ome2::feature::sql::NotDestroyedTools::GetFeatures(*fsLandmask,ign::feature::FeatureFilter("(" + landCoverTypeName + " = '" + landAreaValue + "' OR " + landCoverTypeName + " = '" + inlandwaterValue + "') AND " + countryCodeName + " = '" + _vCountry[i] + "'"));
 				while (itLandmask->hasNext())
                 {
                     ign::feature::Feature fLandmask = itLandmask->next();
@@ -110,8 +111,8 @@ namespace app
 
                     _addLs(*bufferGeom, *cuttingMlsPtr);
                 }
-                _mCountryCuttingGeom.insert(std::make_pair(vCountry[i], cuttingMlsPtr));
-                _mCountryCuttingIndx.insert(std::make_pair(vCountry[i], new epg::tools::geometry::SegmentIndexedGeometry(cuttingMlsPtr)));
+                _mCountryCuttingGeom.insert(std::make_pair(_vCountry[i], cuttingMlsPtr));
+                _mCountryCuttingIndx.insert(std::make_pair(_vCountry[i], new epg::tools::geometry::SegmentIndexedGeometry(cuttingMlsPtr)));
 
                 ign::feature::Feature feat;
                 feat.setGeometry(*cuttingMlsPtr);
@@ -181,7 +182,7 @@ namespace app
             epg::params::EpgParameters const& epgParams = epg::ContextS::getInstance()->getEpgParameters();
             std::string const countryCodeName = epgParams.getValue(COUNTRY_CODE).toString();
 
-            ign::feature::FeatureFilter filterArea;
+            ign::feature::FeatureFilter filterArea( countryCodeName + " = '" + _vCountry.front() + "' OR " + countryCodeName + " = '" + _vCountry.back() + "'");
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ splitting polygons % complete ]\n");
 
@@ -206,7 +207,8 @@ namespace app
                 ign::geometry::MultiLineString mls(vLs);
 
                 std::vector< ign::geometry::Polygon > vPolygons;
-                for (size_t i = 0 ; i < mp.numGeometries() ; ++i) {
+                for (size_t i = 0 ; i < mp.numGeometries() ; ++i)
+                {
                     ign::geometry::Polygon const& p = mp.polygonN(i);
 
                     if (!p.intersects(mls)) continue;
@@ -218,7 +220,8 @@ namespace app
 
                 if (vPolygons.size() <= mp.numGeometries()) continue;
 
-                for (size_t i = 0 ; i < vPolygons.size() ; ++i) {
+                for (size_t i = 0 ; i < vPolygons.size() ; ++i)
+                {
                     ign::feature::Feature newFeat = fArea;
 
                     tools::zFiller(vPolygons[i], -1000); //TODO a parametrer

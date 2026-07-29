@@ -173,9 +173,9 @@ namespace app
 
                 //DEBUG
                 _logger->log(epg::log::DEBUG, "Area id : "+idOrigin);
-
+  
                 //DEBUG
-                // if( mp.distance(ign::geometry::Point(4057843, 2933858)) < 1 ) {
+                // if( mp.distance(ign::geometry::Point(4018583.23, 2945753.01)) < 1 ) {
                 //     bool test = true;
                 // }
 
@@ -247,14 +247,11 @@ namespace app
                         if ( sMergedCp.find(mit_->first) != sMergedCp.end() ) continue;
                         
                         ign::geometry::Point const& cpGeom = mit_->second;
-
+ 
                         //DEBUG
-                        if( cpGeom.distance(ign::geometry::Point(4017849.989, 2945356.294)) < 1) {
-                            bool test = true;
-                        }
-                        if( cpGeom.distance(ign::geometry::Point(4017852.980, 2945347.177)) < 1) {
-                            bool test = true;
-                        }
+                        // if( cpGeom.distance(ign::geometry::Point(4018596.4000, 2945752.1994)) < 1) {
+                        //     bool test = true;
+                        // }
 
                         // on merge les autres CP proches
                         // TODO : faut-il privilégier les CP sur le contour ou ceux à l'intérieur du poly ?

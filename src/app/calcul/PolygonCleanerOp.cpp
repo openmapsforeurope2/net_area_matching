@@ -103,11 +103,12 @@ namespace app
                 boundBuffPtr.reset(boundBuffPtr->Union(*tmpBuffPtr));
             }
 
-            //on recupere la geometry des pays
-            std::vector<std::string> vCountry;
-		    epg::tools::StringTools::Split(_borderCode, "#", vCountry);
+            //--
+			epg::tools::StringTools::Split(_borderCode, "#", _vCountry);
 
-            for (std::vector<std::string>::iterator vit = vCountry.begin() ; vit != vCountry.end() ; ++vit) {
+            //on recupere la geometry des pays
+            for (std::vector<std::string>::iterator vit = _vCountry.begin() ; vit != _vCountry.end() ; ++vit)
+            {
                 _mCountryGeomPtr.insert(std::make_pair(*vit, ign::geometry::GeometryPtr(new ign::geometry::Polygon()) ));
                 // ign::geometry::GeometryPtr landmaskUnionPtr(new ign::geometry::Polygon());
                 ign::feature::sql::FeatureStorePostgis* fsLandmask = context->getDataBaseManager().getFeatureStore(landmaskTableName, idName, geomName);
@@ -151,11 +152,11 @@ namespace app
             params::ThemeParameters *themeParameters = params::ThemeParametersS::getInstance();
             double const distanceMax = themeParameters->getValue(PC_DISTANCE_THRESHOLD).toDouble();
 
-            ign::feature::FeatureFilter filterArea;
+            ign::feature::FeatureFilter filterArea( countryCodeName + " = '" + _vCountry.front() + "' OR " + countryCodeName + " = '" + _vCountry.back() + "'");
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ cleaning polygons % complete ]\n");
 
-            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea);
+            ign::feature::FeatureIteratorPtr itArea = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea, filterArea);
             while (itArea->hasNext())
             {
                 ++display;

@@ -59,6 +59,8 @@ namespace calcul{
 		//--
 		std::string                                              _borderCode;
 		//--
+		std::vector<std::string>                                 _vCountry;
+		//--
 		bool                                                     _verbose;
 
 	private:
@@ -73,8 +75,11 @@ namespace calcul{
 		void _generateCutlByCountry(
 			std::string countryCode
 		) const;
-		
 
+		//--
+		std::string _getOtherCountry(
+			std::string const& country
+		) const;
     };
 
 }

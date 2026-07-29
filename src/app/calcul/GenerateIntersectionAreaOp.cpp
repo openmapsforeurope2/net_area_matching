@@ -101,7 +101,7 @@ namespace app
             std::string country1 = _vCountry.front();
 			std::string country2 = _vCountry.back();
 
-            ign::feature::FeatureFilter filterArea1(countryCodeName+" LIKE '%"+country1+"%'");
+            ign::feature::FeatureFilter filterArea1(countryCodeName+" LIKE '%"+country1+"%' AND "+countryCodeName+" NOT LIKE '%"+country2+"%'");
 
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea1);
             boost::progress_display display(numFeatures, std::cout, "[ computing area intersections % complete ]\n");
@@ -116,7 +116,7 @@ namespace app
                 ign::geometry::MultiPolygon const& areaGeom1 = fArea1.getGeometry().asMultiPolygon();
 				std::string const natId1 = fArea1.getAttribute(natIdIdName).toString();
 
-				ign::feature::FeatureFilter filterArea2(countryCodeName+" LIKE '%"+country2+"%'");
+				ign::feature::FeatureFilter filterArea2(countryCodeName+" LIKE '%"+country2+"%' AND "+countryCodeName+" NOT LIKE '%"+country1+"%'");
 				epg::tools::FilterTools::addAndConditions(filterArea2, "ST_INTERSECTS(" + geomName + ", ST_SetSRID(ST_GeomFromText('" + areaGeom1.toString() + "'),3035))");
 
 				ign::feature::FeatureIteratorPtr itArea2 = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsArea,filterArea2);

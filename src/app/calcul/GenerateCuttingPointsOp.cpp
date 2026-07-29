@@ -73,12 +73,9 @@ void app::calcul::GenerateCuttingPointsOp::_computeByCountry() const
 	epg::Context* context = epg::ContextS::getInstance();
 	std::string const countryCodeName = context->getEpgParameters().getValue(COUNTRY_CODE).toString();
 
-	std::vector<std::string> vCountry;
-	epg::tools::StringTools::Split(_borderCode, "#", vCountry);
-
-	for (size_t i = 0; i < vCountry.size(); ++i)
+	for (size_t i = 0; i < 2; ++i)
 	{
-		ign::feature::FeatureFilter filter(countryCodeName + " LIKE '%" + vCountry[i] + "%'");
+		ign::feature::FeatureFilter filter(countryCodeName + " LIKE '%" + _vCountry[i] + "%' AND " + countryCodeName + " NOT LIKE '%" + _vCountry[1-i] + "%'");
 		_generateCutp(filter, true);
 	}	
 }
@@ -111,6 +108,9 @@ void app::calcul::GenerateCuttingPointsOp::_init()
 	app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
 	std::string const cutlTableName = themeParameters->getValue(CUTL_TABLE).toString();
 	std::string const cutpTableName = themeParameters->getValue(CUTP_TABLE).toString();
+
+	//--
+	epg::tools::StringTools::Split(_borderCode, "#", _vCountry);
 
 	//--
 	_fsArea = context->getDataBaseManager().getFeatureStore(areaTableName, idName, geomName);

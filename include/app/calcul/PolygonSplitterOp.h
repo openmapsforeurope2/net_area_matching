@@ -55,7 +55,9 @@ namespace calcul{
 		//--
 		epg::log::ShapeLogger*                                   _shapeLogger;
 		//--
-		std::string                                              _countryCode;
+		std::string                                              _borderCode;
+		//--
+		std::vector<std::string>                                 _vCountry;
 		//--
 		bool                                                     _verbose;
 

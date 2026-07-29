@@ -85,7 +85,6 @@ namespace app
 		    epg::tools::StringTools::Split(_borderCode, "#", _vCountry);
         }
 
-
         ///
         ///
         ///
@@ -102,7 +101,7 @@ namespace app
 
             size_t idCountryRef = 0;
 
-            ign::feature::FeatureFilter filterArea(countryCodeName+" LIKE '%"+_vCountry[idCountryRef]+"%'");
+            ign::feature::FeatureFilter filterArea(countryCodeName+" LIKE '%"+_vCountry[idCountryRef]+"%' AND " + countryCodeName+ " NOT LIKE '%"+_vCountry[1-idCountryRef]+"%'");
 
             int numFeatures = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsArea, filterArea);
             boost::progress_display display(numFeatures, std::cout, "[ merging intersecting areas (1/2) % complete ]\n");
@@ -168,7 +167,6 @@ namespace app
             }
         }
 
-
         ///
         ///
         ///
@@ -185,7 +183,7 @@ namespace app
 
             std::list<std::pair<size_t, ign::geometry::MultiPolygon>> stack(1, std::make_pair(country, mp_));
             do  {
-                ign::feature::FeatureFilter filterArea(countryCodeName+" LIKE '%"+_vCountry[1-stack.front().first]+"%'");
+                ign::feature::FeatureFilter filterArea(countryCodeName+" LIKE '%"+_vCountry[1-stack.front().first]+"%' AND " + countryCodeName+" NOT LIKE '%"+_vCountry[stack.front().first]+"%'");
                 epg::tools::FilterTools::addAndConditions(filterArea, "ST_INTERSECTS(" + geomName + ", ST_SetSRID(ST_GeomFromText('" + stack.front().second.toString() + "'),3035))");
                 epg::tools::FilterTools::addAndConditions(filterArea, idName + " NOT IN " +_toSqlList(sIntersectingArea));
 
@@ -204,7 +202,6 @@ namespace app
 
             } while ( stack.size() > 0 );
         }
-
 
         ///
         ///

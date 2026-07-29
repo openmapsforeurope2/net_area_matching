@@ -41,7 +41,7 @@ namespace step {
 		app::calcul::PolygonCleanerOp::Compute(countryCodeW, verbose);
 
 		//--
-		app::calcul::PolygonMergerOp::Compute(verbose);
+		app::calcul::PolygonMergerOp::Compute(countryCodeW, verbose);
 	}
 
 }
