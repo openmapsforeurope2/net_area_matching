@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 	OperatorDetail << "set step :" << std::endl
 		<< stepSuite.toString();
 
-    po::options_description desc("Allowed options");./bin/net_area_matching --c config/epg_parameters.ini --s sami_20260907 lu be
+    po::options_description desc("Allowed options");
     desc.add_options()
         ("help", "produce help message")
         ("c" , po::value< std::string >(&epgParametersFile)     , "conf file" )
