@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 	OperatorDetail << "set step :" << std::endl
 		<< stepSuite.toString();
 
-    po::options_description desc("Allowed options");
+    po::options_description desc("Allowed options");./bin/net_area_matching --c config/epg_parameters.ini --s sami_20260907 lu be
     desc.add_options()
         ("help", "produce help message")
         ("c" , po::value< std::string >(&epgParametersFile)     , "conf file" )
@@ -122,11 +122,11 @@ int main(int argc, char *argv[])
         //table de travail
         if ( !suffix.empty() ) {
             std::string tableBaseName = themeParameters->getValue(AREA_TABLE_INIT_BASE).toString();
-            std::string tableName = tableBaseName + "_" + countries.front() + "_" + countries.back() + "_" + suffix;
+            std::string tableName = tableBaseName + "_" + suffix;
             themeParameters->setParameter(AREA_TABLE_INIT, ign::data::String(tableName));
 
             std::string standingWaterTableBaseName = themeParameters->getValue(AREA_TABLE_INIT_STANDING_WATER_BASE).toString();
-            std::string standingWaterTableName = standingWaterTableBaseName + "_" + countries.front() + "_" + countries.back() + "_" + suffix;
+            std::string standingWaterTableName = standingWaterTableBaseName + "_" + suffix;
             themeParameters->setParameter(AREA_TABLE_INIT_STANDING_WATER, ign::data::String(standingWaterTableName));
         }
         if ( themeParameters->getValue(CUTL_TABLE).toString() == "" )
